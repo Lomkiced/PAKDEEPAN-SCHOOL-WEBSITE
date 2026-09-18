@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── Colors: Pink / Light Blue / White ─── */
+  --color-primary: #f472b6; /* Light Pink/Coral */
+  --color-on-primary: #ffffff;
+  --color-primary-container: #fce7f3;
+  --color-on-primary-container: #831843;
+  --color-primary-fixed: #fbcfe8;
+  --color-primary-fixed-dim: #f9a8d4;
+  --color-on-primary-fixed: #831843;
+  --color-on-primary-fixed-variant: #db2777;
+
+  --color-secondary: #38bdf8; /* Light Blue */
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e0f2fe;
+  --color-on-secondary-container: #0369a1;
+  --color-secondary-fixed: #bae6fd;
+  --color-secondary-fixed-dim: #7dd3fc;
+  --color-on-secondary-fixed: #0c4a6e;
+  --color-on-secondary-fixed-variant: #0284c7;
+
+  --color-tertiary: #0284c7; /* Light Blue accent */
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #e0f2fe;
+  --color-on-tertiary-container: #075985;
+  --color-tertiary-fixed: #bae6fd;
+  --color-tertiary-fixed-dim: #7dd3fc;
+  --color-on-tertiary-fixed: #075985;
+  --color-on-tertiary-fixed-variant: #0369a1;
+
+  --color-background: #ffffff;
+  --color-on-background: #0f172a;
+  --color-surface: #ffffff;
+  --color-on-surface: #0f172a;
+  --color-surface-variant: #f1f5f9;
+  --color-on-surface-variant: #475569;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #e2e8f0;
+  
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  --color-surface-container-highest: #cbd5e1;
+
+  --color-inverse-surface: #1e293b;
+  --color-inverse-on-surface: #f1f5f9;
+  --color-inverse-primary: #fbcfe8;
+  --color-surface-tint: #f472b6;
+
+  --color-outline: #64748b;
+  --color-outline-variant: #cbd5e1;
+
+  --color-error: #ef4444;
+  --color-on-error: #ffffff;
+  --color-error-container: #fee2e2;
+  --color-on-error-container: #991b1b;
+
+  /* Feature Pastel Colors */
+  --color-feat-pink: #fdf2f8;
+  --color-on-feat-pink: #db2777;
+  --color-feat-blue: #eff6ff;
+  --color-on-feat-blue: #2563eb;
+  --color-feat-yellow: #fefce8;
+  --color-on-feat-yellow: #ca8a04;
+  --color-feat-green: #f0fdf4;
+  --color-on-feat-green: #16a34a;
+  --color-feat-purple: #faf5ff;
+  --color-on-feat-purple: #9333ea;
+
+  /* Border Radius */
+  --radius-DEFAULT: 0.75rem; /* More rounded by default */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-stack-lg: 48px;
+  --spacing-stack-md: 24px;
+  --spacing-stack-sm: 12px;
+  --spacing-container-max: 1120px;
+  --spacing-section-padding: 80px;
+  --spacing-margin-mobile: 20px;
+  --spacing-gutter: 24px;
+  --spacing-unit: 8px;
+
+  /* Font Families */
+  --font-sherlina: var(--font-sherlina), 'Satisfy', cursive;
+  --font-handwriting: var(--font-sherlina), var(--font-satisfy), 'Satisfy', cursive;
+  --font-marker: var(--font-sherlina), var(--font-mali), 'Mali', cursive;
+  --font-label-caps: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif;
+  --font-body-lg: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif;
+  --font-body-md: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif;
+  --font-display-lg-mobile: var(--font-outfit), 'Outfit', sans-serif;
+  --font-display-lg: var(--font-outfit), 'Outfit', sans-serif;
+  --font-headline-md: var(--font-outfit), 'Outfit', sans-serif;
+  --font-headline-sm: var(--font-outfit), 'Outfit', sans-serif;
+  --font-sans: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif;
+  --font-serif: var(--font-outfit), 'Outfit', sans-serif;
+
+  /* Font Sizes */
+  --text-label-caps: 12px;
+  --text-label-caps--line-height: 1.0;
+  --text-label-caps--letter-spacing: 0.1em;
+  --text-label-caps--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 300;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-display-lg-mobile: 32px;
+  --text-display-lg-mobile--line-height: 1.2;
+  --text-display-lg-mobile--font-weight: 700;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.2;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-headline-md: 32px;
+  --text-headline-md--line-height: 1.3;
+  --text-headline-md--font-weight: 400;
+
+  --text-headline-sm: 24px;
+  --text-headline-sm--line-height: 1.4;
+  --text-headline-sm--font-weight: 400;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-outline-variant);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}

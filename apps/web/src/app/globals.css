@@ -1,0 +1,6 @@
+@import "@pakdeepan/ui/theme.css";
+@source "../../../../packages/ui/src";
+
+.font-sherlina {
+  font-family: var(--font-sherlina), cursive;
+}

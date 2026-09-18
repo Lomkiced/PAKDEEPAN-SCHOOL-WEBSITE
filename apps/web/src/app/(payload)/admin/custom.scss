@@ -1,0 +1,97 @@
+/* Custom Admin Styling for Pakdeepan Kindergarten */
+/* Overriding Payload's default CSS variables with the brand theme */
+
+@layer payload-default {
+  :root {
+    /* Base Backgrounds (White theme) */
+    --theme-bg: #ffffff;
+    --theme-elevation-50: #f8fafc;
+    --theme-elevation-100: #f1f5f9;
+    --theme-elevation-150: #e2e8f0;
+    --theme-elevation-200: #cbd5e1;
+    --theme-elevation-250: #94a3b8;
+    --theme-elevation-300: #64748b;
+    --theme-elevation-400: #475569;
+    --theme-elevation-500: #334155;
+    
+    /* Text Colors */
+    --theme-text: #1e293b;
+    --theme-text-dim: #64748b;
+    
+    /* Brand Primary (Light Blue: #38bdf8) */
+    --theme-success-100: #e0f2fe;
+    --theme-success-200: #bae6fd;
+    --theme-success-250: #7dd3fc;
+    --theme-success-300: #38bdf8;
+    --theme-success-400: #0ea5e9;
+    --theme-success-500: #0284c7;
+    --theme-success-550: #0369a1;
+    --theme-success-600: #075985;
+    
+    /* Brand Accent (Light Pink: #f472b6) */
+    --theme-error-100: #fce7f3;
+    --theme-error-200: #fbcfe8;
+    --theme-error-250: #f9a8d4;
+    --theme-error-300: #f472b6;
+    --theme-error-400: #ec4899;
+    --theme-error-500: #db2777;
+    --theme-error-550: #be185d;
+    --theme-error-600: #9f1239;
+    
+    /* Focus & Highlights */
+    --theme-focus-color: var(--theme-success-500);
+
+    /* Fonts */
+    --font-body: 'Quicksand', sans-serif;
+    --font-heading: 'Nunito', sans-serif;
+  }
+
+  /* Force light mode variables across the board for branding consistency if desired */
+  [data-theme='dark'] {
+    /* Keep a clean dark mode but inject our brand blues and pinks */
+    --theme-bg: #0f172a;
+    --theme-elevation-50: #1e293b;
+    --theme-elevation-100: #334155;
+    --theme-elevation-150: #475569;
+    --theme-elevation-200: #64748b;
+    --theme-elevation-250: #94a3b8;
+    
+    --theme-text: #f8fafc;
+    --theme-text-dim: #94a3b8;
+  }
+
+  /* Admin Header Logo Area */
+  .app-header .logo,
+  .nav .logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--theme-success-500);
+    letter-spacing: -0.02em;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .nav .logo::after {
+    content: "Pakdeepan CMS";
+  }
+  
+  .app-header .logo svg,
+  .nav .logo svg {
+    display: none; /* Hide default Payload logo */
+  }
+
+  /* Custom Login Page Styling */
+  .template-default {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+  }
+  
+  .template-default__wrap {
+    box-shadow: 0 25px 50px -12px rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "home": {
+    "hero": {
+      "badge": "Admissions Open for 2024-2025",
+      "titlePart1": "A Foundation for a",
+      "titlePart2": "Beautiful Future",
+      "description": "Nurturing curiosity, building character, and empowering the next generation of global citizens.",
+      "ctaPrimary": "Begin Application",
+      "ctaSecondary": "Explore Our Campus",
+      "scrollLabel": "Discover"
+    },
+    "personas": {
+      "badge": "Our Community",
+      "title": "Designed for Every Journey",
+      "prospectiveTitle": "Prospective Families",
+      "prospectiveDesc": "Begin your journey with us. Explore our ethos and seamless admissions process.",
+      "prospectiveLink": "Learn More",
+      "parentsTitle": "Current Parents",
+      "parentsDesc": "Access real-time updates, campus news, and resources to support your child.",
+      "parentsLink": "View Campus Life",
+      "studentsTitle": "Students",
+      "studentsDesc": "A safe, inspiring space where young minds flourish through play and discovery daily.",
+      "studentsLink": "Our Philosophy"
+    },
+    "philosophy": {
+      "badge": "Why Pakdeepan?",
+      "title": "An Environment for Growth",
+      "description": "We believe early childhood is the most critical phase of human development. Our approach ensures every child reaches their maximum potential.",
+      "card1Badge": "Play-Based Learning",
+      "card1Title": "Curiosity is our Curriculum",
+      "card1Desc": "Our modern play-based curriculum encourages children to explore their world organically, fostering deep critical thinking skills.",
+      "card2Title": "Unmatched Safety",
+      "card2Desc": "24/7 security, medical staff on-site, and rigorous child protection policies.",
+      "card3Title": "Global Standards",
+      "card3Desc": "Fully accredited curriculum preparing students for top-tier primary schools worldwide.",
+      "card3Link": "Read Our Story"
+    },
+    "programs": {
+      "title": "Academic Programs",
+      "description": "Tailored educational stages designed to meet the precise developmental needs of your child.",
+      "toddlers": {
+        "title": "Toddlers",
+        "age": "Ages 1-3",
+        "desc": "Focusing on sensory exploration, motor skills, and early language development in a highly nurturing space.",
+        "point1": "1:4 Teacher Ratio",
+        "point2": "Sensory Play"
+      },
+      "prek": {
+        "title": "Pre-K",
+        "age": "Ages 3-4",
+        "desc": "Introducing structured routines, collaborative play, and foundational concepts in math and literacy.",
+        "point1": "Phonics Introduction",
+        "point2": "Social Emotional Learning"
+      },
+      "kindergarten": {
+        "title": "Kindergarten",
+        "age": "Ages 4-6",
+        "desc": "Full academic preparation ensuring a confident and seamless transition to primary school environments.",
+        "point1": "Advanced Literacy",
+        "point2": "STEM Projects"
+      }
+    },
+    "news": {
+      "badge": "Latest Updates",
+      "title": "Campus News & Events",
+      "link": "View All Activity",
+      "emptyText": "Check back soon for the latest campus news!",
+      "emptyLink": "Add News in CMS"
+    },
+    "events": {
+      "badge": "Next Upcoming Event",
+      "today": "HAPPENING TODAY",
+      "location": "Location",
+      "link": "View Calendar",
+      "emptyText": "No upcoming events scheduled.",
+      "emptyLink": "Add Event in CMS"
+    },
+    "gallery": {
+      "title": "A Glimpse of Campus Life",
+      "description": "Modern facilities perfectly designed to stimulate young minds safely.",
+      "emptyText": "Upload photos to the Gallery CMS to see them here.",
+      "link": "View Full Gallery"
+    },
+    "cta": {
+      "titlePart1": "Ready to Begin Your",
+      "titlePart2": "Child's Journey?",
+      "description": "Admissions are currently open for the upcoming academic year. Secure your child's place in our community today.",
+      "primaryBtn": "Apply Now",
+      "secondaryBtn": "Schedule a Tour"
+    }
+  },
+  "finance": {
+    "currency": "Baht",
+    "currencySymbol": "฿",
+    "currencyCode": "THB",
+    "tuitionAndFees": "Tuition & Fees",
+    "tuitionFee": "Base Tuition",
+    "perTerm": "per term",
+    "perYear": "per academic year",
+    "perMonth": "per month",
+    "oneTime": "one-time entrance fee",
+    "admissionFee": "Admission Fee",
+    "additionalFees": "Additional Fees",
+    "totalEstimate": "Estimated Total",
+    "promptPayQR": "Pay via PromptPay QR",
+    "bankTransfer": "Bank Transfer",
+    "uploadSlip": "Upload Transfer Slip",
+    "downloadSyllabus": "Download Syllabus (PDF)"
+  },
+  "about": {
+    "visionTitle": "Our Vision",
+    "missionTitle": "Our Mission",
+    "messageTitle": "A Message from the Principal"
+  },
+  "programs": {
+    "title": "Academic Programs",
+    "description": "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum.",
+    "subtitle": "Programs by Age"
+  },
+  "contact": {
+    "title": "Connect With Us",
+    "description": "We welcome your inquiries and look forward to discussing how Pakdeepan Kindergarten School can be part of your family's educational journey."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated",
+    "contents": "Contents",
+    "intro": "At Pakdeepan Kindergarten School, we are committed to protecting the privacy and security of our students, parents, staff, and broader community. This Privacy Policy outlines how we collect, use, and safeguard personal information in a manner that aligns with our core values of transparency and trust.",
+    "informationCollection": "Information Collection",
+    "useOfInformation": "Use of Information",
+    "dataProtection": "Data Protection",
+    "childPrivacy": "Child Privacy",
+    "contactUs": "Contact Us"
+  }
+}
