@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { PlayCircle, BookOpen, Users, Star, Leaf, GlobeHemisphereWest, GraduationCap, FileText, CalendarBlank, UserList, Book, ArrowRight, Heart } from "@phosphor-icons/react"
+import { PlayCircle, BookOpen, Users, Star, Leaf, GlobeHemisphereWest, GraduationCap, FileText, CalendarBlank, UserList, ArrowRight, Heart } from "@phosphor-icons/react"
 import { FadeIn, StaggerContainer, StaggerItem, WaveDivider } from "@pakdeepan/ui"
+import { HeroScrollytelling } from "./_components/HeroScrollytelling"
 
 interface HomeClientProps {
   news: any[];
@@ -24,145 +25,109 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
     { icon: GlobeHemisphereWest, title: "Global Mindset", desc: "Preparing students for a brighter tomorrow." },
   ]
 
-  const QUICK_LINKS = [
-    { icon: GraduationCap, title: "Academic Programs", href: "/programs" },
-    { icon: FileText, title: "Admissions & Enrollment", href: "/admissions" },
-    { icon: CalendarBlank, title: "School Calendar", href: "/campus-life" },
-    { icon: UserList, title: "Parent Portal", href: "#" },
-    { icon: Book, title: "Student Resources", href: "#" },
+  const EDITORIAL_PATHWAYS = [
+    {
+      icon: GraduationCap,
+      title: "Academic Programs",
+      desc: "Early years, kindergarten, and primary bilingual curricula.",
+      href: "/programs",
+    },
+    {
+      icon: FileText,
+      title: "Admissions & Enrollment",
+      desc: "Transparent tuition fees, requirements, and guided enrollment.",
+      href: "/admissions",
+    },
+    {
+      icon: CalendarBlank,
+      title: "Campus Life & Calendar",
+      desc: "Milestones, student events, celebrations, and photo albums.",
+      href: "/campus-life",
+    },
   ]
 
   return (
     <div className="flex flex-col bg-background font-sans overflow-x-hidden">
       <main className="flex-grow pt-20">
 
-        {/* --- HERO SECTION --- */}
-        <section className="relative w-full min-h-[85vh] lg:min-h-[90vh] flex items-center bg-gradient-to-b from-[#e0f2fe] to-[#bae6fd] pt-10 pb-32">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-            
-            {/* Left Content */}
-            <FadeIn delay={0.2} className="max-w-xl">
-              <div className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4 font-sherlina text-lg sm:text-xl md:text-2xl text-primary select-none leading-normal">
-                <span>Learn</span>
-                <Heart size={16} weight="regular" className="text-secondary" />
-                <span>Grow</span>
-                <Heart size={16} weight="regular" className="text-secondary" />
-                <span className="text-secondary">Build Your Future</span>
-              </div>
-              
-              <h1 className="font-display-lg text-[48px] md:text-[64px] lg:text-[72px] leading-[1.1] text-on-background mb-6 tracking-tight font-extrabold text-[#1e3a8a]">
-                Welcome to <br />
-                <span className="text-primary">Pakdeepan</span> School
-              </h1>
-              
-              <p className="font-body-lg text-[18px] md:text-[22px] text-on-surface-variant mb-10 opacity-90 max-w-lg">
-                A nurturing place where great minds grow, good hearts lead, and bright futures begin.
-              </p>
-              
-              <div className="flex flex-wrap items-center gap-4">
-                <Link href="/about" className="flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-white font-bold text-sm hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all active:scale-95">
-                  Discover Our School <ArrowRight size={18} weight="bold" />
-                </Link>
-                <button className="flex items-center gap-2 px-8 py-4 rounded-full bg-white text-[#1e3a8a] font-bold text-sm border border-outline-variant/20 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95">
-                  <PlayCircle size={24} weight="fill" className="text-secondary" /> Watch Video
-                </button>
-              </div>
-            </FadeIn>
+        {/* --- VIDEO-DRIVEN SCROLLYTELLING HERO SECTION --- */}
+        <HeroScrollytelling />
 
-            {/* Right Media */}
-            <FadeIn direction="left" delay={0.4} className="relative hidden lg:block">
-              {/* Decorative Dashed Path */}
-              <svg className="absolute -top-16 -left-16 w-32 h-32 text-primary opacity-50 z-0" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6">
-                <path d="M10 90 Q 50 10 90 90" />
-              </svg>
-              
-              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <img 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4pFr4Rtg57zWkhknWtnKwDkVjjIQMY3ysqyC8fxM0_5yC5d6ftiv2JkfKscMoRrrTy_HNC0xwSiadwgdyXb_bV80CCTVPqalaNTdM2wmZHvf6Npf0381Or3KQY7LwH2SIFQVpj055Q22JPLzO8rONPxje913WGxb2yseMLLDZV5wxO8F9Tsd6fe-kfTpQQ7cCFTjzSBsFOxq6QcA7LA9PNpocYeDwhJBMZogAfK1v3Z02zY2hdn7Vtw" 
-                  alt="Pakdeepan School Building" 
-                  className="w-full h-[500px] object-cover"
-                />
-              </div>
-              
-              {/* Elegant floating accent */}
-              <div className="absolute top-1/2 -left-6 text-primary opacity-80 z-20 transform -translate-y-1/2 pointer-events-none">
-                <Heart size={32} weight="regular" />
-              </div>
-            </FadeIn>
-          </div>
-
-          <WaveDivider className="text-white fill-white" />
-        </section>
-
-        {/* --- FEATURES GRID (Overlapping Hero) --- */}
-        <section className="relative z-20 -mt-24 md:-mt-32 pb-8 md:pb-12">
+        {/* --- UNIFIED FLOATING FEATURE DOCK (Overlapping Hero) --- */}
+        <section className="relative z-40 -mt-20 sm:-mt-24 md:-mt-32 pb-8 md:pb-12">
           <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20">
-            <StaggerContainer className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {FEATURES.map((feat, idx) => (
-                <StaggerItem key={idx}>
-                  <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-slate-200/50 flex flex-col items-center text-center h-full transform transition-all hover:-translate-y-2 hover:shadow-2xl group">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      <feat.icon size={32} weight="fill" />
+            <FadeIn delay={0.3}>
+              <div className="bg-white rounded-3xl md:rounded-[32px] shadow-2xl shadow-slate-200/80 border border-slate-100/90 overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+                  {FEATURES.map((feat, idx) => (
+                    <div 
+                      key={idx} 
+                      className="py-6 px-5 lg:py-7 lg:px-6 flex flex-col items-center text-center group hover:bg-slate-50/70 transition-all duration-300"
+                    >
+                      {/* Refined Icon Badge (Single-Color Uniformity Rule) */}
+                      <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm shadow-primary/10">
+                        <feat.icon size={22} weight="fill" />
+                      </div>
+                      
+                      {/* Pillar Title */}
+                      <h3 className="font-bold text-[#1e3a8a] text-sm lg:text-[15px] mb-1.5 leading-snug tracking-tight group-hover:text-primary transition-colors">
+                        {feat.title}
+                      </h3>
+                      
+                      {/* Description */}
+                      <p className="text-xs text-on-surface-variant leading-relaxed max-w-[200px]">
+                        {feat.desc}
+                      </p>
                     </div>
-                    <h3 className="font-bold text-[#1e3a8a] mb-2">{feat.title}</h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">{feat.desc}</p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+                  ))}
+                </div>
+              </div>
+            </FadeIn>
           </div>
         </section>
 
         {/* --- ABOUT SECTION --- */}
-        <section className="pt-4 md:pt-6 pb-20 md:pb-24 overflow-hidden relative">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section className="relative overflow-hidden bg-white pt-24 pb-20 md:pt-32 md:pb-28">
+          <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             
-            <FadeIn direction="right" className="relative flex justify-center items-center py-4">
-              {/* Layered Architectural Backdrop Frame */}
-              <div className="absolute w-full max-w-[360px] sm:max-w-[400px] md:max-w-[430px] aspect-[4/5] rounded-t-[180px] md:rounded-t-[210px] rounded-b-[2.5rem] bg-gradient-to-tr from-[#e0f2fe]/80 via-white to-[#fce7f3]/70 border-2 border-primary/20 transform -rotate-3 -translate-x-3 translate-y-3 -z-10 shadow-lg shadow-slate-200/40" />
-
-              {/* Ambient Glows */}
-              <div className="absolute -left-8 -bottom-8 w-64 h-64 bg-[#e0f2fe]/60 rounded-full filter blur-3xl -z-20 pointer-events-none" />
-              <div className="absolute -right-8 -top-8 w-64 h-64 bg-[#fce7f3]/50 rounded-full filter blur-3xl -z-20 pointer-events-none" />
-
-              {/* Primary Architectural Arch Frame */}
-              <div className="relative w-full max-w-[360px] sm:max-w-[400px] md:max-w-[430px] aspect-[4/5] rounded-t-[170px] md:rounded-t-[200px] rounded-b-[2.25rem] overflow-hidden border-4 border-white shadow-2xl shadow-slate-300/50 bg-white group">
-                <img 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyKNAH0uMIHB7BsuRGJl2DIkH4CU_BioL8fq6YoUQPZuiOd9shQSfDZzyBqhWqMQ37j1yfDkdPBXFw7y1ud5RN-NW0BNnmrvVlUvfEsQj6a1vwKdw-9o87sgsUQt6_2teQA7YxPJo_j8nG8acwXjoFkKzdc1I5XeU_WvW410L_321eFLeY4d5j1T3slxA8opAH6iJOq7ehTB8BtS9Xp0v7a8YkqGH07bIEbRACICN-EtkHUeKphJI1YQ" 
-                  alt="Pakdeepan students walking together" 
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-
-                {/* Subtle Inner Ring */}
-                <div className="absolute inset-0 rounded-t-[166px] md:rounded-t-[196px] rounded-b-[2.1rem] ring-1 ring-inset ring-black/5 pointer-events-none" />
-              </div>
-
-              {/* Floating Trust Badge (Top-Right) */}
-              <div className="absolute -top-3 right-0 sm:right-2 md:right-4 z-20 bg-white/95 backdrop-blur-md py-2 px-4 rounded-full shadow-lg shadow-slate-200/60 border border-slate-100 flex items-center gap-2.5 transform hover:scale-105 transition-transform cursor-default">
-                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <GraduationCap size={16} weight="fill" />
+            {/* Left Column: Seamless Faded Image */}
+            <div className="relative w-full h-[400px] md:h-[500px] lg:h-[700px]">
+              <FadeIn direction="right" className="absolute inset-0 w-full h-full">
+                <div 
+                  className="w-full h-full"
+                  style={{
+                    maskImage: 'radial-gradient(circle at center left, black 30%, transparent 80%)',
+                    WebkitMaskImage: 'radial-gradient(circle at center left, black 30%, transparent 80%)'
+                  }}
+                >
+                  <img 
+                    src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop" 
+                    alt="Students learning at Pakdeepan School" 
+                    className="w-full h-full object-cover object-[center_35%]"
+                  />
                 </div>
-                <span className="font-bold text-xs text-[#1e3a8a] tracking-wide">Holistic Early Education</span>
-              </div>
-
-              {/* Signature Sherlina Script Accent */}
-              <div className="absolute -bottom-7 right-0 sm:right-4 transform rotate-[-6deg] z-20 pointer-events-none select-none">
-                <p className="font-sherlina text-xl sm:text-2xl md:text-[28px] text-primary leading-tight text-right drop-shadow-sm">
-                  Small steps today, <br className="hidden sm:inline" /> big dreams tomorrow
-                  <Heart size={18} weight="regular" className="inline-block ml-1 text-primary align-middle" />
+              </FadeIn>
+            </div>
+            
+            {/* Right Column: Content */}
+            <FadeIn direction="left" className="px-5 md:px-10 lg:pr-20">
+              
+              {/* Signature Sherlina Script Quote */}
+              <div className="mb-4 transform rotate-[-3deg] inline-block">
+                <p className="font-sherlina text-[28px] md:text-4xl text-primary leading-tight drop-shadow-sm">
+                  Small steps today, big dreams tomorrow
+                  <Heart size={24} weight="fill" className="inline-block ml-2 text-primary align-middle" />
                 </p>
               </div>
-            </FadeIn>
 
-            <FadeIn direction="left" className="pt-10 lg:pt-0">
-              <h2 className="font-display-lg text-[40px] md:text-[48px] text-[#1e3a8a] font-extrabold mb-6 leading-tight tracking-tight">
+              <h2 className="font-display-lg text-[40px] md:text-[48px] lg:text-[56px] text-[#1e3a8a] font-extrabold mb-6 leading-tight tracking-tight drop-shadow-sm">
                 About <span className="text-primary">Pakdeepan School</span>
               </h2>
               <p className="font-body-lg text-[17px] md:text-[18px] text-on-surface-variant mb-10 leading-relaxed max-w-xl">
                 Pakdeepan School is committed to providing high-quality education that empowers every learner to reach their full potential. We believe that education is not just about academics, but also about character, creativity, and kindness.
               </p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 border-t border-b border-outline-variant/30 py-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 border-t border-b border-slate-100 py-8">
                 <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -192,47 +157,73 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
                 </div>
               </div>
 
-              <Link href="/about" className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 transition-all">
+              <Link href="/about" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-white font-bold hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 transition-all active:scale-95">
                 Learn More About Us <ArrowRight size={18} weight="bold" />
               </Link>
             </FadeIn>
+            
           </div>
         </section>
 
-        {/* --- QUICK LINKS SECTION --- */}
-        <section className="bg-primary/5 py-24 border-y border-primary/10">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 grid grid-cols-1 lg:grid-cols-4 gap-12 items-center">
+        {/* --- EDUCATIONAL PATHWAYS SECTION --- */}
+        <section className="py-12 md:py-16 bg-white relative">
+          <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20">
             
-            <FadeIn direction="right" className="lg:col-span-1">
-              <span className="text-xs font-bold tracking-widest text-outline-variant uppercase mb-2 block">Quick Links</span>
-              <h2 className="font-display-lg text-[36px] text-[#1e3a8a] font-extrabold mb-4 leading-tight">
-                Explore Our <span className="text-primary">School</span>
-              </h2>
-              <p className="text-on-surface-variant mb-8">
-                Everything you need, all in one place.
-              </p>
-              <Link href="/campus-life" className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-primary text-white font-bold hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all">
-                View All Links <ArrowRight size={18} weight="bold" />
-              </Link>
-            </FadeIn>
-
-            <div className="lg:col-span-3">
-              <StaggerContainer className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {QUICK_LINKS.map((link, idx) => (
-                  <StaggerItem key={idx}>
-                    <Link href={link.href} className="bg-white rounded-3xl p-6 aspect-square flex flex-col items-center justify-center text-center shadow-md hover:shadow-xl hover:-translate-y-2 transition-all group">
-                      <div className="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-secondary mb-4 group-hover:scale-110 transition-transform">
-                        <link.icon size={32} weight="duotone" />
-                      </div>
-                      <h3 className="font-bold text-[#1e3a8a] text-sm mb-4 leading-tight">{link.title}</h3>
-                      <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant group-hover:bg-primary group-hover:text-white transition-colors">
-                        <ArrowRight size={14} weight="bold" />
-                      </div>
-                    </Link>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10 gap-4">
+              <FadeIn direction="right" className="max-w-xl">
+                <span className="text-xs font-bold tracking-widest text-primary uppercase mb-2 block">Educational Pathways</span>
+                <h2 className="font-display-lg text-[28px] md:text-[34px] text-[#1e3a8a] font-extrabold leading-tight tracking-tight">
+                  Explore <span className="text-primary">Pakdeepan</span>
+                </h2>
+                <p className="font-body-md text-sm md:text-base text-on-surface-variant mt-2 leading-relaxed">
+                  Quick access to our academic curricula, admissions guide, and campus community.
+                </p>
+              </FadeIn>
+              
+              <FadeIn direction="left">
+                <Link 
+                  href="/contact" 
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 transition-all text-sm"
+                >
+                  Book a Campus Tour <ArrowRight size={16} weight="bold" />
+                </Link>
+              </FadeIn>
             </div>
+
+            {/* 3 Sleek, Compact Navigational Link Tiles */}
+            <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {EDITORIAL_PATHWAYS.map((item, idx) => (
+                <StaggerItem key={idx}>
+                  <Link 
+                    href={item.href}
+                    className="group flex flex-col justify-between h-full bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-primary/40 hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div>
+                      {/* Top Bar: Single-Color Icon Badge + Circular Arrow */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm shadow-primary/10">
+                          <item.icon size={22} weight="fill" />
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-all duration-300">
+                          <ArrowRight size={14} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-bold text-[#1e3a8a] text-lg mb-1.5 group-hover:text-primary transition-colors">
+                        {item.title}
+                      </h3>
+                      
+                      {/* Description */}
+                      <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
         </section>
 
@@ -255,26 +246,67 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
             </div>
 
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {news.slice(0, 3).map((item, idx) => (
-                <StaggerItem key={item.id}>
-                  <div className="bg-white rounded-[2rem] border border-outline-variant/20 overflow-hidden group cursor-pointer hover:shadow-xl transition-all h-full flex flex-col">
-                    <div className="h-56 overflow-hidden relative">
-                      <img src={item.featuredImage?.url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPgYckw1dd3Rry3bG4OVMWG9EO2Z8QewT9Gv6eDvgWUpQs8vOCrsrJd-zA85ba7AMqoZ8cmangR_PjyB-bv0TJ3ezyE8b0d-N98Tun5CDGuldil3lzxrDeTc8A-2wI9cykizTD_xfbuoW37PW05YheFlvRe_t3yuL56MOmsKwaI4Ylx6aRj0xo4HD_qpmvlEGvKcyQ9e-dSK2NmgMETjAJ9mrmZSJYygd81GdtJKVbEFCocmE6_icWSA'} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    </div>
-                    <div className="p-8 flex flex-col flex-grow">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-wider rounded-full">{item.category}</span>
-                        <span className="text-xs text-on-surface-variant font-bold">{new Date(item.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              {(news.length > 0 ? news.slice(0, 3) : [
+                { id: "mock-1", title: "Annual Sports Day 2026 Brings Community Together", category: "Sports", publishDate: new Date().toISOString() },
+                { id: "mock-2", title: "Creative Arts Festival Showcases Student Talent", category: "Events", publishDate: new Date().toISOString() },
+                { id: "mock-3", title: "New Interactive Reading Curriculum Launched", category: "Academics", publishDate: new Date().toISOString() }
+              ]).map((item: any, idx: number) => {
+                // Hardcoded high-res Unsplash images for a premium mock experience
+                const mockImages = [
+                  "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=2070&auto=format&fit=crop", // Sports/Activity
+                  "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=2070&auto=format&fit=crop", // Arts/Events
+                  "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop"  // Academics/Reading
+                ]
+                const imageUrl = item.featuredImage?.url || mockImages[idx % mockImages.length]
+
+                return (
+                  <StaggerItem key={item.id} className="h-full">
+                    <Link href={`/campus-life#news`} className="block w-full h-full">
+                      <div className="relative w-full h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500">
+                        
+                        {/* Full-bleed Background Image */}
+                        <div className="absolute inset-0 w-full h-full z-0">
+                          <img 
+                            src={imageUrl} 
+                            alt={item.title} 
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
+                          />
+                        </div>
+
+                        {/* Glassmorphic Dark Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a8a]/95 via-[#1e3a8a]/40 to-transparent z-10 group-hover:from-[#1e3a8a] group-hover:via-[#1e3a8a]/60 transition-all duration-500" />
+
+                        {/* Content Container (Pinned to Bottom) */}
+                        <div className="absolute inset-0 z-20 flex flex-col justify-end p-8">
+                          
+                          {/* Top Meta (Date & Category) */}
+                          <div className="flex justify-between items-center mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                            <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
+                              {item.category}
+                            </span>
+                            <span className="text-xs text-white/90 font-bold drop-shadow-sm">
+                              {new Date(item.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Title */}
+                          <h4 className="font-display-lg text-2xl font-bold text-white mb-2 line-clamp-2 drop-shadow-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                            {item.title}
+                          </h4>
+
+                          {/* Hidden Read More Button (Revealed on Hover) */}
+                          <div className="h-0 overflow-hidden group-hover:h-[40px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out mt-1">
+                            <span className="inline-flex items-center gap-2 text-blue-200 font-bold text-sm hover:text-white">
+                              Read More <ArrowRight size={14} weight="bold" />
+                            </span>
+                          </div>
+                          
+                        </div>
                       </div>
-                      <h4 className="font-display-lg text-xl font-bold text-[#1e3a8a] mb-3 line-clamp-2 group-hover:text-primary transition-colors">{item.title}</h4>
-                      <p className="font-body-md text-on-surface-variant line-clamp-2 text-sm mb-6 flex-grow">{item.excerpt}</p>
-                      <Link href={`/campus-life#news`} className="text-primary font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">
-                        Read More <ArrowRight size={14} weight="bold" />
-                      </Link>
-                    </div>
-                  </div>
-                </StaggerItem>
-              ))}
+                    </Link>
+                  </StaggerItem>
+                )
+              })}
             </StaggerContainer>
           </div>
         </section>

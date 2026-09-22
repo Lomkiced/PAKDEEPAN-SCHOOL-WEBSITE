@@ -21,12 +21,17 @@ All code written for the Pakdeepan Kindergarten platform must adhere to the foll
 - **Colocation:** Keep related files together. If a component is only used by the `Homepage`, put it in `src/app/(home)/_components/` rather than the global `packages/ui` library.
 - **Type Safety:** TypeScript is mandatory. Avoid `any`. Use Zod for runtime validation of all external data (forms, API responses).
 - **Imports:** Use absolute paths (`@/components/...` or `@pakdeepan/ui/...`) instead of relative hell (`../../../../components`).
+- **No Dead or Placeholder Links:** Public marketing and landing pages must never display placeholder links (`href="#"`) or unbuilt out-of-scope features (e.g. Parent Portal, Student Resources). All interactive cards and CTA links must route to real, active pages.
 
 ## Styling Rules
 - **Tailwind CSS:** Use Tailwind utility classes for all styling.
 - **Utility Combiner:** Always use the `cn()` utility (`clsx` + `tailwind-merge`) when exposing a `className` prop on a custom component to prevent class conflicts.
 - **No Inline Styles:** Do not use `style={{ ... }}` unless calculating dynamic values (like Framer Motion animations) that Tailwind cannot handle.
 - **Single-Color Iconography Rule:** In any icon grid, feature cards, or stat block, icons MUST use a single uniform brand color (`text-primary` with `bg-primary/10`). Multi-colored rainbow pastels across repeated cards are strictly prohibited to preserve high-end brand professionalism.
+- **Color Discipline on Navigation & Pathways:** Public marketing and navigation links must strictly adhere to the unified brand palette (white surfaces, deep navy `#1e3a8a`, slate neutrals, and uniform brand pink `primary` accents). Introducing arbitrary auxiliary colors (e.g. green or secondary blue status pills) on standard marketing links is strictly prohibited.
+- **Hero Viewport & Spacing Optimization:** The public landing page hero section must scale comfortably on standard desktop and laptop screens (768p-1080p) without gratuitous empty vertical padding or excessive `min-h-[90vh+]` scaling. Key brand value propositions, primary CTAs, campus visuals, and the floating feature dock must be directly visible above the fold.
+- **GSAP ScrollTrigger Video Scrubbing & Lifecycle:** Interactive video scrubbing must be orchestrated via GSAP's `ScrollTrigger` with `scrub: 1` smooth inertia. Section pinning must strictly release and proceed once `currentTime` reaches completion (`100%` duration). Always clean up ScrollTrigger animations inside React's `useEffect` or `useGSAP` cleanup (`ctx.revert()`). Video tags must declare `muted playsInline preload="auto"`.
+- **Feature Dock Architecture:** Multi-pillar institutional values (e.g. the 5 educational pillars) must be housed within a unified, continuous architectural container with internal hairline dividers rather than disconnected, repeated AI/vibecoded widget boxes with giant icon circles.
 - **Signature Calligraphy Typography:** The `font-sherlina` token (`Sherlina.ttf`) must be reserved exclusively for inspirational decorative quotes and signature school taglines. Ensure adequate sizing (`text-2xl` through `text-5xl`) and avoid enclosing script in heavy boxes.
 
 ## Currency & Financial Rules (Thai Baht - THB)
