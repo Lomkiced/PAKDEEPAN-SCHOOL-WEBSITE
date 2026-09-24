@@ -2,8 +2,6 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { Heart, MapPin, Phone, Envelope, FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo } from "@phosphor-icons/react"
 
 const LINKS = [
   { href: "/about", label: "About" },
@@ -14,48 +12,31 @@ const LINKS = [
   { href: "/privacy", label: "Privacy" },
 ]
 
-const SOCIALS = [
-  { icon: FacebookLogo, href: "#", label: "Facebook" },
-  { icon: InstagramLogo, href: "#", label: "Instagram" },
-  { icon: YoutubeLogo, href: "#", label: "YouTube" },
-  { icon: LinkedinLogo, href: "#", label: "LinkedIn" },
-]
-
 export function Footer() {
   return (
-    <footer className="w-full bg-[#0f1d3a] text-white mt-auto">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 py-10 md:py-12">
-
-        {/* Single Row: Brand | Links | Contact | Socials */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 items-start">
-
-          {/* Brand */}
-          <div>
-            <Link href="/" className="flex items-center gap-3 mb-3 group">
-              <Image 
-                src="/images/pakdeepan-logo.png" 
-                alt="Pakdeepan School Logo" 
-                width={48} 
-                height={48} 
-                className="group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
-              />
-              <div className="flex flex-col leading-none">
-                <span className="text-primary font-bold text-base font-display-lg">Pakdeepan</span>
-                <span className="text-[8px] tracking-[0.2em] font-label-caps text-white/40 uppercase">School</span>
-              </div>
-            </Link>
-            <p className="font-sherlina text-lg text-primary/70 leading-tight transform rotate-[-2deg] inline-block">
-              Together We Grow
-              <Heart size={12} weight="fill" className="inline-block ml-1 text-primary/50 align-middle" />
+    <footer className="w-full bg-[#1e3a8a] text-white pt-16 md:pt-20 rounded-t-[2rem] md:rounded-t-[3rem] mt-auto relative overflow-hidden flex flex-col justify-between">
+      <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 relative z-10 w-full flex-grow">
+        
+        {/* Top: Utility Grid (No generic icons, purely typographic) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 md:mb-20">
+          
+          {/* Brand Philosophy */}
+          <div className="lg:col-span-5 pr-4 md:pr-10">
+            <h3 className="font-display-lg text-[28px] md:text-[36px] font-extrabold mb-6 leading-[1.15]">
+              Small steps today,<br/>
+              <span className="text-primary">big dreams tomorrow.</span>
+            </h3>
+            <p className="font-body-md text-white/60 max-w-sm text-base md:text-lg leading-relaxed">
+              Cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-bold text-[10px] uppercase tracking-widest text-white/30 mb-3">Quick Links</h4>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+          {/* Links */}
+          <div className="lg:col-span-3">
+            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">Explore</h4>
+            <div className="flex flex-col gap-4">
               {LINKS.map(({ href, label }) => (
-                <Link key={label} href={href} className="text-[13px] text-white/50 hover:text-white transition-colors">
+                <Link key={label} href={href} className="text-white/70 hover:text-primary hover:translate-x-1 transition-all duration-300 font-bold text-sm md:text-base w-fit">
                   {label}
                 </Link>
               ))}
@@ -63,49 +44,31 @@ export function Footer() {
           </div>
 
           {/* Contact */}
-          <div>
-            <h4 className="font-bold text-[10px] uppercase tracking-widest text-white/30 mb-3">Contact</h4>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin size={13} weight="fill" className="text-primary/70 shrink-0" />
-                <span className="text-[13px] text-white/50">Chanthaburi, Thailand</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone size={13} weight="fill" className="text-primary/70 shrink-0" />
-                <a href="tel:+66391234567" className="text-[13px] text-white/50 hover:text-white transition-colors">+66 39 123 4567</a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Envelope size={13} weight="fill" className="text-primary/70 shrink-0" />
-                <a href="mailto:admissions@pakdeepan.ac.th" className="text-[13px] text-white/50 hover:text-white transition-colors">admissions@pakdeepan.ac.th</a>
-              </div>
+          <div className="lg:col-span-4">
+            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">Get in Touch</h4>
+            <div className="flex flex-col gap-4">
+              <a href="mailto:admissions@pakdeepan.ac.th" className="text-white/70 hover:text-white transition-colors font-medium text-sm md:text-base">
+                admissions@pakdeepan.ac.th
+              </a>
+              <a href="tel:+66391234567" className="text-white/70 hover:text-white transition-colors font-medium text-sm md:text-base">
+                +66 39 123 4567
+              </a>
+              <p className="text-white/40 font-medium text-sm md:text-base mt-2">
+                Chanthaburi, Thailand
+              </p>
             </div>
           </div>
 
-          {/* Socials */}
-          <div className="flex flex-col items-start lg:items-end">
-            <h4 className="font-bold text-[10px] uppercase tracking-widest text-white/30 mb-3">Follow Us</h4>
-            <div className="flex items-center gap-1.5">
-              {SOCIALS.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-white/6 flex items-center justify-center text-white/35 hover:text-primary hover:bg-primary/12 transition-all duration-200 active:scale-[0.95]"
-                >
-                  <Icon size={16} weight="fill" />
-                </a>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="h-px bg-white/8 mt-8 mb-5" />
-        <p className="text-[11px] text-white/25 text-center">
-          &copy; {new Date().getFullYear()} Pakdeepan Kindergarten School. All rights reserved.
-        </p>
+        {/* Bottom Bar: Copyright & Legal */}
+        <div className="flex flex-col md:flex-row justify-between items-center py-6 border-t border-white/10 text-[12px] text-white/40 font-medium tracking-wide">
+          <p>&copy; {new Date().getFullYear()} Pakdeepan Kindergarten School. All rights reserved.</p>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <a href="#" className="hover:text-white transition-colors">Facebook</a>
+            <a href="#" className="hover:text-white transition-colors">Instagram</a>
+          </div>
+        </div>
       </div>
     </footer>
   )
