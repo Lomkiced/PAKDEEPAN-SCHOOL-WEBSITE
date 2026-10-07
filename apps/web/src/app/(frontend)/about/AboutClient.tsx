@@ -66,43 +66,39 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
 
         {/* --- EDITORIAL MISSION & VISION --- */}
         <section className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20 py-24 md:py-32">
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 border border-slate-100 rounded-3xl overflow-hidden bg-white shadow-sm">
             
             {/* Vision */}
-            <StaggerItem>
-              <div className="relative group">
-                {/* Large Background Typography instead of an Icon */}
-                <div className="absolute -top-12 -left-6 font-display-lg text-[140px] font-extrabold text-primary/5 select-none pointer-events-none group-hover:text-primary/10 transition-colors duration-500">
-                  01
-                </div>
-                <div className="relative z-10">
-                  <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
-                    {dict.about?.visionTitle || "Our Vision"}
-                  </h2>
-                  <div className="w-12 h-1 bg-primary mb-8 rounded-full" />
-                  <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
-                    {vision}
-                  </p>
-                </div>
+            <StaggerItem className="p-10 md:p-16 relative group cursor-default hover:bg-slate-50 transition-colors duration-300 active:scale-[0.99]">
+              {/* Large Background Typography */}
+              <div className="absolute top-6 left-6 font-display-lg text-[140px] font-extrabold text-primary/5 select-none pointer-events-none group-hover:text-primary/10 transition-colors duration-500 leading-none">
+                01
+              </div>
+              <div className="relative z-10 mt-12">
+                <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
+                  {dict.about?.visionTitle || "Our Vision"}
+                </h2>
+                <div className="w-12 h-1 bg-primary mb-8 rounded-full" />
+                <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
+                  {vision}
+                </p>
               </div>
             </StaggerItem>
             
             {/* Mission */}
-            <StaggerItem>
-              <div className="relative group">
-                {/* Large Background Typography instead of an Icon */}
-                <div className="absolute -top-12 -left-6 font-display-lg text-[140px] font-extrabold text-secondary/5 select-none pointer-events-none group-hover:text-secondary/10 transition-colors duration-500">
-                  02
-                </div>
-                <div className="relative z-10">
-                  <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
-                    {dict.about?.missionTitle || "Our Mission"}
-                  </h2>
-                  <div className="w-12 h-1 bg-secondary mb-8 rounded-full" />
-                  <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
-                    {mission}
-                  </p>
-                </div>
+            <StaggerItem className="p-10 md:p-16 relative group cursor-default hover:bg-slate-50 transition-colors duration-300 active:scale-[0.99]">
+              {/* Large Background Typography - Uniform primary color */}
+              <div className="absolute top-6 left-6 font-display-lg text-[140px] font-extrabold text-primary/5 select-none pointer-events-none group-hover:text-primary/10 transition-colors duration-500 leading-none">
+                02
+              </div>
+              <div className="relative z-10 mt-12">
+                <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
+                  {dict.about?.missionTitle || "Our Mission"}
+                </h2>
+                <div className="w-12 h-1 bg-primary mb-8 rounded-full" />
+                <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
+                  {mission}
+                </p>
               </div>
             </StaggerItem>
 
