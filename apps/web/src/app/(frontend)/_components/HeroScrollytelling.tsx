@@ -9,26 +9,31 @@ export function HeroScrollytelling() {
   return (
     <div className="relative w-full overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-10 md:py-16">
 
-      {/* --- HALF-HALF BACKGROUND VIDEO --- */}
+      {/* --- HALF-HALF BACKGROUND VIDEO (PAKDEEPAN LOGO EMBLEM ANIMATION) --- */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex justify-end">
-        {/* The video sits perfectly on the right half (50% width on desktop) */}
+        {/* On mobile/tablet, the video acts as an elegant ambient watermark behind the text;
+            On desktop (lg+), it commands the right half with 100% clarity and zero clipping. */}
         <div 
-          className="relative w-full lg:w-[50%] h-full flex items-center justify-center mix-blend-multiply"
+          className="relative w-full lg:w-[52%] xl:w-[50%] h-full flex items-center justify-center opacity-25 sm:opacity-35 lg:opacity-100 transition-opacity duration-700 mix-blend-multiply"
           style={{
-            // This linear mask creates a flawless, smooth gradient precisely in the middle of the screen,
-            // fading out the left edge of the video so it seamlessly blends with the text half without any visible frame edge.
-            maskImage: 'linear-gradient(to right, transparent 0%, black 25%, black 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 25%, black 100%)'
+            // Feathered left edge to blend seamlessly into the white text half without visible bounding box
+            maskImage: 'linear-gradient(to right, transparent 0%, black 20%, black 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 20%, black 100%)'
           }}
         >
           <video 
-            src="/videos/logo-animation.mp4" 
             playsInline 
             muted 
             autoPlay 
             loop 
-            className="w-full max-w-[1000px] object-contain scale-[1.3] lg:scale-[1.75] mix-blend-multiply brightness-[1.05] contrast-[1.1]"
-          />
+            preload="auto"
+            poster="/videos/pakdeepan-logo-poster.webp"
+            className="w-full max-w-[840px] xl:max-w-[920px] max-h-[82vh] object-contain scale-[1.0] lg:scale-[1.12] xl:scale-[1.18] brightness-[1.02] contrast-[1.05] will-change-transform"
+            aria-label="Pakdeepan School Animated Logo Emblem"
+          >
+            <source src="/videos/pakdeepan-logo.webm" type="video/webm" />
+            <source src="/videos/pakdeepan-logo.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
 

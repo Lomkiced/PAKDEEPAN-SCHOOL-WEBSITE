@@ -1,4 +1,4 @@
-import { getPayload } from "@/lib/payload"
+import { getCachedGlobal } from "@/lib/payload"
 import AboutClient from "./AboutClient"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
@@ -10,23 +10,13 @@ export const metadata: Metadata = {
 }
 
 export default async function AboutPage() {
-  const payload = await getPayload()
-  
   const cookieStore = await cookies()
   const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
   const locale = (localeStr === "th" ? "th" : "en") as "en" | "th"
   const dict = await getDictionary(locale)
 
   // Fetch About Page Global Data
-  let aboutData = null
-  try {
-    aboutData = await payload.findGlobal({
-      slug: "about-page",
-      locale,
-    })
-  } catch (error) {
-    console.error("Error fetching AboutPage global:", error)
-  }
+  const aboutData = await getCachedGlobal("about-page", locale, ["about-page-cache"])
 
   return (
     <AboutClient 

@@ -1,4 +1,4 @@
-import { getPayload } from "@/lib/payload"
+import { getCachedCollection } from "@/lib/payload"
 import ProgramsClient from "./ProgramsClient"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
@@ -10,24 +10,20 @@ export const metadata: Metadata = {
 }
 
 export default async function ProgramsPage() {
-  const payload = await getPayload()
-  
   const cookieStore = await cookies()
   const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
   const locale = (localeStr === "th" ? "th" : "en") as "en" | "th"
   const dict = await getDictionary(locale)
 
   // Fetch Published Programs
-  const programsRes = await payload.find({
-    collection: "programs",
+  const programsRes = await getCachedCollection("programs", locale, ["programs-cache"], {
     depth: 1,
-    locale,
     where: {
       status: {
         equals: "published"
       }
     },
-    sort: "tuitionFee" // Just to have a consistent order
+    sort: "tuitionFee"
   })
 
   // To order programs consistently by age/level
