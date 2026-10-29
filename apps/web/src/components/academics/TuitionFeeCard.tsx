@@ -3,6 +3,7 @@
 import * as React from "react"
 import { formatTHB, formatFeeWithInterval, type CurrencyLocale } from "@/utils/currency"
 import { Coins, DownloadSimple, CheckCircle, GraduationCap } from "@phosphor-icons/react"
+import { useLanguage } from "@/context/LanguageContext"
 
 export interface AdditionalFee {
   feeName: string
@@ -27,8 +28,10 @@ export function TuitionFeeCard({
   billingInterval,
   additionalFees = [],
   syllabusPdfUrl,
-  locale = "th",
+  locale: propLocale,
 }: TuitionFeeCardProps) {
+  const lang = useLanguage()
+  const locale = propLocale || lang?.locale || "th"
   const totalAdditional = additionalFees.reduce((sum, item) => sum + (item.amount || 0), 0)
   const totalEstimatedFirstTerm = baseTuition + totalAdditional
 

@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic"
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { targetType, targetSlug, id, fieldName, mediaId, imageUrl } = body
+    const { targetType, targetSlug, id, fieldName, mediaId, imageUrl, clear, remove } = body
+    const isClearing = clear === true || remove === true
 
     if (!targetType || !targetSlug || !fieldName) {
       return NextResponse.json(
@@ -17,11 +18,11 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = await getPayload()
-    const valueToSet = mediaId || imageUrl
+    const valueToSet = isClearing ? null : (mediaId || imageUrl)
 
-    if (!valueToSet) {
+    if (!isClearing && !valueToSet) {
       return NextResponse.json(
-        { success: false, error: "Either mediaId or imageUrl must be provided" },
+        { success: false, error: "Either mediaId or imageUrl must be provided, or set clear: true" },
         { status: 400 }
       )
     }

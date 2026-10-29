@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "@phosphor-icons/react"
+import { useLanguage } from "@/context/LanguageContext"
 
 export interface HeroScrollytellingProps {
   tagline?: string
@@ -20,20 +21,39 @@ export interface HeroScrollytellingProps {
 }
 
 export function HeroScrollytelling({
-  tagline = "Learn · Grow · Build Your Future",
-  titlePrefix = "Welcome to",
-  titleHighlight = "Pakdeepan",
-  titleSuffix = "School",
-  body = "Every great journey begins by opening a book. We cultivate joyful curiosity, strong bilingual foundations, and creative inquiry in every young child.",
-  primaryCtaLabel = "Discover Our School",
+  tagline,
+  titlePrefix,
+  titleHighlight,
+  titleSuffix,
+  body,
+  primaryCtaLabel,
   primaryCtaLink = "/about",
-  secondaryCtaLabel = "Admissions",
+  secondaryCtaLabel,
   secondaryCtaLink = "/admissions",
   backgroundImage,
   videoPoster = "/videos/pakdeepan-logo-poster.webp",
 }: HeroScrollytellingProps) {
+  const { locale } = useLanguage()
+  const isTh = locale === "th"
+
+  const resolvedTagline =
+    tagline || (isTh ? "เรียนรู้ · เติบโต · สร้างอนาคตของคุณ" : "Learn · Grow · Build Your Future")
+  const resolvedTitlePrefix = titlePrefix || (isTh ? "ยินดีต้อนรับสู่" : "Welcome to")
+  const resolvedTitleHighlight = titleHighlight || (isTh ? "โรงเรียนภักดีพรรณ" : "Pakdeepan")
+  const resolvedTitleSuffix =
+    titleSuffix !== undefined ? titleSuffix : isTh ? "" : "School"
+  const resolvedBody =
+    body ||
+    (isTh
+      ? "ทุกการเดินทางที่ยิ่งใหญ่เริ่มต้นจากการเปิดหนังสือ เราปลูกฝังความอยากรู้อยากเห็นอย่างมีความสุข รากฐานสองภาษาที่แข็งแกร่ง และการค้นคว้าสร้างสรรค์ในเด็กทุกคน"
+      : "Every great journey begins by opening a book. We cultivate joyful curiosity, strong bilingual foundations, and creative inquiry in every young child.")
+  const resolvedPrimaryCtaLabel =
+    primaryCtaLabel || (isTh ? "ค้นพบโรงเรียนของเรา" : "Discover Our School")
+  const resolvedSecondaryCtaLabel =
+    secondaryCtaLabel || (isTh ? "การรับสมัคร" : "Admissions")
+
   // If tagline contains separator '·' or '•', split into decorated words
-  const taglineItems = tagline ? tagline.split(/\s*[·•]\s*/) : ["Learn", "Grow", "Build Your Future"]
+  const taglineItems = resolvedTagline ? resolvedTagline.split(/\s*[·•]\s*/) : ["Learn", "Grow", "Build Your Future"]
 
   return (
     <div className="relative w-full overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-10 md:py-16">
@@ -106,23 +126,23 @@ export function HeroScrollytelling({
             </div>
             
             <h1 className="font-display-lg text-[40px] sm:text-[56px] lg:text-[76px] leading-[1.05] text-[#1e3a8a] mb-6 tracking-tight font-extrabold drop-shadow-sm">
-              {titlePrefix} <br />
+              {resolvedTitlePrefix} <br />
               <span className="text-primary relative inline-block">
-                {titleHighlight} 
+                {resolvedTitleHighlight} 
                 {/* Subtle underline flourish */}
                 <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                 </svg>
               </span>
-              {titleSuffix && (
+              {resolvedTitleSuffix && (
                 <>
-                  <br /> {titleSuffix}
+                  <br /> {resolvedTitleSuffix}
                 </>
               )}
             </h1>
             
             <p className="font-body-lg text-[16px] sm:text-[18px] lg:text-[20px] text-on-surface-variant mb-8 max-w-xl leading-relaxed font-medium">
-              {body}
+              {resolvedBody}
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -130,14 +150,14 @@ export function HeroScrollytelling({
                 href={primaryCtaLink} 
                 className="flex items-center justify-center gap-2 px-8 py-3.5 w-full sm:w-auto rounded-full bg-primary text-white font-bold text-[15px] hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 transition-all active:scale-95"
               >
-                {primaryCtaLabel} <ArrowRight size={18} weight="bold" />
+                {resolvedPrimaryCtaLabel} <ArrowRight size={18} weight="bold" />
               </Link>
               
               <Link 
                 href={secondaryCtaLink} 
                 className="flex items-center justify-center gap-2 px-8 py-3.5 w-full sm:w-auto rounded-full bg-white text-[#1e3a8a] font-bold text-[15px] border border-slate-200 hover:border-[#1e3a8a]/30 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95"
               >
-                {secondaryCtaLabel}
+                {resolvedSecondaryCtaLabel}
               </Link>
             </div>
           </motion.div>

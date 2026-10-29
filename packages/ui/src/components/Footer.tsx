@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 
-const DEFAULT_LINKS = [
+const DEFAULT_LINKS_EN = [
   { href: "/about", label: "About" },
   { href: "/programs", label: "Academics" },
   { href: "/admissions", label: "Admissions" },
@@ -12,7 +12,17 @@ const DEFAULT_LINKS = [
   { href: "/privacy", label: "Privacy" },
 ]
 
+const DEFAULT_LINKS_TH = [
+  { href: "/about", label: "เกี่ยวกับเรา" },
+  { href: "/programs", label: "หลักสูตร" },
+  { href: "/admissions", label: "การรับสมัคร" },
+  { href: "/campus-life", label: "ข่าวสารและกิจกรรม" },
+  { href: "/contact", label: "ติดต่อเรา" },
+  { href: "/privacy", label: "นโยบายความเป็นส่วนตัว" },
+]
+
 export interface FooterProps {
+  currentLocale?: "en" | "th"
   tagline?: string
   philosophy?: string
   email?: string
@@ -28,19 +38,34 @@ export interface FooterProps {
 }
 
 export function Footer({
-  tagline = "Small steps today,\nbig dreams tomorrow.",
-  philosophy = "Cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.",
+  currentLocale = "en",
+  tagline,
+  philosophy,
   email = "admissions@pakdeepan.ac.th",
   phone = "+66 39 123 4567",
-  location = "Chanthaburi, Thailand",
-  copyrightName = "Pakdeepan Kindergarten School",
+  location,
+  copyrightName,
   facebookUrl = "https://facebook.com/pakdeepanschool",
   instagramUrl = "https://instagram.com/pakdeepanschool",
-  links = DEFAULT_LINKS,
+  links,
   logoUrl,
 }: FooterProps = {}) {
+  const isTh = currentLocale === "th"
+
+  const resolvedTagline =
+    tagline || (isTh ? "ก้าวเล็กๆ ในวันนี้\nสู่อนาคตที่ยิ่งใหญ่ในวันพรุ่งนี้" : "Small steps today,\nbig dreams tomorrow.")
+  const resolvedPhilosophy =
+    philosophy ||
+    (isTh
+      ? "บ่มเพาะรากฐานแห่งความอยากรู้อยากเห็น ความเห็นอกเห็นใจ และความเป็นเลิศทางวิชาการในบรรยากาศนานาชาติอันอบอุ่น"
+      : "Cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.")
+  const resolvedCopyrightName =
+    copyrightName || (isTh ? "โรงเรียนอนุบาลภักดีพรรณ" : "Pakdeepan Kindergarten School")
+  const resolvedLocation = location || (isTh ? "จันทบุรี, ประเทศไทย" : "Chanthaburi, Thailand")
+  const resolvedLinks = links || (isTh ? DEFAULT_LINKS_TH : DEFAULT_LINKS_EN)
+
   // Format tagline to render highlighted line
-  const taglineLines = tagline ? tagline.split("\n") : ["Small steps today,", "big dreams tomorrow."]
+  const taglineLines = resolvedTagline.split("\n")
   const firstLine = taglineLines[0]
   const secondLine = taglineLines.slice(1).join(" ")
 
@@ -57,7 +82,7 @@ export function Footer({
               <div className="mb-6">
                 <img 
                   src={logoUrl} 
-                  alt={copyrightName} 
+                  alt={resolvedCopyrightName} 
                   className="h-10 w-auto object-contain brightness-0 invert opacity-90" 
                 />
               </div>
@@ -72,15 +97,17 @@ export function Footer({
               )}
             </h3>
             <p className="font-body-md text-white/60 max-w-sm text-base md:text-lg leading-relaxed">
-              {philosophy}
+              {resolvedPhilosophy}
             </p>
           </div>
 
           {/* Links */}
           <div className="lg:col-span-3">
-            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">Explore</h4>
+            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">
+              {isTh ? "สำรวจ" : "Explore"}
+            </h4>
             <div className="flex flex-col gap-4">
-              {links.map(({ href, label }) => (
+              {resolvedLinks.map(({ href, label }) => (
                 <Link key={label} href={href} className="text-white/70 hover:text-primary hover:translate-x-1 transition-all duration-300 font-bold text-sm md:text-base w-fit">
                   {label}
                 </Link>
@@ -90,7 +117,9 @@ export function Footer({
 
           {/* Contact */}
           <div className="lg:col-span-4">
-            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">Get in Touch</h4>
+            <h4 className="font-bold text-[11px] uppercase tracking-[0.2em] text-white/30 mb-6">
+              {isTh ? "ติดต่อเรา" : "Get in Touch"}
+            </h4>
             <div className="flex flex-col gap-4">
               {email && (
                 <a href={`mailto:${email}`} className="text-white/70 hover:text-white transition-colors font-medium text-sm md:text-base">
@@ -102,9 +131,9 @@ export function Footer({
                   {phone}
                 </a>
               )}
-              {location && (
+              {resolvedLocation && (
                 <p className="text-white/40 font-medium text-sm md:text-base mt-2">
-                  {location}
+                  {resolvedLocation}
                 </p>
               )}
             </div>
@@ -114,7 +143,9 @@ export function Footer({
 
         {/* Bottom Bar: Copyright & Legal */}
         <div className="flex flex-col md:flex-row justify-between items-center py-6 border-t border-white/10 text-[12px] text-white/40 font-medium tracking-wide">
-          <p>&copy; {new Date().getFullYear()} {copyrightName}. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} {resolvedCopyrightName}. {isTh ? "สงวนลิขสิทธิ์ทั้งหมด" : "All rights reserved."}
+          </p>
           <div className="flex gap-6 mt-4 md:mt-0">
             {facebookUrl && (
               <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">

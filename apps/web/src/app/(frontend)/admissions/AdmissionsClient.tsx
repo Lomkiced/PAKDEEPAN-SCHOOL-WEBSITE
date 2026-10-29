@@ -8,6 +8,8 @@ import { CalendarBlank, CheckCircle } from "@phosphor-icons/react"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { formatTHB } from "@/utils/currency"
 import { submitAdmissionInquiry } from "@/actions/admissions"
+import { useLanguage } from "@/context/LanguageContext"
+import { localizeData } from "@/lib/localize"
 
 // Form Validation Schema
 const inquirySchema = z.object({
@@ -29,33 +31,76 @@ interface AdmissionsClientProps {
   locale: string;
 }
 
-const DEFAULT_STEPS = [
+const DEFAULT_STEPS_EN = [
   { stepNumber: 1, title: "Inquiry", desc: "Submit your initial details to connect with our admissions team." },
   { stepNumber: 2, title: "School Tour", desc: "Experience our campus and meet our dedicated educators." },
   { stepNumber: 3, title: "Assessment", desc: "A gentle evaluation to ensure we meet your child's needs." },
   { stepNumber: 4, title: "Enrollment", desc: "Finalize documentation and prepare for the academic year." },
 ]
 
+const DEFAULT_STEPS_TH = [
+  { stepNumber: 1, title: "สอบถามข้อมูล", desc: "ส่งข้อมูลเบื้องต้นเพื่อติดต่อประสานงานกับทีมงานฝ่ายรับสมัครของเรา" },
+  { stepNumber: 2, title: "เยี่ยมชมโรงเรียน", desc: "สัมผัสบรรยากาศจริงในรั้วโรงเรียนและพบปะคุณครูผู้เชี่ยวชาญ" },
+  { stepNumber: 3, title: "การประเมินความพร้อม", desc: "การประเมินอย่างอ่อนโยนเพื่อให้มั่นใจว่าเราตอบสนองต่อพัฒนาการของบุตรหลานท่าน" },
+  { stepNumber: 4, title: "การลงทะเบียน", desc: "จัดเตรียมเอกสารและยืนยันการเข้าเรียนเพื่อเริ่มปีการศึกษาใหม่อย่างมั่นใจ" },
+]
+
 export default function AdmissionsClient({ programs, admissionsPageData, dict, locale }: AdmissionsClientProps) {
+  const { locale: contextLocale } = useLanguage()
+  const activeLocale = (contextLocale || locale || "en") as "en" | "th"
+  const isTh = activeLocale === "th"
+
   const [isSubmitted, setIsSubmitted] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
 
   // Configurable fields from CMS Global
-  const heroBadge = admissionsPageData?.heroBadge || "Join Our Community"
-  const heroTitle = admissionsPageData?.heroTitle || "Admissions & Enrollment"
-  const heroDescription = admissionsPageData?.heroDescription || "Join a community dedicated to excellence, inquiry, and holistic growth. Begin your journey with Pakdeepan Kindergarten School today."
+  const heroBadge = 
+    localizeData(admissionsPageData, 'heroBadge', activeLocale) || 
+    (isTh ? "ร่วมเป็นส่วนหนึ่งของครอบครัวเรา" : "Join Our Community")
+  const heroTitle = 
+    localizeData(admissionsPageData, 'heroTitle', activeLocale) || 
+    (isTh ? "การรับสมัครและการลงทะเบียน" : "Admissions & Enrollment")
+  const heroDescription = 
+    localizeData(admissionsPageData, 'heroDescription', activeLocale) || 
+    (isTh 
+      ? "ร่วมเป็นส่วนหนึ่งของชุมชนที่มุ่งมั่นสู่ความเป็นเลิศ การสืบเสาะค้นหา และการเติบโตอย่างรอบด้าน เริ่มต้นการเดินทางของบุตรหลานท่านที่โรงเรียนอนุบาลภักดีพรรณวันนี้" 
+      : "Join a community dedicated to excellence, inquiry, and holistic growth. Begin your journey with Pakdeepan Kindergarten School today.")
   
   const stepsList = admissionsPageData?.steps && admissionsPageData.steps.length > 0 
-    ? admissionsPageData.steps 
-    : DEFAULT_STEPS
+    ? admissionsPageData.steps.map((item: any) => ({
+        ...item,
+        title: localizeData(item, 'title', activeLocale) || item.title,
+        desc: localizeData(item, 'desc', activeLocale) || item.desc,
+      }))
+    : (isTh ? DEFAULT_STEPS_TH : DEFAULT_STEPS_EN)
 
-  const formTitle = admissionsPageData?.formTitle || "Inquiry Form"
-  const formSubtitle = admissionsPageData?.formSubtitle || "Please provide your details below, and our admissions team will contact you shortly to guide you through the next steps."
-  const consentLabel = admissionsPageData?.consentLabel || "I consent to Pakdeepan Kindergarten School collecting and processing my data for admissions purposes in accordance with the Privacy Policy."
-  const submitButtonLabel = admissionsPageData?.submitButtonLabel || "Submit Inquiry"
-  const successTitle = admissionsPageData?.successTitle || "Inquiry Received"
-  const successMessage = admissionsPageData?.successMessage || "Thank you for your interest in Pakdeepan Kindergarten School. Our admissions team will review your details and contact you shortly."
-  const floatingTourLabel = admissionsPageData?.floatingTourLabel || "Schedule a Tour"
+  const formTitle = 
+    localizeData(admissionsPageData, 'formTitle', activeLocale) || 
+    (isTh ? "แบบฟอร์มแสดงความจำนงสมัครเรียน" : "Inquiry Form")
+  const formSubtitle = 
+    localizeData(admissionsPageData, 'formSubtitle', activeLocale) || 
+    (isTh 
+      ? "กรุณากรอกข้อมูลของท่านด้านล่าง ทีมงานฝ่ายรับสมัครจะติดต่อกลับอย่างรวดเร็วเพื่อแนะนำขั้นตอนถัดไป" 
+      : "Please provide your details below, and our admissions team will contact you shortly to guide you through the next steps.")
+  const consentLabel = 
+    localizeData(admissionsPageData, 'consentLabel', activeLocale) || 
+    (isTh 
+      ? "ข้าพเจ้ายินยอมให้โรงเรียนอนุบาลภักดีพรรณเก็บและประมวลผลข้อมูลส่วนบุคคลเพื่อวัตถุประสงค์ในการรับสมัครเรียนตามนโยบายความเป็นส่วนตัว" 
+      : "I consent to Pakdeepan Kindergarten School collecting and processing my data for admissions purposes in accordance with the Privacy Policy.")
+  const submitButtonLabel = 
+    localizeData(admissionsPageData, 'submitButtonLabel', activeLocale) || 
+    (isTh ? "ส่งแบบฟอร์มสอบถาม" : "Submit Inquiry")
+  const successTitle = 
+    localizeData(admissionsPageData, 'successTitle', activeLocale) || 
+    (isTh ? "ได้รับข้อมูลการสอบถามเรียบร้อยแล้ว" : "Inquiry Received")
+  const successMessage = 
+    localizeData(admissionsPageData, 'successMessage', activeLocale) || 
+    (isTh 
+      ? "ขอบพระคุณที่ให้ความสนใจโรงเรียนอนุบาลภักดีพรรณ ทีมงานฝ่ายรับสมัครจะตรวจสอบข้อมูลและติดต่อกลับท่านในเร็วๆ นี้" 
+      : "Thank you for your interest in Pakdeepan Kindergarten School. Our admissions team will review your details and contact you shortly.")
+  const floatingTourLabel = 
+    localizeData(admissionsPageData, 'floatingTourLabel', activeLocale) || 
+    (isTh ? "นัดหมายเยี่ยมชมโรงเรียน" : "Schedule a Tour")
 
   const {
     register,
@@ -74,7 +119,7 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
       setIsSubmitted(true)
       reset()
     } else {
-      setServerError(result.error || "An unexpected error occurred.")
+      setServerError(result.error || (isTh ? "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง" : "An unexpected error occurred."))
     }
   }
 
@@ -131,41 +176,49 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
         {/* Tuition Fees Table */}
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 mb-20">
           <FadeIn direction="up">
-            <h2 className="font-headline-md text-headline-md text-primary mb-6 text-center md:text-left">{dict.finance?.tuitionAndFees || "Tuition & Fees"}</h2>
+            <h2 className="font-headline-md text-headline-md text-primary mb-6 text-center md:text-left">
+              {dict.finance?.tuitionAndFees || (isTh ? "ค่าธรรมเนียมการศึกษา" : "Tuition & Fees")}
+            </h2>
             <div className="bg-surface rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden border border-outline-variant/30">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead className="bg-surface-container-low font-label-caps text-label-caps text-on-surface">
                     <tr>
-                      <th className="p-4 border-b border-outline-variant/30">Program</th>
-                      <th className="p-4 border-b border-outline-variant/30 text-right">Tuition Fee ({dict.finance?.currencySymbol || "฿"})</th>
+                      <th className="p-4 border-b border-outline-variant/30">
+                        {isTh ? "ระดับชั้น / หลักสูตร" : "Program"}
+                      </th>
+                      <th className="p-4 border-b border-outline-variant/30 text-right">
+                        {isTh ? "ค่าเล่าเรียน (฿)" : `Tuition Fee (${dict.finance?.currencySymbol || "฿"})`}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="font-body-md text-body-md text-on-surface-variant">
                     {programs.length > 0 ? programs.map((program) => (
                       <tr key={program.id} className="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/10">
                         <td className="p-4">
-                          <span className="block font-semibold text-on-surface">{program.title}</span>
+                          <span className="block font-semibold text-on-surface">
+                            {localizeData(program, 'title', activeLocale) || program.title}
+                          </span>
                           <span className="text-sm opacity-80">
-                            {program.level === 'kindergarten' && "Ages 2-5"}
-                            {program.level === 'primary' && "Grades 1-6"}
-                            {program.level === 'secondary' && "Grades 7-12"}
+                            {program.level === 'kindergarten' && (isTh ? "อายุ 2-5 ขวบ" : "Ages 2-5")}
+                            {program.level === 'primary' && (isTh ? "ประถมศึกษาปีที่ 1-6" : "Grades 1-6")}
+                            {program.level === 'secondary' && (isTh ? "มัธยมศึกษาปีที่ 1-6" : "Grades 7-12")}
                             {program.level === 'english-program' && "EP"}
                           </span>
                         </td>
                         <td className="p-4 text-right">
                           <span className="font-semibold text-primary">{formatTHB(program.tuitionFee)}</span>
                           <span className="text-sm ml-1">
-                            / {program.billingInterval === 'term' ? (dict.finance?.perTerm || "term") : 
-                               program.billingInterval === 'year' ? (dict.finance?.perYear || "year") : 
-                               (dict.finance?.perMonth || "month")}
+                            / {program.billingInterval === 'term' ? (dict.finance?.perTerm || (isTh ? "ภาคเรียน" : "term")) : 
+                               program.billingInterval === 'year' ? (dict.finance?.perYear || (isTh ? "ปีการศึกษา" : "year")) : 
+                               (dict.finance?.perMonth || (isTh ? "เดือน" : "month"))}
                           </span>
                         </td>
                       </tr>
                     )) : (
                       <tr className="hover:bg-surface-container-lowest transition-colors">
                         <td colSpan={2} className="p-8 text-center text-on-surface-variant">
-                          No tuition data available.
+                          {isTh ? "ไม่มีข้อมูลค่าธรรมเนียมการศึกษา" : "No tuition data available."}
                         </td>
                       </tr>
                     )}
@@ -194,7 +247,7 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
                     onClick={() => setIsSubmitted(false)}
                     className="bg-surface-container-high text-on-surface hover:bg-surface-container-highest px-6 py-2 rounded-full transition-colors font-label-caps text-label-caps cursor-pointer"
                   >
-                    Submit Another
+                    {isTh ? "ส่งแบบฟอร์มอีกครั้ง" : "Submit Another"}
                   </button>
                 </div>
               ) : (
@@ -214,18 +267,22 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Parent/Guardian Name</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">
+                          {isTh ? "ชื่อ-นามสกุล ผู้ปกครอง" : "Parent/Guardian Name"}
+                        </label>
                         <input 
                           {...register("parentName")}
                           className={`w-full rounded-md border ${errors.parentName ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors`} 
-                          placeholder="Jane Doe" 
+                          placeholder={isTh ? "เช่น คุณวิภาดา เจริญสุข" : "Jane Doe"} 
                           type="text"
                         />
                         {errors.parentName && <span className="text-error text-xs">{errors.parentName.message}</span>}
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Email Address</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">
+                          {isTh ? "ที่อยู่อีเมล" : "Email Address"}
+                        </label>
                         <input 
                           {...register("email")}
                           className={`w-full rounded-md border ${errors.email ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors`} 
@@ -240,31 +297,37 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Child&apos;s Name</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">
+                          {isTh ? "ชื่อ-นามสกุล บุตรหลาน" : "Child's Name"}
+                        </label>
                         <input 
                           {...register("childName")}
                           className={`w-full rounded-md border ${errors.childName ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors`} 
-                          placeholder="John Doe" 
+                          placeholder={isTh ? "เช่น ด.ช. ภานุวัฒน์" : "John Doe"} 
                           type="text"
                         />
                         {errors.childName && <span className="text-error text-xs">{errors.childName.message}</span>}
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Child&apos;s Age / Expected Grade</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">
+                          {isTh ? "อายุบุตรหลาน / ระดับชั้นที่ประสงค์เข้าเรียน" : "Child's Age / Expected Grade"}
+                        </label>
                         <select 
                           {...register("grade")}
                           className={`w-full rounded-md border ${errors.grade ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors cursor-pointer`}
                         >
-                          <option value="">Select Grade...</option>
+                          <option value="">{isTh ? "เลือกระดับชั้น..." : "Select Grade..."}</option>
                           {programs.map((program) => (
-                            <option key={program.id} value={program.id}>{program.title}</option>
+                            <option key={program.id} value={program.id}>
+                              {localizeData(program, 'title', activeLocale) || program.title}
+                            </option>
                           ))}
                           {programs.length === 0 && (
                             <>
-                              <option value="pre-k">Pre-K (3-4 yrs)</option>
-                              <option value="kindergarten">Kindergarten (5-6 yrs)</option>
-                              <option value="lower-primary">Lower Primary (7-10 yrs)</option>
+                              <option value="pre-k">{isTh ? "เตรียมอนุบาล (อายุ 3-4 ปี)" : "Pre-K (3-4 yrs)"}</option>
+                              <option value="kindergarten">{isTh ? "อนุบาล (อายุ 5-6 ปี)" : "Kindergarten (5-6 yrs)"}</option>
+                              <option value="lower-primary">{isTh ? "ประถมศึกษาตอนต้น (อายุ 7-10 ปี)" : "Lower Primary (7-10 yrs)"}</option>
                             </>
                           )}
                         </select>
@@ -293,7 +356,7 @@ export default function AdmissionsClient({ programs, admissionsPageData, dict, l
                       className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-full hover:opacity-90 transition-opacity mt-8 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" 
                       type="submit"
                     >
-                      {isSubmitting ? "Submitting..." : submitButtonLabel}
+                      {isSubmitting ? (isTh ? "กำลังส่งข้อมูล..." : "Submitting...") : submitButtonLabel}
                     </button>
                   </form>
                 </>

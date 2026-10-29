@@ -8,6 +8,8 @@ import { z } from "zod"
 import { Phone, EnvelopeSimple, MapPin, LinkedinLogo, InstagramLogo, FacebookLogo, YoutubeLogo, ArrowRight, PaperPlaneRight } from "@phosphor-icons/react"
 import { cn } from "@pakdeepan/ui/src/utils/cn"
 import { submitInquiry } from "@/actions/contact"
+import { useLanguage } from "@/context/LanguageContext"
+import { localizeData } from "@/lib/localize"
 
 const contactSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -29,6 +31,10 @@ interface ContactClientProps {
 }
 
 export default function ContactClient({ siteSettings, dict, locale }: ContactClientProps) {
+  const { locale: contextLocale } = useLanguage()
+  const activeLocale = (contextLocale || locale || "en") as "en" | "th"
+  const isTh = activeLocale === "th"
+
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
 
@@ -59,7 +65,6 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
       // Reset success message after 5 seconds
       setTimeout(() => setIsSuccess(false), 5000)
     } else {
-      // In a real app, you might want to show a toast error here
       console.error(result.error)
       alert(result.error)
     }
@@ -69,12 +74,12 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
   const contact = siteSettings?.contact || {}
   const phone = contact.phone || "+66 39 123 4567"
   const email = contact.email || "admissions@pakdeepan.ac.th"
-  const address = contact.address || "Chanthaburi, Thailand"
+  const address = localizeData(contact, 'address', activeLocale) || (isTh ? "จังหวัดจันทบุรี, ประเทศไทย" : "Chanthaburi, Thailand")
   const mapsUrl = contact.mapsUrl || "https://maps.google.com"
   const mapsImage = contact.mapsImage?.url || "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop"
   
-  const officeDays = siteSettings?.officeHours?.days || "Monday – Friday"
-  const officeHoursTime = siteSettings?.officeHours?.hours || "8:00 AM – 4:00 PM (Local Time)"
+  const officeDays = localizeData(siteSettings?.officeHours, 'days', activeLocale) || (isTh ? "วันจันทร์ – วันศุกร์" : "Monday – Friday")
+  const officeHoursTime = localizeData(siteSettings?.officeHours, 'hours', activeLocale) || (isTh ? "08:00 น. – 16:00 น." : "8:00 AM – 4:00 PM (Local Time)")
 
   const social = siteSettings?.social || {}
 
@@ -86,10 +91,12 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 text-center">
           <FadeIn direction="up">
             <h1 className="font-display-lg text-[40px] md:text-[56px] text-primary mb-4 tracking-tight">
-              Connect With Us
+              {isTh ? "ติดต่อเรา" : "Connect With Us"}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              We welcome your inquiries and look forward to discussing how Pakdeepan Kindergarten School can be part of your family&apos;s educational journey.
+              {isTh 
+                ? "เรายินดีต้อนรับทุกคำถามและพร้อมให้คำปรึกษา เพื่อร่วมเป็นส่วนหนึ่งในเส้นทางการศึกษาของบุตรหลานท่านที่โรงเรียนอนุบาลภักดีพรรณ"
+                : "We welcome your inquiries and look forward to discussing how Pakdeepan Kindergarten School can be part of your family's educational journey."}
             </p>
           </FadeIn>
         </section>
@@ -104,9 +111,11 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                 {/* Info Card */}
                 <div className="bg-surface-container-lowest rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-8 flex flex-col gap-8 border border-outline-variant/30">
                   <div>
-                    <h3 className="font-headline-sm text-[24px] text-secondary mb-2 tracking-tight">Admissions Office</h3>
+                    <h3 className="font-headline-sm text-[24px] text-secondary mb-2 tracking-tight">
+                      {isTh ? "สำนักงานฝ่ายรับสมัคร" : "Admissions Office"}
+                    </h3>
                     <p className="font-body-md text-body-md text-on-surface-variant">
-                      Available {officeDays}<br/>
+                      {isTh ? `เปิดทำการ ${officeDays}` : `Available ${officeDays}`}<br/>
                       {officeHoursTime}
                     </p>
                   </div>
@@ -174,7 +183,7 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-surface/90 via-surface/40 to-transparent flex items-end p-6">
                     <span className="font-label-caps text-label-caps flex items-center gap-2 text-primary group-hover:text-secondary transition-colors">
-                      View on Maps <ArrowRight size={16} />
+                      {isTh ? "ดูบนแผนที่ Google Maps" : "View on Maps"} <ArrowRight size={16} />
                     </span>
                   </div>
                 </div>
@@ -189,26 +198,34 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                   {/* Subtle background decoration */}
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container/20 rounded-bl-full -z-10 blur-3xl pointer-events-none"></div>
                   
-                  <h2 className="font-headline-md text-headline-md text-on-surface mb-8">Send a Message</h2>
+                  <h2 className="font-headline-md text-headline-md text-on-surface mb-8">
+                    {isTh ? "ส่งข้อความถึงเรา" : "Send a Message"}
+                  </h2>
                   
                   {isSuccess ? (
                     <div className="flex flex-col items-center justify-center text-center h-full min-h-[300px] animate-in fade-in zoom-in duration-500">
                       <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center text-primary mb-6">
                         <PaperPlaneRight size={32} weight="fill" />
                       </div>
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">Message Sent Successfully!</h3>
+                      <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">
+                        {isTh ? "ส่งข้อความสำเร็จเรียบร้อยแล้ว!" : "Message Sent Successfully!"}
+                      </h3>
                       <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-                        Thank you for reaching out. Our admissions team will review your inquiry and get back to you within 24 hours.
+                        {isTh 
+                          ? "ขอบพระคุณสำหรับการติดต่อ ทีมงานฝ่ายรับสมัครจะตรวจสอบและติดต่อกลับท่านภายใน 24 ชั่วโมง"
+                          : "Thank you for reaching out. Our admissions team will review your inquiry and get back to you within 24 hours."}
                       </p>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="font-label-caps text-label-caps text-on-surface-variant">First Name</label>
+                          <label className="font-label-caps text-label-caps text-on-surface-variant">
+                            {isTh ? "ชื่อจริง" : "First Name"}
+                          </label>
                           <input 
                             {...register("firstName")}
-                            placeholder="e.g. Eleanor"
+                            placeholder={isTh ? "เช่น กานต์" : "e.g. Eleanor"}
                             className={cn(
                               "w-full bg-surface-container-lowest border rounded-lg px-4 py-3 font-body-md text-on-surface outline-none transition-all",
                               "focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-outline",
@@ -217,12 +234,14 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                           />
                           {errors.firstName && <p className="text-error text-xs">{errors.firstName.message}</p>}
                         </div>
-                        
+
                         <div className="space-y-2">
-                          <label className="font-label-caps text-label-caps text-on-surface-variant">Last Name</label>
+                          <label className="font-label-caps text-label-caps text-on-surface-variant">
+                            {isTh ? "นามสกุล" : "Last Name"}
+                          </label>
                           <input 
                             {...register("lastName")}
-                            placeholder="e.g. Vance"
+                            placeholder={isTh ? "เช่น เจริญสุข" : "e.g. Vance"}
                             className={cn(
                               "w-full bg-surface-container-lowest border rounded-lg px-4 py-3 font-body-md text-on-surface outline-none transition-all",
                               "focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-outline",
@@ -234,7 +253,9 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                       </div>
 
                       <div className="space-y-2">
-                        <label className="font-label-caps text-label-caps text-on-surface-variant">Email Address</label>
+                        <label className="font-label-caps text-label-caps text-on-surface-variant">
+                          {isTh ? "ที่อยู่อีเมล" : "Email Address"}
+                        </label>
                         <input 
                           {...register("email")}
                           placeholder="eleanor@example.com"
@@ -248,7 +269,9 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                       </div>
 
                       <div className="space-y-2">
-                        <label className="font-label-caps text-label-caps text-on-surface-variant">Area of Interest</label>
+                        <label className="font-label-caps text-label-caps text-on-surface-variant">
+                          {isTh ? "เรื่องที่สนใจสอบถาม" : "Area of Interest"}
+                        </label>
                         <select 
                           {...register("interest")}
                           className={cn(
@@ -257,21 +280,33 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                             errors.interest ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/50"
                           )}
                         >
-                          <option value="early_years">Admissions - Early Years (Toddler/Pre-K)</option>
-                          <option value="kindergarten">Admissions - Kindergarten</option>
-                          <option value="tour">Schedule a Campus Tour</option>
-                          <option value="careers">Careers & Teaching</option>
-                          <option value="other">Other Inquiry</option>
+                          <option value="early_years">
+                            {isTh ? "การรับสมัคร - ปฐมวัย (บริบาล / เตรียมอนุบาล)" : "Admissions - Early Years (Toddler/Pre-K)"}
+                          </option>
+                          <option value="kindergarten">
+                            {isTh ? "การรับสมัคร - อนุบาล" : "Admissions - Kindergarten"}
+                          </option>
+                          <option value="tour">
+                            {isTh ? "นัดหมายเยี่ยมชมโรงเรียน" : "Schedule a Campus Tour"}
+                          </option>
+                          <option value="careers">
+                            {isTh ? "ร่วมงานกับเราและสมัครงานครู" : "Careers & Teaching"}
+                          </option>
+                          <option value="other">
+                            {isTh ? "สอบถามเรื่องอื่นๆ" : "Other Inquiry"}
+                          </option>
                         </select>
                         {errors.interest && <p className="text-error text-xs">{errors.interest.message}</p>}
                       </div>
 
                       <div className="space-y-2">
-                        <label className="font-label-caps text-label-caps text-on-surface-variant">Your Message</label>
+                        <label className="font-label-caps text-label-caps text-on-surface-variant">
+                          {isTh ? "ข้อความของคุณ" : "Your Message"}
+                        </label>
                         <textarea 
                           {...register("message")}
                           rows={4}
-                          placeholder="How can we help you?"
+                          placeholder={isTh ? "มีอะไรให้เราช่วยดูแลท่านได้บ้าง?" : "How can we help you?"}
                           className={cn(
                             "w-full bg-surface-container-lowest border rounded-lg px-4 py-3 font-body-md text-on-surface outline-none transition-all resize-y",
                             "focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-outline",
@@ -289,7 +324,15 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                           className="mt-1 w-4 h-4 rounded border-outline-variant/50 text-primary focus:ring-primary cursor-pointer accent-primary"
                         />
                         <label htmlFor="consent" className="font-body-md text-on-surface-variant text-sm cursor-pointer select-none">
-                          I agree to the <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a> and consent to being contacted regarding my inquiry.
+                          {isTh ? (
+                            <>
+                              ข้าพเจ้ายินยอมตาม <a href="/privacy" className="text-primary hover:underline">นโยบายความเป็นส่วนตัว</a> และยินยอมให้โรงเรียนติดต่อกลับเพื่อแจ้งข้อมูลการรับสมัคร
+                            </>
+                          ) : (
+                            <>
+                              I agree to the <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a> and consent to being contacted regarding my inquiry.
+                            </>
+                          )}
                         </label>
                       </div>
                       {errors.consent && <p className="text-error text-xs pl-7">{errors.consent.message}</p>}
@@ -300,7 +343,7 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                           disabled={isSubmitting}
                           className="bg-primary text-on-primary px-8 py-3 rounded-full font-label-caps text-label-caps flex items-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-70 shadow-sm hover:shadow-md cursor-pointer"
                         >
-                          {isSubmitting ? "Sending..." : "Submit Inquiry"}
+                          {isSubmitting ? (isTh ? "กำลังส่ง..." : "Sending...") : (isTh ? "ส่งข้อความสอบถาม" : "Submit Inquiry")}
                           {!isSubmitting && <ArrowRight size={16} />}
                         </button>
                       </div>

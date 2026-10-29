@@ -3,8 +3,11 @@
 import * as React from "react"
 import "vanilla-cookieconsent/dist/cookieconsent.css"
 import * as CookieConsent from "vanilla-cookieconsent"
+import { useLanguage } from "@/context/LanguageContext"
 
 export function CookieConsentProvider() {
+  const { locale } = useLanguage()
+
   React.useEffect(() => {
     CookieConsent.run({
       categories: {
@@ -20,7 +23,8 @@ export function CookieConsentProvider() {
         },
       },
       language: {
-        default: "en",
+        default: locale || "en",
+        autoDetect: "document",
         translations: {
           en: {
             consentModal: {
@@ -55,6 +59,39 @@ export function CookieConsentProvider() {
               ],
             },
           },
+          th: {
+            consentModal: {
+              title: "เราให้ความสำคัญกับความเป็นส่วนตัวของคุณ",
+              description:
+                "เราใช้คุกกี้เพื่อเพิ่มประสิทธิภาพและประสบการณ์ที่ดีในการใช้งานเว็บไซต์ การคลิก 'ยอมรับทั้งหมด' ถือว่าท่านยินยอมให้เราใช้คุกกี้ตาม <a href='/privacy'>นโยบายความเป็นส่วนตัว</a> ของเรา",
+              acceptAllBtn: "ยอมรับทั้งหมด",
+              acceptNecessaryBtn: "ปฏิเสธทั้งหมด",
+              showPreferencesBtn: "ตั้งค่าคุกกี้",
+            },
+            preferencesModal: {
+              title: "การตั้งค่าความเป็นส่วนตัว",
+              acceptAllBtn: "ยอมรับทั้งหมด",
+              acceptNecessaryBtn: "ปฏิเสธทั้งหมด",
+              savePreferencesBtn: "บันทึกการตั้งค่า",
+              closeIconLabel: "ปิด",
+              sections: [
+                {
+                  title: "การใช้งานคุกกี้",
+                  description: "เราใช้คุกกี้เพื่อสนับสนุนการทำงานพื้นฐานของเว็บไซต์และยกระดับประสบการณ์การใช้งานของคุณ",
+                },
+                {
+                  title: "คุกกี้ที่จำเป็นอย่างยิ่ง",
+                  description: "คุกกี้เหล่านี้จำเป็นต่อการทำงานพื้นฐานและความปลอดภัยของเว็บไซต์",
+                  linkedCategory: "necessary",
+                },
+                {
+                  title: "คุกกี้เพื่อการวิเคราะห์",
+                  description: "คุกกี้เหล่านี้ช่วยให้เราเข้าใจการเข้าชมและการใช้งานเว็บไซต์เพื่อพัฒนาให้ดียิ่งขึ้น",
+                  linkedCategory: "analytics",
+                },
+              ],
+            },
+          },
         },
       },
       guiOptions: {
@@ -67,7 +104,15 @@ export function CookieConsentProvider() {
         },
       },
     })
-  }, [])
+  }, [locale])
+
+  React.useEffect(() => {
+    try {
+      CookieConsent.setLanguage(locale)
+    } catch {
+      // Ignored
+    }
+  }, [locale])
 
   return null
 }

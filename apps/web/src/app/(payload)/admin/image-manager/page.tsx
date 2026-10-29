@@ -1,10 +1,16 @@
+import "@/app/globals.css"
 import { getPayload } from "@/lib/payload"
 import { ImageManagerClient } from "@/components/admin/ImageManagerClient"
+import { cookies } from "next/headers"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function ImageManagerPage() {
+  const cookieStore = await cookies()
+  const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
+  const initialLocale = (localeStr === "th" ? "th" : "en") as "en" | "th"
+
   const payload = await getPayload()
 
   // Fetch all site globals concurrently
@@ -24,6 +30,7 @@ export default async function ImageManagerPage() {
 
   return (
     <ImageManagerClient
+      initialLocale={initialLocale}
       siteSettings={siteSettings}
       homePage={homePage}
       aboutPage={aboutPage}

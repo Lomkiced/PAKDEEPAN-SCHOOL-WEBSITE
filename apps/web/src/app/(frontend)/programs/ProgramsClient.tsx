@@ -4,6 +4,8 @@ import * as React from "react"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { Baby, Shapes, Student, Brain, Translate, Atom, Book, Sparkle, Globe } from "@phosphor-icons/react"
 import { formatTHB } from "@/utils/currency"
+import { useLanguage } from "@/context/LanguageContext"
+import { localizeData } from "@/lib/localize"
 
 interface ProgramsClientProps {
   programs: any[];
@@ -146,19 +148,43 @@ const DEFAULT_SCHEDULE_TH = [
 ]
 
 export default function ProgramsClient({ programs, programsPageData, dict, locale }: ProgramsClientProps) {
-  const isTh = locale === "th"
-  const heroTitle = programsPageData?.heroTitle || dict.programs?.title || (isTh ? "หลักสูตรการศึกษา" : "Academic Programs")
-  const heroDescription = programsPageData?.heroDescription || dict.programs?.description || (isTh ? "บ่มเพาะความอยากรู้อยากเห็นและวางรากฐานสู่ความรักในการเรียนรู้ตลอดชีวิตผ่านหลักสูตรปฐมวัยที่ออกแบบเป็นพิเศษ" : "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum.")
+  const { locale: contextLocale } = useLanguage()
+  const activeLocale = (contextLocale || locale || "en") as "en" | "th"
+  const isTh = activeLocale === "th"
+
+  const heroTitle = 
+    localizeData(programsPageData, 'heroTitle', activeLocale) || 
+    dict.programs?.title || 
+    (isTh ? "หลักสูตรการศึกษา" : "Academic Programs")
+  const heroDescription = 
+    localizeData(programsPageData, 'heroDescription', activeLocale) || 
+    dict.programs?.description || 
+    (isTh ? "บ่มเพาะความอยากรู้อยากเห็นและวางรากฐานสู่ความรักในการเรียนรู้ตลอดชีวิตผ่านหลักสูตรปฐมวัยที่ออกแบบเป็นพิเศษ" : "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum.")
   
-  const curriculumTitle = programsPageData?.curriculumTitle || (isTh ? "จุดเด่นของหลักสูตร" : "Curriculum Highlights")
-  const highlights = programsPageData?.highlights && programsPageData.highlights.length > 0 
+  const curriculumTitle = 
+    localizeData(programsPageData, 'curriculumTitle', activeLocale) || 
+    (isTh ? "จุดเด่นของหลักสูตร" : "Curriculum Highlights")
+  const rawHighlights = programsPageData?.highlights && programsPageData.highlights.length > 0 
     ? programsPageData.highlights 
     : (isTh ? DEFAULT_HIGHLIGHTS_TH : DEFAULT_HIGHLIGHTS_EN)
+  const highlights = rawHighlights.map((item: any) => ({
+    ...item,
+    title: localizeData(item, 'title', activeLocale) || item.title,
+    description: localizeData(item, 'description', activeLocale) || item.description,
+  }))
 
-  const scheduleTitle = programsPageData?.scheduleTitle || (isTh ? "ตารางกิจกรรมประจำวัน" : "A Typical Day")
-  const scheduleItems = programsPageData?.scheduleItems && programsPageData.scheduleItems.length > 0 
+  const scheduleTitle = 
+    localizeData(programsPageData, 'scheduleTitle', activeLocale) || 
+    (isTh ? "ตารางกิจกรรมประจำวัน" : "A Typical Day")
+  const rawScheduleItems = programsPageData?.scheduleItems && programsPageData.scheduleItems.length > 0 
     ? programsPageData.scheduleItems 
     : (isTh ? DEFAULT_SCHEDULE_TH : DEFAULT_SCHEDULE_EN)
+  const scheduleItems = rawScheduleItems.map((item: any) => ({
+    ...item,
+    time: localizeData(item, 'time', activeLocale) || item.time,
+    title: localizeData(item, 'title', activeLocale) || item.title,
+    description: localizeData(item, 'description', activeLocale) || item.description,
+  }))
 
   return (
     <div className="flex flex-col relative">
@@ -179,83 +205,92 @@ export default function ProgramsClient({ programs, programsPageData, dict, local
         {/* Programs by Age Group (Bento Grid from CMS) */}
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 space-y-12">
           <FadeIn direction="up">
-            <h2 className="font-headline-md text-headline-md text-primary text-center">{dict.programs?.subtitle || "Programs by Age"}</h2>
+            <h2 className="font-headline-md text-headline-md text-primary text-center">
+              {dict.programs?.subtitle || (isTh ? "หลักสูตรตามช่วงวัย" : "Programs by Age")}
+            </h2>
           </FadeIn>
           
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {programs.length > 0 ? programs.map((program, idx) => (
-              <StaggerItem key={program.id} className={idx % 3 === 2 ? "md:col-span-2" : "h-full"}>
-                <div className="bg-surface-container-lowest h-full rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-8 flex flex-col space-y-4 border border-outline-variant/30 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                  <div className="absolute top-0 right-0 p-4">
-                    <span className={`font-label-caps text-label-caps px-3 py-1 rounded-full ${getProgramColorClass(program.level, true, true)}`}>
-                      {program.level === 'kindergarten' && (isTh ? "อายุ 2-5 ปี" : "Ages 2-5")}
-                      {program.level === 'primary' && (isTh ? "ชั้น ป.1-ป.6" : "Grades 1-6")}
-                      {program.level === 'secondary' && (isTh ? "ชั้น ม.1-ม.6" : "Grades 7-12")}
-                      {program.level === 'english-program' && (isTh ? "หลักสูตร EP" : "EP")}
-                    </span>
-                  </div>
-                  
-                  {idx % 3 === 2 ? (
-                    // Large card layout (spanning 2 columns)
-                    <div className="flex flex-col md:flex-row items-center gap-8 h-full">
-                      <div className="w-full md:w-1/3 h-48 md:h-full min-h-[200px] rounded-lg overflow-hidden border border-outline-variant/30 relative">
-                        <img 
-                          className="object-cover w-full h-full absolute inset-0 group-hover:scale-105 transition-transform duration-500" 
-                          alt={program.title} 
-                          src={program.featuredImage?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop"}
-                        />
+            {programs.length > 0 ? programs.map((program, idx) => {
+              const programTitle = localizeData(program, 'title', activeLocale) || program.title
+              const programSummary = localizeData(program, 'summary', activeLocale) || program.summary
+
+              return (
+                <StaggerItem key={program.id} className={idx % 3 === 2 ? "md:col-span-2" : "h-full"}>
+                  <div className="bg-surface-container-lowest h-full rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-8 flex flex-col space-y-4 border border-outline-variant/30 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                    <div className="absolute top-0 right-0 p-4">
+                      <span className={`font-label-caps text-label-caps px-3 py-1 rounded-full ${getProgramColorClass(program.level, true, true)}`}>
+                        {program.level === 'kindergarten' && (isTh ? "อายุ 2-5 ปี" : "Ages 2-5")}
+                        {program.level === 'primary' && (isTh ? "ชั้น ป.1-ป.6" : "Grades 1-6")}
+                        {program.level === 'secondary' && (isTh ? "ชั้น ม.1-ม.6" : "Grades 7-12")}
+                        {program.level === 'english-program' && (isTh ? "หลักสูตร EP" : "EP")}
+                      </span>
+                    </div>
+                    
+                    {idx % 3 === 2 ? (
+                      // Large card layout (spanning 2 columns)
+                      <div className="flex flex-col md:flex-row items-center gap-8 h-full">
+                        <div className="w-full md:w-1/3 h-48 md:h-full min-h-[200px] rounded-lg overflow-hidden border border-outline-variant/30 relative">
+                          <img 
+                            className="object-cover w-full h-full absolute inset-0 group-hover:scale-105 transition-transform duration-500" 
+                            alt={programTitle} 
+                            src={program.featuredImage?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop"}
+                          />
+                        </div>
+                        <div className="flex-grow flex flex-col space-y-4 justify-center py-2">
+                          {getProgramIcon(program.level)}
+                          <h3 className="font-headline-sm text-headline-sm text-on-surface">{programTitle}</h3>
+                          <p className="font-body-md text-body-md text-on-surface-variant max-w-xl">
+                            {programSummary}
+                          </p>
+                          
+                          {/* Tuition info */}
+                          <div className="mt-4 pt-4 border-t border-outline-variant/30">
+                            <p className="text-sm font-label-caps text-on-surface-variant mb-1">
+                              {dict.finance?.tuitionFee || (isTh ? "ค่าเล่าเรียนพื้นฐาน" : "Base Tuition")}:
+                            </p>
+                            <p className={`font-bold ${getProgramColorClass(program.level, true)}`}>
+                              {formatTHB(program.tuitionFee)} / 
+                              {program.billingInterval === 'term' ? ` ${dict.finance?.perTerm || (isTh ? "ภาคเรียน" : "term")}` : 
+                               program.billingInterval === 'year' ? ` ${dict.finance?.perYear || (isTh ? "ปีการศึกษา" : "year")}` : 
+                               ` ${dict.finance?.perMonth || (isTh ? "เดือน" : "month")}`}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-grow flex flex-col space-y-4 justify-center py-2">
+                    ) : (
+                      // Standard card layout
+                      <>
                         {getProgramIcon(program.level)}
-                        <h3 className="font-headline-sm text-headline-sm text-on-surface">{program.title}</h3>
-                        <p className="font-body-md text-body-md text-on-surface-variant max-w-xl">
-                          {program.summary}
+                        <h3 className="font-headline-sm text-headline-sm text-on-surface">{programTitle}</h3>
+                        <p className="font-body-md text-body-md text-on-surface-variant flex-grow">
+                          {programSummary}
                         </p>
                         
                         {/* Tuition info */}
                         <div className="mt-4 pt-4 border-t border-outline-variant/30">
                           <p className="text-sm font-label-caps text-on-surface-variant mb-1">
-                            {dict.finance?.tuitionFee || "Base Tuition"}:
+                            {dict.finance?.tuitionFee || (isTh ? "ค่าเล่าเรียนพื้นฐาน" : "Base Tuition")}:
                           </p>
                           <p className={`font-bold ${getProgramColorClass(program.level, true)}`}>
                             {formatTHB(program.tuitionFee)} / 
-                            {program.billingInterval === 'term' ? ` ${dict.finance?.perTerm || "term"}` : 
-                             program.billingInterval === 'year' ? ` ${dict.finance?.perYear || "year"}` : 
-                             ` ${dict.finance?.perMonth || "month"}`}
+                            {program.billingInterval === 'term' ? ` ${dict.finance?.perTerm || (isTh ? "ภาคเรียน" : "term")}` : 
+                             program.billingInterval === 'year' ? ` ${dict.finance?.perYear || (isTh ? "ปีการศึกษา" : "year")}` : 
+                             ` ${dict.finance?.perMonth || (isTh ? "เดือน" : "month")}`}
                           </p>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    // Standard card layout
-                    <>
-                      {getProgramIcon(program.level)}
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface">{program.title}</h3>
-                      <p className="font-body-md text-body-md text-on-surface-variant flex-grow">
-                        {program.summary}
-                      </p>
-                      
-                      {/* Tuition info */}
-                      <div className="mt-4 pt-4 border-t border-outline-variant/30">
-                        <p className="text-sm font-label-caps text-on-surface-variant mb-1">
-                          {dict.finance?.tuitionFee || "Base Tuition"}:
-                        </p>
-                        <p className={`font-bold ${getProgramColorClass(program.level, true)}`}>
-                          {formatTHB(program.tuitionFee)} / 
-                          {program.billingInterval === 'term' ? ` ${dict.finance?.perTerm || "term"}` : 
-                           program.billingInterval === 'year' ? ` ${dict.finance?.perYear || "year"}` : 
-                           ` ${dict.finance?.perMonth || "month"}`}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </StaggerItem>
-            )) : (
+                      </>
+                    )}
+                  </div>
+                </StaggerItem>
+              )
+            }) : (
               // Empty state
               <div className="col-span-1 md:col-span-2 text-center p-12 bg-surface rounded-xl border border-outline-variant/30">
-                <p className="text-on-surface-variant mb-2">No programs currently available.</p>
+                <p className="text-on-surface-variant mb-2">
+                  {isTh ? "ไม่มีข้อมูลหลักสูตรในขณะนี้" : "No programs currently available."}
+                </p>
               </div>
             )}
             

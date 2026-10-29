@@ -124,10 +124,17 @@ export function LanguageProvider({
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 
+const fallbackContext: LanguageContextType = {
+  locale: "en",
+  setLocale: () => {},
+  dict: {},
+  t: (keyPath: string, fallback?: string) => fallback || keyPath,
+}
+
 export function useLanguage() {
   const context = React.useContext(LanguageContext)
   if (!context) {
-    throw new Error("useLanguage must be used within a LanguageProvider")
+    return fallbackContext
   }
   return context
 }

@@ -6,6 +6,8 @@ import { ArrowRight, Heart } from "@phosphor-icons/react"
 import { motion } from "framer-motion"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { HeroScrollytelling } from "./_components/HeroScrollytelling"
+import { useLanguage } from "@/context/LanguageContext"
+import { localizeData } from "@/lib/localize"
 
 interface HomeClientProps {
   news: any[];
@@ -17,7 +19,7 @@ interface HomeClientProps {
   locale: string;
 }
 
-const DEFAULT_EDITORIAL_PATHWAYS = [
+const DEFAULT_EDITORIAL_PATHWAYS_EN = [
   {
     title: "Academic Programs",
     desc: "Early years, kindergarten, and primary bilingual curricula.",
@@ -35,7 +37,25 @@ const DEFAULT_EDITORIAL_PATHWAYS = [
   },
 ]
 
-const DEFAULT_MARQUEE_ITEMS = [
+const DEFAULT_EDITORIAL_PATHWAYS_TH = [
+  {
+    title: "โปรแกรมการศึกษา",
+    desc: "หลักสูตรสองภาษาสำหรับเตรียมอนุบาล อนุบาล และประถมวัย",
+    href: "/programs",
+  },
+  {
+    title: "การรับสมัครและการลงทะเบียน",
+    desc: "ค่าธรรมเนียมการศึกษาที่โปร่งใส ข้อกำหนด และขั้นตอนการรับสมัครอย่างละเอียด",
+    href: "/admissions",
+  },
+  {
+    title: "ชีวิตในโรงเรียนและปฏิทินกิจกรรม",
+    desc: "หมุดหมายแห่งการเรียนรู้ กิจกรรมนักเรียน การเฉลิมฉลอง และอัลบั้มภาพกิจกรรม",
+    href: "/campus-life",
+  },
+]
+
+const DEFAULT_MARQUEE_ITEMS_EN = [
   "Bilingual Excellence",
   "Global Mindset",
   "Nurturing Empathy",
@@ -43,53 +63,117 @@ const DEFAULT_MARQUEE_ITEMS = [
   "Joyful Curiosity",
 ]
 
+const DEFAULT_MARQUEE_ITEMS_TH = [
+  "ความเป็นเลิศสองภาษา",
+  "มุมมองระดับสากล",
+  "บ่มเพาะความเห็นอกเห็นใจ",
+  "การค้นคว้าสร้างสรรค์",
+  "ความอยากรู้อยากเห็นอย่างมีความสุข",
+]
+
 export default function HomeClient({ news, events, gallery, programs = [], homeData, dict, locale }: HomeClientProps) {
+  const { locale: contextLocale } = useLanguage()
+  const activeLocale = (contextLocale || locale || "en") as "en" | "th"
+  const isTh = activeLocale === "th"
+
   // Extract marquee items from CMS if configured
   const marqueeItems: string[] = 
     homeData?.marqueeItems && homeData.marqueeItems.length > 0
-      ? homeData.marqueeItems.map((item: any) => item.text || item).filter(Boolean)
-      : DEFAULT_MARQUEE_ITEMS
+      ? homeData.marqueeItems.map((item: any) => localizeData(item, 'text', activeLocale) || item.text || item).filter(Boolean)
+      : isTh ? DEFAULT_MARQUEE_ITEMS_TH : DEFAULT_MARQUEE_ITEMS_EN
 
   // Pathways items from CMS or default
   const pathwaysList = 
     homeData?.pathways && homeData.pathways.length > 0
-      ? homeData.pathways
-      : DEFAULT_EDITORIAL_PATHWAYS
+      ? homeData.pathways.map((item: any) => ({
+          title: localizeData(item, 'title', activeLocale) || item.title,
+          desc: localizeData(item, 'desc', activeLocale) || item.desc,
+          href: item.href || '#',
+        }))
+      : isTh ? DEFAULT_EDITORIAL_PATHWAYS_TH : DEFAULT_EDITORIAL_PATHWAYS_EN
 
   // Philosophy section values
   const philosophyImg = 
     homeData?.philosophyImage?.url || 
     "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop"
-  const philosophyTagline = homeData?.philosophyScriptTagline || "Small steps today, big dreams tomorrow"
-  const philosophyHeading = homeData?.philosophyHeading || "More than a school."
-  const philosophySubheading = homeData?.philosophySubheading || "A foundation for life."
-  const philosophyBody = homeData?.philosophyBody || "We believe that education is not just about academics, but about character, creativity, and cultivating joyful curiosity in an international setting."
-  const philosophyLinkLabel = homeData?.philosophyLinkLabel || "Read our story"
+  const philosophyTagline = 
+    localizeData(homeData, 'philosophyScriptTagline', activeLocale) || 
+    (isTh ? "ก้าวเล็กๆ ในวันนี้ สู่อนาคตที่ยิ่งใหญ่ในวันพรุ่งนี้" : "Small steps today, big dreams tomorrow")
+  const philosophyHeading = 
+    localizeData(homeData, 'philosophyHeading', activeLocale) || 
+    (isTh ? "มากกว่าโรงเรียน" : "More than a school.")
+  const philosophySubheading = 
+    localizeData(homeData, 'philosophySubheading', activeLocale) || 
+    (isTh ? "รากฐานเพื่อชีวิตที่ดี" : "A foundation for life.")
+  const philosophyBody = 
+    localizeData(homeData, 'philosophyBody', activeLocale) || 
+    (isTh ? "เราเชื่อมั่นว่าการศึกษาไม่ได้เป็นเพียงเรื่องของวิชาการเท่านั้น แต่คือการสร้างเสริมลักษณะนิสัย ความคิดสร้างสรรค์ และบ่มเพาะความสุขแห่งการเรียนรู้ในบรรยากาศนานาชาติ" : "We believe that education is not just about academics, but about character, creativity, and cultivating joyful curiosity in an international setting.")
+  const philosophyLinkLabel = 
+    localizeData(homeData, 'philosophyLinkLabel', activeLocale) || 
+    (isTh ? "อ่านเรื่องราวของเรา" : "Read our story")
   const philosophyLinkHref = homeData?.philosophyLinkHref || "/about"
 
   // Pathways header values
-  const pathwaysBadge = homeData?.pathwaysBadge || "Educational Pathways"
-  const pathwaysTitlePrefix = homeData?.pathwaysTitlePrefix || "Explore"
-  const pathwaysTitleHighlight = homeData?.pathwaysTitleHighlight || "Pakdeepan"
-  const pathwaysCTALabel = homeData?.pathwaysCTALabel || "Book a Campus Tour"
+  const pathwaysBadge = 
+    localizeData(homeData, 'pathwaysBadge', activeLocale) || 
+    (isTh ? "เส้นทางการศึกษา" : "Educational Pathways")
+  const pathwaysTitlePrefix = 
+    localizeData(homeData, 'pathwaysTitlePrefix', activeLocale) || 
+    (isTh ? "ค้นพบ" : "Explore")
+  const pathwaysTitleHighlight = 
+    localizeData(homeData, 'pathwaysTitleHighlight', activeLocale) || 
+    (isTh ? "ภักดีพรรณ" : "Pakdeepan")
+  const pathwaysCTALabel = 
+    localizeData(homeData, 'pathwaysCTALabel', activeLocale) || 
+    (isTh ? "นัดหมายเยี่ยมชมโรงเรียน" : "Book a Campus Tour")
   const pathwaysCTALink = homeData?.pathwaysCTALink || "/contact"
 
   // News section values
-  const newsBadge = homeData?.newsBadge || "Latest News & Events"
-  const newsTitlePrefix = homeData?.newsTitlePrefix || "Stay"
-  const newsTitleHighlight = homeData?.newsTitleHighlight || "Informed"
-  const newsSubtitle = homeData?.newsSubtitle || "Get the latest updates, announcements, and upcoming events at Pakdeepan School."
-  const newsViewAllLabel = homeData?.newsViewAllLabel || "View All News & Events"
+  const newsBadge = 
+    localizeData(homeData, 'newsBadge', activeLocale) || 
+    (isTh ? "ข่าวสารและกิจกรรมล่าสุด" : "Latest News & Events")
+  const newsTitlePrefix = 
+    localizeData(homeData, 'newsTitlePrefix', activeLocale) || 
+    (isTh ? "ติดตาม" : "Stay")
+  const newsTitleHighlight = 
+    localizeData(homeData, 'newsTitleHighlight', activeLocale) || 
+    (isTh ? "ข่าวสาร" : "Informed")
+  const newsSubtitle = 
+    localizeData(homeData, 'newsSubtitle', activeLocale) || 
+    (isTh ? "รับข้อมูลอัปเดต ประกาศ และกิจกรรมที่จะเกิดขึ้นที่โรงเรียนภักดีพรรณ" : "Get the latest updates, announcements, and upcoming events at Pakdeepan School.")
+  const newsViewAllLabel = 
+    localizeData(homeData, 'newsViewAllLabel', activeLocale) || 
+    (isTh ? "ดูข่าวสารและกิจกรรมทั้งหมด" : "View All News & Events")
 
   // CTA banner values
-  const ctaHeading = homeData?.ctaHeading || "See Our School in Action"
-  const ctaBody = homeData?.ctaBody || "Take a glimpse of our vibrant community, classrooms, and school life."
-  const ctaButtonLabel = homeData?.ctaButtonLabel || "View Gallery"
+  const ctaHeading = 
+    localizeData(homeData, 'ctaHeading', activeLocale) || 
+    (isTh ? "สัมผัสบรรยากาศจริงในโรงเรียนของเรา" : "See Our School in Action")
+  const ctaBody = 
+    localizeData(homeData, 'ctaBody', activeLocale) || 
+    (isTh ? "ชมภาพบรรยากาศชุมชนที่เปี่ยมด้วยชีวิตชีวา ห้องเรียน และกิจกรรมของนักเรียน" : "Take a glimpse of our vibrant community, classrooms, and school life.")
+  const ctaButtonLabel = 
+    localizeData(homeData, 'ctaButtonLabel', activeLocale) || 
+    (isTh ? "ดูแกลเลอรีภาพ" : "View Gallery")
   const ctaButtonLink = homeData?.ctaButtonLink || "/campus-life"
-  const ctaScriptText = homeData?.ctaScriptText || "Together We Grow"
+  const ctaScriptText = 
+    localizeData(homeData, 'ctaScriptText', activeLocale) || 
+    (isTh ? "เติบโตไปด้วยกัน" : "Together We Grow")
   const polaroid1 = homeData?.ctaPolaroid1?.url || "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600&auto=format&fit=crop"
   const polaroid2 = homeData?.ctaPolaroid2?.url || "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop"
   const polaroid3 = homeData?.ctaPolaroid3?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop"
+
+  const mockNews = isTh
+    ? [
+        { id: "mock-1", title: "วันกีฬาสีประจำปีรวมพลังชุมชนภักดีพรรณ", category: "กีฬา", publishDate: new Date().toISOString() },
+        { id: "mock-2", title: "เทศกาลศิลปะสร้างสรรค์แสดงศักยภาพนักเรียน", category: "กิจกรรม", publishDate: new Date().toISOString() },
+        { id: "mock-3", title: "เปิดตัวหลักสูตรส่งเสริมการอ่านเชิงปฏิสัมพันธ์ใหม่", category: "วิชาการ", publishDate: new Date().toISOString() },
+      ]
+    : [
+        { id: "mock-1", title: "Annual Sports Day Brings Community Together", category: "Sports", publishDate: new Date().toISOString() },
+        { id: "mock-2", title: "Creative Arts Festival Showcases Student Talent", category: "Events", publishDate: new Date().toISOString() },
+        { id: "mock-3", title: "New Interactive Reading Curriculum Launched", category: "Academics", publishDate: new Date().toISOString() },
+      ]
 
   return (
     <div className="flex flex-col bg-background font-sans overflow-x-hidden">
@@ -254,17 +338,15 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
             </div>
 
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {(news.length > 0 ? news.slice(0, 3) : [
-                { id: "mock-1", title: "Annual Sports Day Brings Community Together", category: "Sports", publishDate: new Date().toISOString() },
-                { id: "mock-2", title: "Creative Arts Festival Showcases Student Talent", category: "Events", publishDate: new Date().toISOString() },
-                { id: "mock-3", title: "New Interactive Reading Curriculum Launched", category: "Academics", publishDate: new Date().toISOString() }
-              ]).map((item: any, idx: number) => {
+              {(news.length > 0 ? news.slice(0, 3) : mockNews).map((item: any, idx: number) => {
                 const fallbackImages = [
                   "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=1200&auto=format&fit=crop",
                   "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=1200&auto=format&fit=crop",
                   "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200&auto=format&fit=crop"
                 ]
                 const imageUrl = item.featuredImage?.url || fallbackImages[idx % fallbackImages.length]
+                const itemTitle = localizeData(item, 'title', activeLocale) || item.title
+                const itemCategory = localizeData(item, 'category', activeLocale) || item.category
 
                 return (
                   <StaggerItem key={item.id} className="h-full">
@@ -275,7 +357,7 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
                         <div className="absolute inset-0 w-full h-full z-0">
                           <img 
                             src={imageUrl} 
-                            alt={item.title} 
+                            alt={itemTitle} 
                             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
                           />
                         </div>
@@ -289,22 +371,22 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
                           {/* Top Meta (Date & Category) */}
                           <div className="flex justify-between items-center mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                             <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
-                              {item.category}
+                              {itemCategory}
                             </span>
                             <span className="text-xs text-white/90 font-bold drop-shadow-sm">
-                              {item.publishDate ? new Date(item.publishDate).toLocaleDateString(locale === "th" ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ""}
+                              {item.publishDate ? new Date(item.publishDate).toLocaleDateString(activeLocale === "th" ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ""}
                             </span>
                           </div>
 
                           {/* Title */}
                           <h4 className="font-display-lg text-2xl font-bold text-white mb-2 line-clamp-2 drop-shadow-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                            {item.title}
+                            {itemTitle}
                           </h4>
 
                           {/* Hidden Read More Button (Revealed on Hover) */}
                           <div className="h-0 overflow-hidden group-hover:h-[40px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out mt-1">
                             <span className="inline-flex items-center gap-2 text-blue-200 font-bold text-sm hover:text-white">
-                              Read More <ArrowRight size={14} weight="bold" />
+                              {isTh ? "อ่านเพิ่มเติม" : "Read More"} <ArrowRight size={14} weight="bold" />
                             </span>
                           </div>
                           

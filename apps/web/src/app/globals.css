@@ -1,4 +1,6 @@
 @import "@pakdeepan/ui/theme.css";
+@source "../";
+@source "../../src";
 @source "../../../../packages/ui/src";
 
 .font-sherlina {

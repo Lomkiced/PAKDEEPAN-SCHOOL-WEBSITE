@@ -7,13 +7,22 @@ import { cn } from "../utils/cn"
 import Image from "next/image"
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion"
 
-const NAV_LINKS = [
+const NAV_LINKS_EN = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/programs", label: "Academics" },
   { href: "/admissions", label: "Admissions" },
   { href: "/campus-life", label: "News & Events" },
   { href: "/contact", label: "Contact" },
+] as const
+
+const NAV_LINKS_TH = [
+  { href: "/", label: "หน้าแรก" },
+  { href: "/about", label: "เกี่ยวกับเรา" },
+  { href: "/programs", label: "หลักสูตร" },
+  { href: "/admissions", label: "การรับสมัคร" },
+  { href: "/campus-life", label: "ข่าวสารและกิจกรรม" },
+  { href: "/contact", label: "ติดต่อเรา" },
 ] as const
 
 export interface NavBarProps {
@@ -23,16 +32,18 @@ export interface NavBarProps {
   schoolName?: string
   logoUrl?: string
   currentLocale?: "en" | "th"
+  navLinks?: { href: string; label: string }[]
   onLocaleChange?: (locale: "en" | "th") => void
 }
 
 export function NavBar({
-  ctaLabel = "Enroll Now",
-  ctaMobileLabel = "Enroll",
+  ctaLabel,
+  ctaMobileLabel,
   ctaLink = "/admissions",
-  schoolName = "Pakdeepan",
+  schoolName,
   logoUrl = "/images/pakdeepan-logo.png",
   currentLocale = "en",
+  navLinks,
   onLocaleChange,
 }: NavBarProps = {}) {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -40,6 +51,12 @@ export function NavBar({
   const [activeLocale, setActiveLocale] = React.useState<"en" | "th">(currentLocale)
   const pathname = usePathname()
   const { scrollY } = useScroll()
+
+  // Compute localized labels
+  const resolvedCtaLabel = ctaLabel || (activeLocale === "th" ? "สมัครเรียน" : "Enroll Now")
+  const resolvedCtaMobileLabel = ctaMobileLabel || (activeLocale === "th" ? "สมัคร" : "Enroll")
+  const resolvedSchoolName = schoolName || (activeLocale === "th" ? "โรงเรียนภักดีพรรณ" : "Pakdeepan")
+  const activeNavLinks = navLinks || (activeLocale === "th" ? NAV_LINKS_TH : NAV_LINKS_EN)
 
   // Sync active locale if prop changes
   React.useEffect(() => {
@@ -95,7 +112,7 @@ export function NavBar({
           <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 group relative z-[110]">
             <Image 
               src={logoUrl || "/images/pakdeepan-logo.png"} 
-              alt={`${schoolName} Logo`} 
+              alt={`${resolvedSchoolName} Logo`} 
               width={48} 
               height={48} 
               className="group-hover:scale-105 transition-transform duration-500 drop-shadow-sm"
@@ -103,7 +120,7 @@ export function NavBar({
             />
             <div className="flex flex-col leading-none">
               <span className="font-display-lg font-extrabold text-[22px] text-[#1e3a8a] transition-colors duration-500">
-                {schoolName}
+                {resolvedSchoolName}
               </span>
             </div>
           </Link>
@@ -153,7 +170,7 @@ export function NavBar({
                 "bg-[#1e3a8a] text-white hover:bg-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5"
               )}
             >
-              {ctaLabel}
+              {resolvedCtaLabel}
             </Link>
 
             {/* Menu Toggle (Magnetic/Architectural) */}
@@ -163,7 +180,7 @@ export function NavBar({
               aria-label="Toggle navigation menu"
             >
               <span className="font-bold text-[14px] uppercase tracking-widest hidden sm:block">
-                {isOpen ? "Close" : "Menu"}
+                {isOpen ? (activeLocale === "th" ? "ปิด" : "Close") : (activeLocale === "th" ? "เมนู" : "Menu")}
               </span>
               <div className="w-11 h-11 rounded-full flex flex-col items-center justify-center gap-[5px] bg-slate-100/80 group-hover:bg-slate-200/80 transition-colors shadow-sm">
                 <span className={cn("w-5 h-[2px] rounded-full transition-all duration-300", isOpen ? "bg-current rotate-45 translate-y-[3.5px]" : "bg-current")} />
@@ -203,7 +220,7 @@ export function NavBar({
               
               {/* Navigation Links */}
               <div className="flex flex-col gap-6 w-full flex-grow">
-                {NAV_LINKS.map(({ href, label }, idx) => {
+                {activeNavLinks.map(({ href, label }, idx) => {
                   const isActive = href === "/" ? pathname === "/" : (pathname === href || pathname.startsWith(href + "/"))
                   return (
                     <motion.div
@@ -237,7 +254,9 @@ export function NavBar({
                 className="w-full flex justify-between items-end border-t border-slate-200 pt-8 mt-10"
               >
                 <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold tracking-widest text-primary uppercase">Language</span>
+                  <span className="text-xs font-bold tracking-widest text-primary uppercase">
+                    {activeLocale === "th" ? "ภาษา" : "Language"}
+                  </span>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
@@ -268,7 +287,7 @@ export function NavBar({
                   onClick={() => setIsOpen(false)}
                   className="md:hidden px-8 py-3 bg-[#1e3a8a] text-white text-[13px] font-bold rounded-full shadow-lg shadow-primary/20"
                 >
-                  {ctaMobileLabel}
+                  {resolvedCtaMobileLabel}
                 </Link>
               </motion.div>
 

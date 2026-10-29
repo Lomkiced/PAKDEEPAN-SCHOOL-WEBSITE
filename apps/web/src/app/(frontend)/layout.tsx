@@ -81,6 +81,7 @@ export default async function FrontendLayout({
             {children}
           </main>
           <Footer 
+            currentLocale={locale}
             tagline={siteSettings?.footer?.tagline}
             philosophy={siteSettings?.footer?.philosophy}
             email={siteSettings?.contact?.email}

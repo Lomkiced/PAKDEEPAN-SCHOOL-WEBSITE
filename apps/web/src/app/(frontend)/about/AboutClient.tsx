@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
+import { useLanguage } from "@/context/LanguageContext"
+import { localizeData } from "@/lib/localize"
 
 interface AboutClientProps {
   aboutData: any;
@@ -10,109 +12,157 @@ interface AboutClientProps {
 }
 
 export default function AboutClient({ aboutData, dict, locale }: AboutClientProps) {
+  const { locale: contextLocale } = useLanguage()
+  const activeLocale = (contextLocale || locale || "en") as "en" | "th"
+  const isTh = activeLocale === "th"
+
   // --- HERO SECTION ---
-  const heroBadge = aboutData?.heroBadge || dict.about?.heroBadge || (locale === "th" ? "เรื่องราวของเรา" : "Our Story");
-  const heroTitle = aboutData?.heroTitle || dict.about?.heroTitle || (locale === "th" ? "บ่มเพาะความเป็นเลิศในการศึกษาระดับปฐมวัย" : "Nurturing Excellence in Early Education");
-  const heroDescription = aboutData?.heroDescription || dict.about?.heroDescription || (locale === "th" ? "ณ โรงเรียนภักดีพรรณ เราเชื่อมั่นในการสร้างรากฐานแห่งความอยากรู้อยากเห็น ความเห็นอกเห็นใจ และความเป็นเลิศทางวิชาการในบรรยากาศอบอุ่นมาตรฐานสากล" : "At Pakdeepan Kindergarten School, we believe in cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.");
+  const heroBadge = 
+    localizeData(aboutData, 'heroBadge', activeLocale) || 
+    dict.about?.heroBadge || 
+    (isTh ? "เรื่องราวของเรา" : "Our Story");
+  const heroTitle = 
+    localizeData(aboutData, 'heroTitle', activeLocale) || 
+    dict.about?.heroTitle || 
+    (isTh ? "บ่มเพาะความเป็นเลิศในการศึกษาระดับปฐมวัย" : "Nurturing Excellence in Early Education");
+  const heroDescription = 
+    localizeData(aboutData, 'heroDescription', activeLocale) || 
+    dict.about?.heroDescription || 
+    (isTh ? "ณ โรงเรียนภักดีพรรณ เราเชื่อมั่นในการสร้างรากฐานแห่งความอยากรู้อยากเห็น ความเห็นอกเห็นใจ และความเป็นเลิศทางวิชาการในบรรยากาศอบอุ่นมาตรฐานสากล" : "At Pakdeepan Kindergarten School, we believe in cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.");
   const heroImage = aboutData?.heroImage?.url || "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop";
 
   // --- VISION & MISSION ---
-  const vision = aboutData?.vision || dict.about?.vision || (locale === "th" ? "เป็นสถาบันการศึกษาระดับปฐมวัยชั้นนำที่ได้รับการยอมรับในระดับสากล ในการพัฒนาผู้เรียนให้เป็นนักคิดสร้างสรรค์และผู้นำที่เปี่ยมด้วยความเมตตาตั้งแต่ก้าวแรกของการศึกษา" : "To be the premier international early years institution, recognized globally for fostering innovative thinkers and compassionate leaders from their very first steps in education.");
-  const mission = aboutData?.mission || dict.about?.mission || (locale === "th" ? "เราจัดเตรียมหลักสูตรแบบองค์รวมที่เน้นเด็กเป็นศูนย์กลาง ภายใต้สภาพแวดล้อมที่ปลอดภัย สร้างแรงบันดาลใจ และเปิดกว้าง เพื่อให้เด็กทุกคนค้นพบศักยภาพอันโดดเด่นของตนเองผ่านการสืบเสาะและการเรียนรู้ที่เปี่ยมสุข" : "We provide a holistic, child-centered curriculum within a safe, inspiring, and culturally diverse environment, empowering each child to reach their unique potential through inquiry and joyful discovery.");
+  const vision = 
+    localizeData(aboutData, 'vision', activeLocale) || 
+    dict.about?.vision || 
+    (isTh ? "เป็นสถาบันการศึกษาระดับปฐมวัยชั้นนำที่ได้รับการยอมรับในระดับสากล ในการพัฒนาผู้เรียนให้เป็นนักคิดสร้างสรรค์และผู้นำที่เปี่ยมด้วยความเมตตาตั้งแต่ก้าวแรกของการศึกษา" : "To be the premier international early years institution, recognized globally for fostering innovative thinkers and compassionate leaders from their very first steps in education.");
+  const mission = 
+    localizeData(aboutData, 'mission', activeLocale) || 
+    dict.about?.mission || 
+    (isTh ? "เราจัดเตรียมหลักสูตรแบบองค์รวมที่เน้นเด็กเป็นศูนย์กลาง ภายใต้สภาพแวดล้อมที่ปลอดภัย สร้างแรงบันดาลใจ และเปิดกว้าง เพื่อให้เด็กทุกคนค้นพบศักยภาพอันโดดเด่นของตนเองผ่านการสืบเสาะและการเรียนรู้ที่เปี่ยมสุข" : "We provide a holistic, child-centered curriculum within a safe, inspiring, and culturally diverse environment, empowering each child to reach their unique potential through inquiry and joyful discovery.");
 
   // --- SCHOOL DIRECTOR MESSAGE ---
-  const principalName = aboutData?.principalName || "Dr. Elena Rostova";
-  const principalTitle = aboutData?.principalTitle || dict.about?.directorTitle || (locale === "th" ? "ผู้อำนวยการโรงเรียน (ปริญญาเอก ด้านการศึกษาปฐมวัย)" : "School Director (Ph.D. in Early Education)");
-  const principalMessage = aboutData?.principalMessage || dict.about?.principalMessage || (locale === "th" ? "ยินดีต้อนรับสู่ประชาคมที่เด็กทุกคนได้รับการเอาใจใส่ รับฟัง และมองเห็นคุณค่า ทีมครูและบุคลากรของเรามุ่งมั่นมอบจุดเริ่มต้นที่ดีที่สุดสำหรับการเรียนรู้ตลอดชีวิตของบุตรหลานท่าน" : "Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child's lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth.");
+  const principalName = 
+    localizeData(aboutData, 'principalName', activeLocale) || 
+    (isTh ? "ดร. เอเลน่า รอสโตวา" : "Dr. Elena Rostova");
+  const principalTitle = 
+    localizeData(aboutData, 'principalTitle', activeLocale) || 
+    dict.about?.directorTitle || 
+    (isTh ? "ผู้อำนวยการโรงเรียน (ปริญญาเอก ด้านการศึกษาปฐมวัย)" : "School Director (Ph.D. in Early Education)");
+  const principalMessage = 
+    localizeData(aboutData, 'principalMessage', activeLocale) || 
+    dict.about?.principalMessage || 
+    (isTh ? "ยินดีต้อนรับสู่ประชาคมที่เด็กทุกคนได้รับการเอาใจใส่ รับฟัง และมองเห็นคุณค่า ทีมครูและบุคลากรของเรามุ่งมั่นมอบจุดเริ่มต้นที่ดีที่สุดสำหรับการเรียนรู้ตลอดชีวิตของบุตรหลานท่าน เราเชื่อมั่นว่าความเป็นเลิศที่แท้จริงเกิดขึ้นเมื่อวิชาการที่เข้มข้นผสานกับความอบอุ่นและเอาใจใส่" : "Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child's lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth.");
   const principalPhoto = aboutData?.principalPhoto?.url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop";
 
   // --- HISTORY & HERITAGE ---
-  const historyBadge = aboutData?.historyBadge || (locale === "th" ? "ประวัติและความเป็นมา" : "Our Heritage");
-  const historyTitle = aboutData?.historyTitle || (locale === "th" ? "รากฐานแห่งความไว้วางใจและการดูแลเอาใจใส่" : "A Foundation Built on Trust and Care");
-  const historyDescription = aboutData?.historyDescription || (locale === "th" ? "ก่อตั้งขึ้นในจังหวัดจันทบุรีด้วยวิสัยทัศน์ที่มุ่งเน้นการศึกษาปฐมวัยสองภาษาที่ทันสมัยและเปี่ยมสุข โรงเรียนภักดีพรรณได้บ่มเพาะเยาวชนรุ่นแล้วรุ่นเล่าให้เติบโตอย่างมั่นใจและสร้างสรรค์" : "Founded in Chanthaburi with a vision for modern, joyful, and bilingual early years learning, Pakdeepan Kindergarten School has nurtured generations of young learners into confident, creative global citizens.");
+  const historyBadge = 
+    localizeData(aboutData, 'historyBadge', activeLocale) || 
+    (isTh ? "ประวัติและความเป็นมา" : "Our Heritage");
+  const historyTitle = 
+    localizeData(aboutData, 'historyTitle', activeLocale) || 
+    (isTh ? "รากฐานแห่งความไว้วางใจและการดูแลเอาใจใส่" : "A Foundation Built on Trust and Care");
+  const historyDescription = 
+    localizeData(aboutData, 'historyDescription', activeLocale) || 
+    (isTh ? "ก่อตั้งขึ้นในจังหวัดจันทบุรีด้วยวิสัยทัศน์ที่มุ่งเน้นการศึกษาปฐมวัยสองภาษาที่ทันสมัยและเปี่ยมสุข โรงเรียนภักดีพรรณได้บ่มเพาะเยาวชนรุ่นแล้วรุ่นเล่าให้เติบโตอย่างมั่นใจและสร้างสรรค์" : "Founded in Chanthaburi with a vision for modern, joyful, and bilingual early years learning, Pakdeepan Kindergarten School has nurtured generations of young learners into confident, creative global citizens.");
   const historyImage = aboutData?.historyImage?.url || "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop";
 
   const defaultMilestones = [
     {
       year: "2010",
-      title: locale === "th" ? "ก่อตั้งโรงเรียนภักดีพรรณ" : "Founding of Pakdeepan",
-      description: locale === "th" 
+      title: isTh ? "ก่อตั้งโรงเรียนภักดีพรรณ" : "Founding of Pakdeepan",
+      description: isTh 
         ? "ริเริ่มก่อตั้งโรงเรียนด้วยชั้นเรียนอนุบาล 2 ห้อง เพื่อสร้างสภาพแวดล้อมที่เปี่ยมด้วยความอบอุ่นและการเรียนรู้สองภาษา"
         : "Established in Chanthaburi with two early-years classrooms, pioneering inquiry-based bilingual early education."
     },
     {
       year: "2016",
-      title: locale === "th" ? "ขยายวิทยาเขตและสิ่งอำนวยความสะดวกระดับสากล" : "Campus Expansion & Innovation Wing",
-      description: locale === "th"
+      title: isTh ? "ขยายวิทยาเขตและสิ่งอำนวยความสะดวกระดับสากล" : "Campus Expansion & Innovation Wing",
+      description: isTh
         ? "เปิดอาคารกิจกรรมสร้างสรรค์ สวนการเรียนรู้ธรรมชาติ และศูนย์พัฒนาการทางภาษา"
         : "Opened modern play-inquiry gardens, dedicated atelier creative studios, and early sensory development spaces."
     },
     {
       year: "2021",
-      title: locale === "th" ? "การรับรองมาตรฐานหลักสูตรนานาชาติ" : "International Accreditation & Holistic Pathways",
-      description: locale === "th"
+      title: isTh ? "การรับรองมาตรฐานหลักสูตรนานาชาติ" : "International Accreditation & Holistic Pathways",
+      description: isTh
         ? "ยกระดับหลักสูตรบูรณาการสองภาษา ผสานมาตรฐานวิชาการสากลและความพร้อมสู่ระดับประถมศึกษา"
         : "Integrated dual-immersion English-Thai frameworks aligned with premier international early years standards."
     },
     {
       year: "2025+",
-      title: locale === "th" ? "ก้าวสู่อนาคตแห่งการเรียนรู้ที่ยั่งยืน" : "Next-Gen Early Learning",
-      description: locale === "th"
+      title: isTh ? "ก้าวสู่อนาคตแห่งการเรียนรู้ที่ยั่งยืน" : "Next-Gen Early Learning",
+      description: isTh
         ? "มุ่งมั่นสร้างพลเมืองโลกที่มีความมั่นใจ มีความคิดสร้างสรรค์ และมีคุณธรรมเป็นเข็มทิศชีวิต"
         : "Empowering confident, compassionate global citizens through experiential STEM, arts, and character education."
     }
   ];
 
   const milestones = (aboutData?.milestones && aboutData.milestones.length > 0)
-    ? aboutData.milestones
+    ? aboutData.milestones.map((item: any) => ({
+        ...item,
+        title: localizeData(item, 'title', activeLocale) || item.title,
+        description: localizeData(item, 'description', activeLocale) || item.description,
+      }))
     : defaultMilestones;
 
   // --- FACULTY & TEACHERS ---
-  const facultyBadge = aboutData?.facultyBadge || (locale === "th" ? "คณะครูและบุคลากร" : "Our Educators");
-  const facultyTitle = aboutData?.facultyTitle || (locale === "th" ? "ครูผู้เปี่ยมด้วยหัวใจ ผู้นำทางสู่การเรียนรู้" : "Passionate Educators, Nurturing Leaders");
-  const facultyDescription = aboutData?.facultyDescription || (locale === "th" ? "ทีมครูผู้ทรงคุณวุฒิทั้งชาวไทยและชาวต่างชาติ นำประสบการณ์และความเชี่ยวชาญด้านปฐมวัยมาส่งมอบความรักและการดูแลในทุกๆ วัน" : "Our team of certified international and Thai educators brings decades of specialized early learning experience and warmth to every classroom.");
+  const facultyBadge = 
+    localizeData(aboutData, 'facultyBadge', activeLocale) || 
+    (isTh ? "คณะครูและบุคลากร" : "Our Educators");
+  const facultyTitle = 
+    localizeData(aboutData, 'facultyTitle', activeLocale) || 
+    (isTh ? "ครูผู้เปี่ยมด้วยหัวใจ ผู้นำทางสู่การเรียนรู้" : "Passionate Educators, Nurturing Leaders");
+  const facultyDescription = 
+    localizeData(aboutData, 'facultyDescription', activeLocale) || 
+    (isTh ? "ทีมครูผู้ทรงคุณวุฒิทั้งชาวไทยและชาวต่างชาติ นำประสบการณ์และความเชี่ยวชาญด้านปฐมวัยมาส่งมอบความรักและการดูแลในทุกๆ วัน" : "Our team of certified international and Thai educators brings decades of specialized early learning experience and warmth to every classroom.");
 
   const defaultFaculty = [
     {
-      name: locale === "th" ? "ครูเอเลน่า รอสโตวา" : "Dr. Elena Rostova",
-      role: locale === "th" ? "ผู้อำนวยการโรงเรียน" : "School Director",
+      name: isTh ? "ครูเอเลน่า รอสโตวา" : "Dr. Elena Rostova",
+      role: isTh ? "ผู้อำนวยการโรงเรียน" : "School Director",
       qualification: "Ph.D. Early Childhood Education (UCL)",
       photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
-      bio: locale === "th"
+      bio: isTh
         ? "ประสบการณ์กว่า 18 ปีในการบริหารโรงเรียนนานาชาติและการพัฒนาหลักสูตรปฐมวัย"
         : "18+ years leading international early years institutes with deep passion for child-led inquiry."
     },
     {
-      name: locale === "th" ? "ครูกานต์ธิดา ศิริโรจน์" : "Kanthida Siriroj",
-      role: locale === "th" ? "หัวหน้าฝ่ายวิชาการภาษาไทยและปฐมวัย" : "Head of Thai Language & Culture",
+      name: isTh ? "ครูกานต์ธิดา ศิริโรจน์" : "Kanthida Siriroj",
+      role: isTh ? "หัวหน้าฝ่ายวิชาการภาษาไทยและปฐมวัย" : "Head of Thai Language & Culture",
       qualification: "M.Ed. Curriculum & Instruction (Chulalongkorn)",
       photoUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?q=80&w=600&auto=format&fit=crop",
-      bio: locale === "th"
+      bio: isTh
         ? "ผู้เชี่ยวชาญด้านวรรณกรรมเด็ก การสื่อสารสองภาษา และการเสริมสร้างทักษะทางสังคมและอารมณ์"
         : "Specialist in bilingual literacy, social-emotional growth, and creative literature for young learners."
     },
     {
-      name: locale === "th" ? "มาร์คัส เชน" : "Marcus Chen",
-      role: locale === "th" ? "ครูผู้เชี่ยวชาญด้าน STEM และสิ่งแวดล้อมศึกษา" : "Lead Early STEM & Inquiry Specialist",
+      name: isTh ? "มาร์คัส เชน" : "Marcus Chen",
+      role: isTh ? "ครูผู้เชี่ยวชาญด้าน STEM และสิ่งแวดล้อมศึกษา" : "Lead Early STEM & Inquiry Specialist",
       qualification: "B.Sc. Cognitive Science, PGCE Early Years",
       photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop",
-      bio: locale === "th"
+      bio: isTh
         ? "ปลูกฝังความรักในธรรมชาติ วิทยาศาสตร์เชิงประจักษ์ และการคิดวิเคราะห์ผ่านการทดลองจริง"
         : "Fostering organic curiosity through hands-on science experiments, mathematics, and botanical discovery."
     },
     {
-      name: locale === "th" ? "โซเฟีย มาร์ติเนซ" : "Sofia Martinez",
-      role: locale === "th" ? "ครูผู้เชี่ยวชาญศิลปะและดนตรีบำบัดปฐมวัย" : "Arts & Expressive Movement Specialist",
+      name: isTh ? "โซเฟีย มาร์ติเนซ" : "Sofia Martinez",
+      role: isTh ? "ครูผู้เชี่ยวชาญศิลปะและดนตรีบำบัดปฐมวัย" : "Arts & Expressive Movement Specialist",
       qualification: "M.A. Creative Arts Therapy, Orff Schulwerk Certified",
       photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop",
-      bio: locale === "th"
+      bio: isTh
         ? "สร้างสรรค์การเรียนรู้ผ่านสุนทรียศาสตร์ ดนตรี และการเคลื่อนไหวเพื่อพัฒนาการของสมองทั้งสองซีก"
         : "Integrating fine motor dexterity, rhythm, and joyful visual expression into daily classroom rhythms."
     }
   ];
 
   const facultyMembers = (aboutData?.facultyMembers && aboutData.facultyMembers.length > 0)
-    ? aboutData.facultyMembers
+    ? aboutData.facultyMembers.map((member: any) => ({
+        ...member,
+        name: localizeData(member, 'name', activeLocale) || member.name,
+        role: localizeData(member, 'role', activeLocale) || member.role,
+        bio: localizeData(member, 'bio', activeLocale) || member.bio,
+      }))
     : defaultFaculty;
 
   return (
@@ -166,7 +216,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
               </div>
               <div className="relative z-10 mt-12">
                 <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
-                  {dict.about?.visionTitle || (locale === "th" ? "วิสัยทัศน์ของเรา" : "Our Vision")}
+                  {dict.about?.visionTitle || (isTh ? "วิสัยทัศน์ของเรา" : "Our Vision")}
                 </h2>
                 <div className="w-12 h-1 bg-primary mb-8 rounded-full" />
                 <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
@@ -182,7 +232,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
               </div>
               <div className="relative z-10 mt-12">
                 <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-6">
-                  {dict.about?.missionTitle || (locale === "th" ? "พันธกิจของเรา" : "Our Mission")}
+                  {dict.about?.missionTitle || (isTh ? "พันธกิจของเรา" : "Our Mission")}
                 </h2>
                 <div className="w-12 h-1 bg-primary mb-8 rounded-full" />
                 <p className="font-body-md text-[17px] md:text-[19px] leading-loose text-on-surface-variant">
@@ -216,11 +266,11 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
                 {/* Right: Editorial Typography Message */}
                 <div className="lg:col-span-7 flex flex-col justify-center">
                   <span className="text-sm font-bold tracking-widest text-primary uppercase mb-4 block">
-                    {dict.about?.leadershipBadge || (locale === "th" ? "ฝ่ายบริหารโรงเรียน" : "Leadership")}
+                    {dict.about?.leadershipBadge || (isTh ? "ฝ่ายบริหารโรงเรียน" : "Leadership")}
                   </span>
                   
                   <h3 className="font-display-lg text-[36px] md:text-[48px] text-[#1e3a8a] font-extrabold leading-tight mb-10">
-                    {dict.about?.messageTitle || (locale === "th" ? "สาส์นจากผู้อำนวยการโรงเรียน" : "A Message from the School Director")}
+                    {dict.about?.messageTitle || (isTh ? "สาส์นจากผู้อำนวยการโรงเรียน" : "A Message from the School Director")}
                   </h3>
                   
                   {/* The Quote Block */}
