@@ -4,6 +4,9 @@ import { cookies } from "next/headers"
 import { getDictionary } from "@/lib/i18n"
 import { getCachedGlobal } from "@/lib/payload"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: "Privacy Policy | Pakdeepan Kindergarten School",
   description: "Learn how Pakdeepan Kindergarten School collects, uses, and safeguards your personal information.",

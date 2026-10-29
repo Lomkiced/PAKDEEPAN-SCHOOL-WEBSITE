@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { revalidateTag } from 'next/cache'
+import { revalidateAllRoutes } from '@/lib/revalidate'
 
 export const Programs: CollectionConfig = {
   slug: 'programs',
@@ -19,12 +19,12 @@ export const Programs: CollectionConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag('programs-cache', 'default')
-          revalidateTag('home-cache', 'default')
-        } catch (e) {
-          console.error('[Programs afterChange] Revalidation error:', e)
-        }
+        revalidateAllRoutes('/programs', ['programs-cache', 'home-cache'])
+      },
+    ],
+    afterDelete: [
+      async () => {
+        revalidateAllRoutes('/programs', ['programs-cache', 'home-cache'])
       },
     ],
   },

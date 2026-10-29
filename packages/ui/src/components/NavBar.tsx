@@ -21,6 +21,9 @@ export interface NavBarProps {
   ctaMobileLabel?: string
   ctaLink?: string
   schoolName?: string
+  logoUrl?: string
+  currentLocale?: "en" | "th"
+  onLocaleChange?: (locale: "en" | "th") => void
 }
 
 export function NavBar({
@@ -28,11 +31,35 @@ export function NavBar({
   ctaMobileLabel = "Enroll",
   ctaLink = "/admissions",
   schoolName = "Pakdeepan",
+  logoUrl = "/images/pakdeepan-logo.png",
+  currentLocale = "en",
+  onLocaleChange,
 }: NavBarProps = {}) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
+  const [activeLocale, setActiveLocale] = React.useState<"en" | "th">(currentLocale)
   const pathname = usePathname()
   const { scrollY } = useScroll()
+
+  // Sync active locale if prop changes
+  React.useEffect(() => {
+    setActiveLocale(currentLocale)
+  }, [currentLocale])
+
+  const handleLanguageSwitch = (newLocale: "en" | "th") => {
+    setActiveLocale(newLocale)
+    try {
+      localStorage.setItem("pakdeepan_locale", newLocale)
+      document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
+    } catch {
+      // Ignore
+    }
+    if (onLocaleChange) {
+      onLocaleChange(newLocale)
+    } else {
+      window.location.reload()
+    }
+  }
 
   // Track scroll position
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -67,7 +94,7 @@ export function NavBar({
           {/* Brand */}
           <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 group relative z-[110]">
             <Image 
-              src="/images/pakdeepan-logo.png" 
+              src={logoUrl || "/images/pakdeepan-logo.png"} 
               alt={`${schoolName} Logo`} 
               width={48} 
               height={48} 
@@ -82,8 +109,42 @@ export function NavBar({
           </Link>
           
           {/* Actions */}
-          <div className="flex items-center gap-6 relative z-[110]">
+          <div className="flex items-center gap-3 sm:gap-6 relative z-[110]">
             
+            {/* Prominent Language Switcher Pill */}
+            <div
+              className="inline-flex items-center p-0.5 sm:p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-sm text-xs font-bold"
+              role="group"
+              aria-label="Language Selector"
+            >
+              <button
+                type="button"
+                onClick={() => handleLanguageSwitch("en")}
+                className={cn(
+                  "px-2.5 sm:px-3 py-1 rounded-full transition-all duration-300 text-[11px] sm:text-xs",
+                  activeLocale === "en"
+                    ? "bg-[#1e3a8a] text-white shadow-sm font-extrabold"
+                    : "text-[#1e3a8a]/70 hover:text-[#1e3a8a]"
+                )}
+                aria-pressed={activeLocale === "en"}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLanguageSwitch("th")}
+                className={cn(
+                  "px-2.5 sm:px-3 py-1 rounded-full transition-all duration-300 text-[11px] sm:text-xs",
+                  activeLocale === "th"
+                    ? "bg-[#1e3a8a] text-white shadow-sm font-extrabold"
+                    : "text-[#1e3a8a]/70 hover:text-[#1e3a8a]"
+                )}
+                aria-pressed={activeLocale === "th"}
+              >
+                ไทย
+              </button>
+            </div>
+
             <Link 
               href={ctaLink} 
               onClick={() => setIsOpen(false)}
@@ -177,13 +238,27 @@ export function NavBar({
               >
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold tracking-widest text-primary uppercase">Language</span>
-                  <div className="flex gap-4">
-                    <button onClick={() => { document.cookie = "NEXT_LOCALE=en; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors cursor-pointer">
-                      EN
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleLanguageSwitch("en")}
+                      className={cn(
+                        "font-bold text-sm transition-colors cursor-pointer",
+                        activeLocale === "en" ? "text-primary underline font-extrabold" : "text-[#1e3a8a] hover:text-primary"
+                      )}
+                    >
+                      English (EN)
                     </button>
                     <span className="text-slate-300">|</span>
-                    <button onClick={() => { document.cookie = "NEXT_LOCALE=th; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors cursor-pointer">
-                      TH
+                    <button
+                      type="button"
+                      onClick={() => handleLanguageSwitch("th")}
+                      className={cn(
+                        "font-bold text-sm transition-colors cursor-pointer",
+                        activeLocale === "th" ? "text-primary underline font-extrabold" : "text-[#1e3a8a] hover:text-primary"
+                      )}
+                    >
+                      ภาษาไทย (TH)
                     </button>
                   </div>
                 </div>

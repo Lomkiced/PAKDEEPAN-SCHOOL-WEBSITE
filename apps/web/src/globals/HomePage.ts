@@ -1,5 +1,5 @@
 import type { GlobalConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const HomePage: GlobalConfig = {
   slug: "home-page",
@@ -13,12 +13,7 @@ export const HomePage: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag("home-page-cache", "default")
-          revalidateTag("home-cache", "default")
-        } catch (e) {
-          console.error("[HomePage afterChange] Revalidation error:", e)
-        }
+        revalidateAllRoutes("/", ["home-page-cache", "home-cache"])
       },
     ],
   },
@@ -99,6 +94,24 @@ export const HomePage: GlobalConfig = {
               required: true,
               defaultValue: "/admissions",
               label: "Secondary CTA Button Link",
+            },
+            {
+              name: "heroBackgroundImage",
+              type: "upload",
+              relationTo: "media",
+              label: "Hero Ambient / Background Image",
+              admin: {
+                description: "Optional background image behind hero content. Falls back to subtle brand ambient gradients.",
+              },
+            },
+            {
+              name: "heroVideoPoster",
+              type: "upload",
+              relationTo: "media",
+              label: "Hero Video Poster (Fallback)",
+              admin: {
+                description: "Poster preview image displayed before the animated emblem loads.",
+              },
             },
           ],
         },

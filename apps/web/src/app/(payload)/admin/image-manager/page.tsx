@@ -1,0 +1,37 @@
+import { getPayload } from "@/lib/payload"
+import { ImageManagerClient } from "@/components/admin/ImageManagerClient"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
+export default async function ImageManagerPage() {
+  const payload = await getPayload()
+
+  // Fetch all site globals concurrently
+  const [siteSettings, homePage, aboutPage] = await Promise.all([
+    payload.findGlobal({ slug: "site-settings", depth: 1 }).catch(() => null),
+    payload.findGlobal({ slug: "home-page", depth: 1 }).catch(() => null),
+    payload.findGlobal({ slug: "about-page", depth: 1 }).catch(() => null),
+  ])
+
+  // Fetch collections concurrently
+  const [programsRes, newsRes, eventsRes, galleryRes] = await Promise.all([
+    payload.find({ collection: "programs", depth: 1, limit: 100 }).catch(() => ({ docs: [] })),
+    payload.find({ collection: "news", depth: 1, limit: 100 }).catch(() => ({ docs: [] })),
+    payload.find({ collection: "events", depth: 1, limit: 100 }).catch(() => ({ docs: [] })),
+    payload.find({ collection: "gallery-images", depth: 1, limit: 100 }).catch(() => ({ docs: [] })),
+  ])
+
+  return (
+    <ImageManagerClient
+      siteSettings={siteSettings}
+      homePage={homePage}
+      aboutPage={aboutPage}
+      programs={programsRes.docs}
+      news={newsRes.docs}
+      events={eventsRes.docs}
+      gallery={galleryRes.docs}
+    />
+  )
+}
+

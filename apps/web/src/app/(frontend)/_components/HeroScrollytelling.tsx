@@ -15,6 +15,8 @@ export interface HeroScrollytellingProps {
   primaryCtaLink?: string
   secondaryCtaLabel?: string
   secondaryCtaLink?: string
+  backgroundImage?: string
+  videoPoster?: string
 }
 
 export function HeroScrollytelling({
@@ -27,12 +29,26 @@ export function HeroScrollytelling({
   primaryCtaLink = "/about",
   secondaryCtaLabel = "Admissions",
   secondaryCtaLink = "/admissions",
+  backgroundImage,
+  videoPoster = "/videos/pakdeepan-logo-poster.webp",
 }: HeroScrollytellingProps) {
   // If tagline contains separator '·' or '•', split into decorated words
   const taglineItems = tagline ? tagline.split(/\s*[·•]\s*/) : ["Learn", "Grow", "Build Your Future"]
 
   return (
     <div className="relative w-full overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-10 md:py-16">
+
+      {/* Dynamic Background Image (if configured in CMS) */}
+      {backgroundImage && (
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <img 
+            src={backgroundImage} 
+            alt="School Hero Background" 
+            className="w-full h-full object-cover opacity-10"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/30" />
+        </div>
+      )}
 
       {/* --- HALF-HALF BACKGROUND VIDEO (PAKDEEPAN LOGO EMBLEM ANIMATION) --- */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex justify-end">
@@ -52,7 +68,7 @@ export function HeroScrollytelling({
             autoPlay 
             loop 
             preload="auto"
-            poster="/videos/pakdeepan-logo-poster.webp"
+            poster={videoPoster || "/videos/pakdeepan-logo-poster.webp"}
             className="w-full max-w-[840px] xl:max-w-[920px] max-h-[82vh] object-contain scale-[1.0] lg:scale-[1.12] xl:scale-[1.18] brightness-[1.02] contrast-[1.05] will-change-transform"
             aria-label="Pakdeepan School Animated Logo Emblem"
           >

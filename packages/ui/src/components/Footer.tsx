@@ -24,6 +24,7 @@ export interface FooterProps {
   linkedinUrl?: string
   youtubeUrl?: string
   links?: { href: string; label: string }[]
+  logoUrl?: string
 }
 
 export function Footer({
@@ -36,6 +37,7 @@ export function Footer({
   facebookUrl = "https://facebook.com/pakdeepanschool",
   instagramUrl = "https://instagram.com/pakdeepanschool",
   links = DEFAULT_LINKS,
+  logoUrl,
 }: FooterProps = {}) {
   // Format tagline to render highlighted line
   const taglineLines = tagline ? tagline.split("\n") : ["Small steps today,", "big dreams tomorrow."]
@@ -51,6 +53,15 @@ export function Footer({
           
           {/* Brand Philosophy */}
           <div className="lg:col-span-5 pr-4 md:pr-10">
+            {logoUrl && (
+              <div className="mb-6">
+                <img 
+                  src={logoUrl} 
+                  alt={copyrightName} 
+                  className="h-10 w-auto object-contain brightness-0 invert opacity-90" 
+                />
+              </div>
+            )}
             <h3 className="font-display-lg text-[28px] md:text-[36px] font-extrabold mb-6 leading-[1.15]">
               {firstLine}
               {secondLine && (

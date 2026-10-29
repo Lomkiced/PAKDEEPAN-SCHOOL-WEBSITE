@@ -1,4 +1,25 @@
 {
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "academics": "Academics",
+    "admissions": "Admissions",
+    "campusLife": "News & Events",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "enrollNow": "Enroll Now",
+    "enroll": "Enroll",
+    "menu": "Menu",
+    "close": "Close",
+    "language": "Language"
+  },
+  "director": {
+    "badge": "Leadership",
+    "title": "A Message from the School Director",
+    "defaultName": "Dr. Elena Rostova",
+    "defaultTitle": "School Director (Ph.D. in Early Education)",
+    "defaultMessage": "Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child's lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth."
+  },
   "home": {
     "hero": {
       "badge": "Admissions Open for 2024-2025",
@@ -108,9 +129,14 @@
     "downloadSyllabus": "Download Syllabus (PDF)"
   },
   "about": {
+    "heroBadge": "Our Story",
+    "heroTitle": "Nurturing Excellence in Early Education",
+    "heroDescription": "At Pakdeepan Kindergarten School, we believe in cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.",
     "visionTitle": "Our Vision",
     "missionTitle": "Our Mission",
-    "messageTitle": "A Message from the Principal"
+    "messageTitle": "A Message from the School Director",
+    "leadershipBadge": "Leadership",
+    "directorTitle": "School Director (Ph.D. in Early Education)"
   },
   "programs": {
     "title": "Academic Programs",
@@ -131,5 +157,108 @@
     "dataProtection": "Data Protection",
     "childPrivacy": "Child Privacy",
     "contactUs": "Contact Us"
+  },
+  "admin": {
+    "title": "Pakdeepan School CMS",
+    "subtitle": "Content Management & Visual Asset Administration",
+    "nav": {
+      "dashboard": "Dashboard",
+      "imageManager": "Visual Assets & Image Manager",
+      "siteSettings": "Site Settings",
+      "homePage": "Home Page",
+      "aboutPage": "About Us & Leadership",
+      "programs": "Academic Programs",
+      "programsPage": "Programs Page Settings",
+      "news": "News & Articles",
+      "events": "Events Calendar",
+      "gallery": "School Photo Gallery",
+      "admissionsPage": "Admissions & Tuition",
+      "campusLifePage": "Campus Life Settings",
+      "privacyPage": "Privacy Policy",
+      "inquiries": "Admissions Inquiries",
+      "media": "Media Library",
+      "users": "Admin Users",
+      "backToAdmin": "Back to Admin",
+      "viewWebsite": "View Public Website"
+    },
+    "metrics": {
+      "totalPrograms": "Active Programs",
+      "totalNews": "Published Articles",
+      "totalEvents": "Upcoming Events",
+      "totalGallery": "Gallery Photos",
+      "totalInquiries": "Pending Inquiries"
+    },
+    "actions": {
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "saved": "Saved Successfully",
+      "uploadImage": "Upload Image",
+      "applyPublish": "Apply & Publish",
+      "replaceImage": "Replace Image",
+      "removeImage": "Remove",
+      "clear": "Clear",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "addNew": "Add New",
+      "filter": "Filter",
+      "search": "Search...",
+      "refresh": "Refresh",
+      "copyUrl": "Copy URL",
+      "urlCopied": "URL Copied to Clipboard"
+    },
+    "uploader": {
+      "tabUpload": "Upload Local File",
+      "tabUrl": "Paste External URL",
+      "dragTitle": "Click to upload or drag and drop",
+      "dragSubtitle": "PNG, JPG, WebP, SVG, AVIF (Max 10MB)",
+      "urlLabel": "Image Source URL",
+      "urlPlaceholder": "https://images.unsplash.com/... or https://...",
+      "urlHelper": "Paste any high-resolution public URL. It will preview live immediately.",
+      "livePreview": "Live Preview",
+      "noImage": "No image assigned",
+      "noImageSub": "Upload or paste URL above",
+      "badgeLive": "Live on Site",
+      "badgeFileReady": "New File Ready",
+      "badgeUrlReady": "URL Ready",
+      "syncActive": "Real-Time Sync Active",
+      "toastSuccess": "Image published and synchronized with website in real-time!",
+      "toastError": "Failed to upload image. Please try again."
+    },
+    "modules": {
+      "siteAndHero": "Site Settings & Hero Visual Assets",
+      "siteAndHeroDesc": "Official branding, hero background, video poster, philosophy image, and home CTA polaroids.",
+      "schoolDirector": "School Director & About Page Imagery",
+      "schoolDirectorDesc": "Official portrait of the School Director, hero backdrop, and heritage campus archive.",
+      "programs": "Academic Program Curriculum Cards",
+      "programsDesc": "Featured imagery for each educational level displayed on the Academics page.",
+      "newsAndEvents": "News Articles & Upcoming Events",
+      "newsAndEventsDesc": "Replace cover photos for news announcements and calendar events on the Campus Life page.",
+      "gallery": "School Gallery & Facilities",
+      "galleryDesc": "Replace gallery photos displayed on the Campus Life interactive gallery.",
+      "logoLabel": "Official School Logo",
+      "logoDesc": "Displayed in the sticky navigation header and footer across all pages.",
+      "heroBgLabel": "Hero Ambient / Background Image",
+      "heroBgDesc": "Ambient textured background displayed in the hero scrollytelling section.",
+      "heroVideoPosterLabel": "Hero Animated Video Poster (Fallback)",
+      "heroVideoPosterDesc": "Image shown before the hero animated video emblem loads.",
+      "philosophyLabel": "Philosophy Feature Image",
+      "philosophyDesc": "Large photography card in the 'More than a school' philosophy section.",
+      "polaroid1": "Polaroid 1 (Left Tilt)",
+      "polaroid2": "Polaroid 2 (Center Straight)",
+      "polaroid3": "Polaroid 3 (Right Tilt)",
+      "directorPortrait": "School Director Portrait",
+      "directorPortraitDesc": "Prominent portrait shown alongside the School Director's Message.",
+      "aboutHeroLabel": "About Page Hero Background",
+      "aboutHeroDesc": "Cinematic edge-to-edge photography behind the 'Our Story' title.",
+      "historyLabel": "History & Heritage Archive Photo",
+      "historyDesc": "Historical photograph shown next to the school's heritage narrative."
+    },
+    "fallbackNotice": "If a Thai field is empty, English will be displayed automatically.",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    }
   }
 }

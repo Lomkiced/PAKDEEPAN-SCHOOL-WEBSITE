@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const News: CollectionConfig = {
   slug: "news",
@@ -18,12 +18,12 @@ export const News: CollectionConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag('campus-life-cache', 'default')
-          revalidateTag('home-cache', 'default')
-        } catch (e) {
-          console.error('[News afterChange] Revalidation error:', e)
-        }
+        revalidateAllRoutes("/campus-life", ["campus-life-cache", "home-cache"])
+      },
+    ],
+    afterDelete: [
+      async () => {
+        revalidateAllRoutes("/campus-life", ["campus-life-cache", "home-cache"])
       },
     ],
   },

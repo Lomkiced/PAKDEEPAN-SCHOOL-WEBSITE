@@ -1,5 +1,5 @@
 import type { GlobalConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const ProgramsPage: GlobalConfig = {
   slug: "programs-page",
@@ -13,12 +13,7 @@ export const ProgramsPage: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag("programs-page-cache", "default")
-          revalidateTag("programs-cache", "default")
-        } catch (e) {
-          console.error("[ProgramsPage afterChange] Revalidation error:", e)
-        }
+        revalidateAllRoutes("/programs", ["programs-page-cache", "programs-cache"])
       },
     ],
   },

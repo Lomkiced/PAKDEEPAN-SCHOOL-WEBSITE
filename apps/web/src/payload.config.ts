@@ -33,13 +33,27 @@ export default buildConfig({
       titleSuffix: " | Pakdeepan Admin",
       description: "Pakdeepan Kindergarten School — Content Management System",
     },
+    components: {
+      beforeDashboard: [
+        "@/components/admin/AdminNavBanner#AdminNavBanner",
+      ],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
 
   localization: {
-    locales: ["en", "th"],
+    locales: [
+      {
+        label: "English (EN)",
+        code: "en",
+      },
+      {
+        label: "ภาษาไทย (TH)",
+        code: "th",
+      },
+    ],
     defaultLocale: "en",
     fallback: true,
   },

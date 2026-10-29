@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -8,6 +9,18 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true, // Public read access for images
+  },
+  hooks: {
+    afterChange: [
+      async () => {
+        revalidateAllRoutes()
+      },
+    ],
+    afterDelete: [
+      async () => {
+        revalidateAllRoutes()
+      },
+    ],
   },
   upload: {
     staticDir: "media",

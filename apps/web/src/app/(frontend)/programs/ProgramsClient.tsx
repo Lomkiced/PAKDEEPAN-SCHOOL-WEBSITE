@@ -63,7 +63,7 @@ const renderHighlightIcon = (iconName: string) => {
   }
 }
 
-const DEFAULT_HIGHLIGHTS = [
+const DEFAULT_HIGHLIGHTS_EN = [
   {
     iconName: "Brain",
     title: "Montessori-Inspired",
@@ -81,7 +81,25 @@ const DEFAULT_HIGHLIGHTS = [
   }
 ]
 
-const DEFAULT_SCHEDULE = [
+const DEFAULT_HIGHLIGHTS_TH = [
+  {
+    iconName: "Brain",
+    title: "แนวคิดมอนเตสซอรี่",
+    description: "ส่งเสริมการเรียนรู้ด้วยตนเองและการคิดวิเคราะห์อย่างเป็นอิสระผ่านกิจกรรมที่ลงมือปฏิบัติจริง"
+  },
+  {
+    iconName: "Translate",
+    title: "หลักสูตรสองภาษาเข้มข้น",
+    description: "ซึมซับการใช้ภาษาอังกฤษและภาษาไทยอย่างเป็นธรรมชาติ พัฒนาความยืดหยุ่นทางความคิดตั้งแต่วัยเยาว์"
+  },
+  {
+    iconName: "Atom",
+    title: "STEM ปฐมวัย",
+    description: "ปูพื้นฐานคณิตศาสตร์และวิทยาศาสตร์ผ่านการทดลองและการสังเกตธรรมชาติอย่างสนุกสนาน"
+  }
+]
+
+const DEFAULT_SCHEDULE_EN = [
   {
     time: "08:30 AM",
     title: "Arrival & Morning Greeting",
@@ -104,19 +122,43 @@ const DEFAULT_SCHEDULE = [
   }
 ]
 
+const DEFAULT_SCHEDULE_TH = [
+  {
+    time: "08:30 น.",
+    title: "เดินทางถึงโรงเรียนและการต้อนรับยามเช้า",
+    description: "ต้อนรับนักเรียนด้วยความอบอุ่นและเตรียมความพร้อมสู่การเรียนรู้ตลอดวัน"
+  },
+  {
+    time: "09:00 น.",
+    title: "กิจกรรมการเรียนรู้แบบบูรณาการ",
+    description: "เสริมสร้างทักษะการรู้หนังสือ ตัวเลข และการเรียนรู้แบบโครงงาน"
+  },
+  {
+    time: "10:30 น.",
+    title: "กิจกรรมกลางแจ้งและธรรมชาติศึกษา",
+    description: "พัฒนากล้ามเนื้อมัดใหญ่และการเคลื่อนไหวในสวนธรรมชาติที่ปลอดภัย"
+  },
+  {
+    time: "12:00 น.",
+    title: "รับประทานอาหารกลางวันและเวลาพักผ่อน",
+    description: "อาหารที่มีคุณค่าทางโภชนาการครบถ้วนตามด้วยเวลาพักผ่อนอย่างสงบ"
+  }
+]
+
 export default function ProgramsClient({ programs, programsPageData, dict, locale }: ProgramsClientProps) {
-  const heroTitle = programsPageData?.heroTitle || dict.programs?.title || "Academic Programs"
-  const heroDescription = programsPageData?.heroDescription || dict.programs?.description || "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum."
+  const isTh = locale === "th"
+  const heroTitle = programsPageData?.heroTitle || dict.programs?.title || (isTh ? "หลักสูตรการศึกษา" : "Academic Programs")
+  const heroDescription = programsPageData?.heroDescription || dict.programs?.description || (isTh ? "บ่มเพาะความอยากรู้อยากเห็นและวางรากฐานสู่ความรักในการเรียนรู้ตลอดชีวิตผ่านหลักสูตรปฐมวัยที่ออกแบบเป็นพิเศษ" : "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum.")
   
-  const curriculumTitle = programsPageData?.curriculumTitle || "Curriculum Highlights"
+  const curriculumTitle = programsPageData?.curriculumTitle || (isTh ? "จุดเด่นของหลักสูตร" : "Curriculum Highlights")
   const highlights = programsPageData?.highlights && programsPageData.highlights.length > 0 
     ? programsPageData.highlights 
-    : DEFAULT_HIGHLIGHTS
+    : (isTh ? DEFAULT_HIGHLIGHTS_TH : DEFAULT_HIGHLIGHTS_EN)
 
-  const scheduleTitle = programsPageData?.scheduleTitle || "A Typical Day"
+  const scheduleTitle = programsPageData?.scheduleTitle || (isTh ? "ตารางกิจกรรมประจำวัน" : "A Typical Day")
   const scheduleItems = programsPageData?.scheduleItems && programsPageData.scheduleItems.length > 0 
     ? programsPageData.scheduleItems 
-    : DEFAULT_SCHEDULE
+    : (isTh ? DEFAULT_SCHEDULE_TH : DEFAULT_SCHEDULE_EN)
 
   return (
     <div className="flex flex-col relative">
@@ -147,10 +189,10 @@ export default function ProgramsClient({ programs, programsPageData, dict, local
                 <div className="bg-surface-container-lowest h-full rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-8 flex flex-col space-y-4 border border-outline-variant/30 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
                   <div className="absolute top-0 right-0 p-4">
                     <span className={`font-label-caps text-label-caps px-3 py-1 rounded-full ${getProgramColorClass(program.level, true, true)}`}>
-                      {program.level === 'kindergarten' && "Ages 2-5"}
-                      {program.level === 'primary' && "Grades 1-6"}
-                      {program.level === 'secondary' && "Grades 7-12"}
-                      {program.level === 'english-program' && "EP"}
+                      {program.level === 'kindergarten' && (isTh ? "อายุ 2-5 ปี" : "Ages 2-5")}
+                      {program.level === 'primary' && (isTh ? "ชั้น ป.1-ป.6" : "Grades 1-6")}
+                      {program.level === 'secondary' && (isTh ? "ชั้น ม.1-ม.6" : "Grades 7-12")}
+                      {program.level === 'english-program' && (isTh ? "หลักสูตร EP" : "EP")}
                     </span>
                   </div>
                   

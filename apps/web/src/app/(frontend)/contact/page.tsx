@@ -4,6 +4,9 @@ import type { Metadata } from "next"
 import { cookies } from "next/headers"
 import { getDictionary } from "@/lib/i18n"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: "Contact Us | Pakdeepan Kindergarten",
   description: "Get in touch with Pakdeepan Kindergarten School. We welcome your inquiries.",

@@ -1,5 +1,5 @@
 import type { GlobalConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const CampusLifePage: GlobalConfig = {
   slug: "campus-life-page",
@@ -13,12 +13,7 @@ export const CampusLifePage: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag("campus-life-page-cache", "default")
-          revalidateTag("campus-life-cache", "default")
-        } catch (e) {
-          console.error("[CampusLifePage afterChange] Revalidation error:", e)
-        }
+        revalidateAllRoutes("/campus-life", ["campus-life-page-cache", "campus-life-cache"])
       },
     ],
   },

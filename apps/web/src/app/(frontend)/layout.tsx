@@ -4,6 +4,8 @@ import localFont from "next/font/local"
 import { cookies } from "next/headers"
 import { NavBar, Footer } from "@pakdeepan/ui"
 import { CookieConsentProvider } from "@/components/CookieConsentProvider"
+import { LanguageProvider } from "@/context/LanguageContext"
+import { getDictionary } from "@/lib/i18n"
 import { getCachedGlobal } from "@/lib/payload"
 import "../globals.css"
 
@@ -35,6 +37,9 @@ const mali = Mali({
   subsets: ["latin", "thai"],
 })
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: "Pakdeepan Kindergarten School | A Foundation for a Beautiful Future",
   description: "Premium early childhood education nurturing creativity, curiosity, and character.",
@@ -57,31 +62,39 @@ export default async function FrontendLayout({
     console.error("Failed to load site settings in layout:", error)
   }
 
+  // Fetch dictionary
+  const dict = await getDictionary(locale)
+
   return (
     <html lang={locale}>
       <body className={`${outfit.variable} ${plusJakartaSans.variable} ${sherlina.variable} ${satisfy.variable} ${mali.variable} bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col`}>
-        <NavBar 
-          ctaLabel={siteSettings?.navigation?.ctaLabel}
-          ctaMobileLabel={siteSettings?.navigation?.ctaMobileLabel}
-          ctaLink={siteSettings?.navigation?.ctaLink}
-          schoolName={siteSettings?.schoolName}
-        />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer 
-          tagline={siteSettings?.footer?.tagline}
-          philosophy={siteSettings?.footer?.philosophy}
-          email={siteSettings?.contact?.email}
-          phone={siteSettings?.contact?.phone}
-          location={siteSettings?.footer?.location}
-          copyrightName={siteSettings?.footer?.copyrightName || siteSettings?.schoolName}
-          facebookUrl={siteSettings?.social?.facebook}
-          instagramUrl={siteSettings?.social?.instagram}
-          linkedinUrl={siteSettings?.social?.linkedin}
-          youtubeUrl={siteSettings?.social?.youtube}
-        />
-        <CookieConsentProvider />
+        <LanguageProvider initialLocale={locale} initialDict={dict}>
+          <NavBar 
+            ctaLabel={siteSettings?.navigation?.ctaLabel}
+            ctaMobileLabel={siteSettings?.navigation?.ctaMobileLabel}
+            ctaLink={siteSettings?.navigation?.ctaLink}
+            schoolName={siteSettings?.schoolName}
+            logoUrl={siteSettings?.logo?.url}
+            currentLocale={locale}
+          />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer 
+            tagline={siteSettings?.footer?.tagline}
+            philosophy={siteSettings?.footer?.philosophy}
+            email={siteSettings?.contact?.email}
+            phone={siteSettings?.contact?.phone}
+            location={siteSettings?.footer?.location}
+            copyrightName={siteSettings?.footer?.copyrightName || siteSettings?.schoolName}
+            facebookUrl={siteSettings?.social?.facebook}
+            instagramUrl={siteSettings?.social?.instagram}
+            linkedinUrl={siteSettings?.social?.linkedin}
+            youtubeUrl={siteSettings?.social?.youtube}
+            logoUrl={siteSettings?.logo?.url}
+          />
+          <CookieConsentProvider />
+        </LanguageProvider>
       </body>
     </html>
   )

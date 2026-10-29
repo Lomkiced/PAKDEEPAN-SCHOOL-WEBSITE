@@ -6,6 +6,9 @@ import { cookies } from "next/headers"
 import { getDictionary } from "@/lib/i18n"
 import { getCachedGlobal } from "@/lib/payload"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: "Pakdeepan Kindergarten School | A Foundation for a Beautiful Future",
   description: "Premium early childhood education nurturing creativity, curiosity, and character.",

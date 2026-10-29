@@ -106,6 +106,8 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
           primaryCtaLink={homeData?.heroPrimaryCTALink}
           secondaryCtaLabel={homeData?.heroSecondaryCTALabel}
           secondaryCtaLink={homeData?.heroSecondaryCTALink}
+          backgroundImage={homeData?.heroBackgroundImage?.url}
+          videoPoster={homeData?.heroVideoPoster?.url}
         />
 
         {/* --- INFINITE SCROLLING MARQUEE --- */}

@@ -1,5 +1,5 @@
 import type { GlobalConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const PrivacyPage: GlobalConfig = {
   slug: "privacy-page",
@@ -13,12 +13,7 @@ export const PrivacyPage: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag("privacy-page-cache", "default")
-          revalidateTag("privacy-cache", "default")
-        } catch (e) {
-          console.error("[PrivacyPage afterChange] Revalidation error:", e)
-        }
+        revalidateAllRoutes("/privacy", ["privacy-page-cache", "privacy-cache"])
       },
     ],
   },

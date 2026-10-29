@@ -1,5 +1,5 @@
 import type { GlobalConfig } from "payload"
-import { revalidateTag } from "next/cache"
+import { revalidateAllRoutes } from "@/lib/revalidate"
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -14,13 +14,7 @@ export const SiteSettings: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag("site-settings-cache", "default")
-          revalidateTag("contact-cache", "default")
-          revalidateTag("home-cache", "default")
-        } catch (e) {
-          console.error("[SiteSettings afterChange] Revalidation error:", e)
-        }
+        revalidateAllRoutes("/", ["site-settings-cache", "contact-cache", "home-cache"])
       },
     ],
   },
@@ -37,6 +31,15 @@ export const SiteSettings: GlobalConfig = {
       type: "text",
       defaultValue: "Excellence in Early Education",
       label: "Tagline",
+    },
+    {
+      name: "logo",
+      type: "upload",
+      relationTo: "media",
+      label: "School Logo",
+      admin: {
+        description: "Official school logo used in Header and Footer. If not provided, the default brand asset is displayed.",
+      },
     },
     {
       type: "group",

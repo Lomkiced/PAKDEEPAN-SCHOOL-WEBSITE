@@ -1,11 +1,11 @@
 import type { GlobalConfig } from 'payload'
-import { revalidateTag } from 'next/cache'
+import { revalidateAllRoutes } from '@/lib/revalidate'
 
 export const AboutPage: GlobalConfig = {
   slug: 'about-page',
   label: 'About Page',
   admin: {
-    description: 'Manage content for the About Us page.',
+    description: 'Manage content for the About Us page (Hero, Vision/Mission, School Director Message, History, and Faculty/Staff).',
   },
   access: {
     read: () => true, // Public read for website
@@ -13,11 +13,7 @@ export const AboutPage: GlobalConfig = {
   hooks: {
     afterChange: [
       async () => {
-        try {
-          revalidateTag('about-page-cache', 'default')
-        } catch (e) {
-          console.error('[AboutPage afterChange] Revalidation error:', e)
-        }
+        revalidateAllRoutes('/about', ['about-page-cache'])
       },
     ],
   },
@@ -83,22 +79,22 @@ export const AboutPage: GlobalConfig = {
           ],
         },
         {
-          label: 'Principal Message',
+          label: 'School Director Message',
           fields: [
             {
               name: 'principalName',
               type: 'text',
               required: true,
               defaultValue: 'Dr. Elena Rostova',
-              label: 'Principal Name',
+              label: 'School Director Name',
             },
             {
               name: 'principalTitle',
               type: 'text',
               localized: true,
               required: true,
-              defaultValue: 'Ph.D. in Early Education',
-              label: 'Principal Title',
+              defaultValue: 'School Director (Ph.D. in Early Education)',
+              label: 'School Director Title',
             },
             {
               name: 'principalMessage',
@@ -106,14 +102,136 @@ export const AboutPage: GlobalConfig = {
               localized: true,
               required: true,
               defaultValue: '"Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child\'s lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth."',
-              label: 'Principal Message',
+              label: 'School Director Message',
             },
             {
               name: 'principalPhoto',
               type: 'upload',
               relationTo: 'media',
               required: false,
-              label: 'Principal Photo',
+              label: 'School Director Portrait',
+            },
+          ],
+        },
+        {
+          label: 'History & Heritage',
+          fields: [
+            {
+              name: 'historyBadge',
+              type: 'text',
+              localized: true,
+              defaultValue: 'Our Heritage',
+              label: 'History Eyebrow Badge',
+            },
+            {
+              name: 'historyTitle',
+              type: 'text',
+              localized: true,
+              defaultValue: 'A Foundation Built on Trust and Care',
+              label: 'History Title',
+            },
+            {
+              name: 'historyDescription',
+              type: 'textarea',
+              localized: true,
+              defaultValue: 'Founded in Chanthaburi with a vision for modern, joyful, and bilingual early years learning, Pakdeepan Kindergarten School has nurtured generations of young learners into confident, creative global citizens.',
+              label: 'History Narrative',
+            },
+            {
+              name: 'historyImage',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'History Photo / Campus Archive',
+            },
+            {
+              name: 'milestones',
+              type: 'array',
+              label: 'Historical Milestones',
+              fields: [
+                {
+                  name: 'year',
+                  type: 'text',
+                  required: true,
+                  label: 'Year',
+                },
+                {
+                  name: 'title',
+                  type: 'text',
+                  localized: true,
+                  required: true,
+                  label: 'Milestone Title',
+                },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  localized: true,
+                  label: 'Milestone Description',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Faculty & Teachers',
+          fields: [
+            {
+              name: 'facultyBadge',
+              type: 'text',
+              localized: true,
+              defaultValue: 'Our Educators',
+              label: 'Faculty Eyebrow Badge',
+            },
+            {
+              name: 'facultyTitle',
+              type: 'text',
+              localized: true,
+              defaultValue: 'Passionate Educators, Nurturing Leaders',
+              label: 'Faculty Title',
+            },
+            {
+              name: 'facultyDescription',
+              type: 'textarea',
+              localized: true,
+              defaultValue: 'Our team of certified international and Thai educators brings decades of specialized early learning experience and warmth to every classroom.',
+              label: 'Faculty Description',
+            },
+            {
+              name: 'facultyMembers',
+              type: 'array',
+              label: 'Faculty Members',
+              fields: [
+                {
+                  name: 'name',
+                  type: 'text',
+                  required: true,
+                  label: 'Teacher / Staff Name',
+                },
+                {
+                  name: 'role',
+                  type: 'text',
+                  localized: true,
+                  required: true,
+                  label: 'Role / Designation',
+                },
+                {
+                  name: 'qualification',
+                  type: 'text',
+                  localized: true,
+                  label: 'Degrees / Certifications',
+                },
+                {
+                  name: 'photo',
+                  type: 'upload',
+                  relationTo: 'media',
+                  label: 'Educator Photo',
+                },
+                {
+                  name: 'bio',
+                  type: 'textarea',
+                  localized: true,
+                  label: 'Brief Bio',
+                },
+              ],
             },
           ],
         },
