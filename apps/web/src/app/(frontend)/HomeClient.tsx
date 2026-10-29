@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { PlayCircle, Users, Star, GraduationCap, FileText, CalendarBlank, UserList, ArrowRight, Heart } from "@phosphor-icons/react"
+import { ArrowRight, Heart } from "@phosphor-icons/react"
 import { motion } from "framer-motion"
-import { FadeIn, StaggerContainer, StaggerItem, WaveDivider } from "@pakdeepan/ui"
+import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { HeroScrollytelling } from "./_components/HeroScrollytelling"
 
 interface HomeClientProps {
@@ -12,41 +12,101 @@ interface HomeClientProps {
   events: any[];
   gallery: any[];
   programs?: any[];
+  homeData?: any;
   dict: any;
   locale: string;
 }
 
-export default function HomeClient({ news, events, gallery, programs = [], dict, locale }: HomeClientProps) {
-  
+const DEFAULT_EDITORIAL_PATHWAYS = [
+  {
+    title: "Academic Programs",
+    desc: "Early years, kindergarten, and primary bilingual curricula.",
+    href: "/programs",
+  },
+  {
+    title: "Admissions & Enrollment",
+    desc: "Transparent tuition fees, requirements, and guided enrollment.",
+    href: "/admissions",
+  },
+  {
+    title: "Campus Life & Calendar",
+    desc: "Milestones, student events, celebrations, and photo albums.",
+    href: "/campus-life",
+  },
+]
 
+const DEFAULT_MARQUEE_ITEMS = [
+  "Bilingual Excellence",
+  "Global Mindset",
+  "Nurturing Empathy",
+  "Creative Inquiry",
+  "Joyful Curiosity",
+]
 
-  const EDITORIAL_PATHWAYS = [
-    {
-      icon: GraduationCap,
-      title: "Academic Programs",
-      desc: "Early years, kindergarten, and primary bilingual curricula.",
-      href: "/programs",
-    },
-    {
-      icon: FileText,
-      title: "Admissions & Enrollment",
-      desc: "Transparent tuition fees, requirements, and guided enrollment.",
-      href: "/admissions",
-    },
-    {
-      icon: CalendarBlank,
-      title: "Campus Life & Calendar",
-      desc: "Milestones, student events, celebrations, and photo albums.",
-      href: "/campus-life",
-    },
-  ]
+export default function HomeClient({ news, events, gallery, programs = [], homeData, dict, locale }: HomeClientProps) {
+  // Extract marquee items from CMS if configured
+  const marqueeItems: string[] = 
+    homeData?.marqueeItems && homeData.marqueeItems.length > 0
+      ? homeData.marqueeItems.map((item: any) => item.text || item).filter(Boolean)
+      : DEFAULT_MARQUEE_ITEMS
+
+  // Pathways items from CMS or default
+  const pathwaysList = 
+    homeData?.pathways && homeData.pathways.length > 0
+      ? homeData.pathways
+      : DEFAULT_EDITORIAL_PATHWAYS
+
+  // Philosophy section values
+  const philosophyImg = 
+    homeData?.philosophyImage?.url || 
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop"
+  const philosophyTagline = homeData?.philosophyScriptTagline || "Small steps today, big dreams tomorrow"
+  const philosophyHeading = homeData?.philosophyHeading || "More than a school."
+  const philosophySubheading = homeData?.philosophySubheading || "A foundation for life."
+  const philosophyBody = homeData?.philosophyBody || "We believe that education is not just about academics, but about character, creativity, and cultivating joyful curiosity in an international setting."
+  const philosophyLinkLabel = homeData?.philosophyLinkLabel || "Read our story"
+  const philosophyLinkHref = homeData?.philosophyLinkHref || "/about"
+
+  // Pathways header values
+  const pathwaysBadge = homeData?.pathwaysBadge || "Educational Pathways"
+  const pathwaysTitlePrefix = homeData?.pathwaysTitlePrefix || "Explore"
+  const pathwaysTitleHighlight = homeData?.pathwaysTitleHighlight || "Pakdeepan"
+  const pathwaysCTALabel = homeData?.pathwaysCTALabel || "Book a Campus Tour"
+  const pathwaysCTALink = homeData?.pathwaysCTALink || "/contact"
+
+  // News section values
+  const newsBadge = homeData?.newsBadge || "Latest News & Events"
+  const newsTitlePrefix = homeData?.newsTitlePrefix || "Stay"
+  const newsTitleHighlight = homeData?.newsTitleHighlight || "Informed"
+  const newsSubtitle = homeData?.newsSubtitle || "Get the latest updates, announcements, and upcoming events at Pakdeepan School."
+  const newsViewAllLabel = homeData?.newsViewAllLabel || "View All News & Events"
+
+  // CTA banner values
+  const ctaHeading = homeData?.ctaHeading || "See Our School in Action"
+  const ctaBody = homeData?.ctaBody || "Take a glimpse of our vibrant community, classrooms, and school life."
+  const ctaButtonLabel = homeData?.ctaButtonLabel || "View Gallery"
+  const ctaButtonLink = homeData?.ctaButtonLink || "/campus-life"
+  const ctaScriptText = homeData?.ctaScriptText || "Together We Grow"
+  const polaroid1 = homeData?.ctaPolaroid1?.url || "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600&auto=format&fit=crop"
+  const polaroid2 = homeData?.ctaPolaroid2?.url || "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop"
+  const polaroid3 = homeData?.ctaPolaroid3?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop"
 
   return (
     <div className="flex flex-col bg-background font-sans overflow-x-hidden">
       <main className="flex-grow pt-16">
 
         {/* --- VIDEO-DRIVEN SCROLLYTELLING HERO SECTION --- */}
-        <HeroScrollytelling />
+        <HeroScrollytelling 
+          tagline={homeData?.heroTagline}
+          titlePrefix={homeData?.heroTitlePrefix}
+          titleHighlight={homeData?.heroTitleHighlight}
+          titleSuffix={homeData?.heroTitleSuffix}
+          body={homeData?.heroBody}
+          primaryCtaLabel={homeData?.heroPrimaryCTALabel}
+          primaryCtaLink={homeData?.heroPrimaryCTALink}
+          secondaryCtaLabel={homeData?.heroSecondaryCTALabel}
+          secondaryCtaLink={homeData?.heroSecondaryCTALink}
+        />
 
         {/* --- INFINITE SCROLLING MARQUEE --- */}
         <section className="relative z-40 bg-[#1e3a8a] py-6 overflow-hidden border-y border-white/10 shadow-xl">
@@ -58,16 +118,14 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
             >
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="flex gap-12 items-center">
-                  <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">Bilingual Excellence</span>
-                  <span className="text-primary/60 text-xl">✦</span>
-                  <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">Global Mindset</span>
-                  <span className="text-primary/60 text-xl">✦</span>
-                  <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">Nurturing Empathy</span>
-                  <span className="text-primary/60 text-xl">✦</span>
-                  <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">Creative Inquiry</span>
-                  <span className="text-primary/60 text-xl">✦</span>
-                  <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">Joyful Curiosity</span>
-                  <span className="text-primary/60 text-xl">✦</span>
+                  {marqueeItems.map((slogan, sIdx) => (
+                    <React.Fragment key={sIdx}>
+                      <span className="text-white font-display-lg text-[15px] lg:text-[18px] uppercase tracking-widest font-bold">
+                        {slogan}
+                      </span>
+                      <span className="text-primary/60 text-xl">✦</span>
+                    </React.Fragment>
+                  ))}
                 </div>
               ))}
             </motion.div>
@@ -81,8 +139,8 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
               {/* Massive Editorial Image */}
               <div className="w-full h-[500px] md:h-[650px] lg:h-[750px] rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl shadow-slate-200/50">
                 <img 
-                  src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop" 
-                  alt="Students learning at Pakdeepan School" 
+                  src={philosophyImg} 
+                  alt={philosophyHeading} 
                   className="w-full h-full object-cover object-[center_35%] transform hover:scale-105 transition-transform duration-[1.5s] ease-out"
                 />
               </div>
@@ -93,23 +151,23 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
                 {/* Signature Sherlina Script */}
                 <div className="mb-4 transform rotate-[-3deg] inline-block">
                   <p className="font-sherlina text-[28px] md:text-[36px] text-primary leading-tight drop-shadow-sm">
-                    Small steps today, big dreams tomorrow
+                    {philosophyTagline}
                   </p>
                 </div>
                 
                 <h2 className="font-display-lg text-[36px] md:text-[44px] lg:text-[52px] text-[#1e3a8a] font-extrabold mb-6 leading-[1.1] tracking-tight drop-shadow-sm">
-                  More than a school.<br/>
+                  {philosophyHeading}<br/>
                   <span className="text-on-surface-variant font-body-lg text-[22px] md:text-[28px] font-medium tracking-normal block mt-2">
-                    A foundation for life.
+                    {philosophySubheading}
                   </span>
                 </h2>
                 
                 <p className="font-body-md text-[16px] md:text-[18px] text-on-surface-variant mb-10 leading-relaxed">
-                  We believe that education is not just about academics, but about character, creativity, and cultivating joyful curiosity in an international setting.
+                  {philosophyBody}
                 </p>
                 
-                <Link href="/about" className="inline-flex items-center gap-3 text-[#1e3a8a] font-bold text-lg hover:text-primary transition-colors group">
-                  <span className="border-b-2 border-transparent group-hover:border-primary transition-colors pb-0.5">Read our story</span>
+                <Link href={philosophyLinkHref} className="inline-flex items-center gap-3 text-[#1e3a8a] font-bold text-lg hover:text-primary transition-colors group">
+                  <span className="border-b-2 border-transparent group-hover:border-primary transition-colors pb-0.5">{philosophyLinkLabel}</span>
                   <ArrowRight size={20} weight="bold" className="group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -124,28 +182,28 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
             {/* Section Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6 border-b border-slate-100 pb-8">
               <FadeIn direction="right" className="max-w-xl">
-                <span className="text-xs font-bold tracking-widest text-primary uppercase mb-3 block">Educational Pathways</span>
+                <span className="text-xs font-bold tracking-widest text-primary uppercase mb-3 block">{pathwaysBadge}</span>
                 <h2 className="font-display-lg text-[36px] md:text-[48px] text-[#1e3a8a] font-extrabold leading-tight tracking-tight">
-                  Explore <span className="text-primary">Pakdeepan</span>
+                  {pathwaysTitlePrefix} <span className="text-primary">{pathwaysTitleHighlight}</span>
                 </h2>
               </FadeIn>
               
               <FadeIn direction="left">
                 <Link 
-                  href="/contact" 
+                  href={pathwaysCTALink} 
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#1e3a8a] text-white font-bold hover:bg-primary hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 transition-all text-sm"
                 >
-                  Book a Campus Tour <ArrowRight size={16} weight="bold" />
+                  {pathwaysCTALabel} <ArrowRight size={16} weight="bold" />
                 </Link>
               </FadeIn>
             </div>
 
             {/* Editorial Typographic Index */}
             <div className="flex flex-col">
-              {EDITORIAL_PATHWAYS.map((item, idx) => (
+              {pathwaysList.map((item: any, idx: number) => (
                 <Link 
                   key={idx}
-                  href={item.href}
+                  href={item.href || "#"}
                   className="group flex flex-col md:flex-row md:items-center justify-between py-10 md:py-14 border-b border-slate-100 hover:border-primary/30 transition-colors duration-500"
                 >
                   <div className="flex items-start md:items-center gap-6 md:gap-12 w-full">
@@ -180,32 +238,31 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
           <div className="max-w-[1440px] mx-auto px-5 md:px-10 lg:px-20">
             <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
               <FadeIn direction="right">
-                <span className="text-xs font-bold tracking-widest text-outline-variant uppercase mb-2 block">Latest News & Events</span>
+                <span className="text-xs font-bold tracking-widest text-outline-variant uppercase mb-2 block">{newsBadge}</span>
                 <h2 className="font-display-lg text-[36px] text-[#1e3a8a] font-extrabold leading-tight">
-                  Stay <span className="text-primary">Informed</span>
+                  {newsTitlePrefix} <span className="text-primary">{newsTitleHighlight}</span>
                 </h2>
-                <p className="text-on-surface-variant mt-2 max-w-sm">Get the latest updates, announcements, and upcoming events at Pakdeepan School.</p>
+                <p className="text-on-surface-variant mt-2 max-w-sm">{newsSubtitle}</p>
               </FadeIn>
               <FadeIn direction="left">
                 <Link href="/campus-life" className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#1e3a8a] text-[#1e3a8a] font-bold hover:bg-[#1e3a8a] hover:text-white transition-colors">
-                  View All News & Events <ArrowRight size={16} weight="bold" />
+                  {newsViewAllLabel} <ArrowRight size={16} weight="bold" />
                 </Link>
               </FadeIn>
             </div>
 
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {(news.length > 0 ? news.slice(0, 3) : [
-                { id: "mock-1", title: "Annual Sports Day 2026 Brings Community Together", category: "Sports", publishDate: new Date().toISOString() },
+                { id: "mock-1", title: "Annual Sports Day Brings Community Together", category: "Sports", publishDate: new Date().toISOString() },
                 { id: "mock-2", title: "Creative Arts Festival Showcases Student Talent", category: "Events", publishDate: new Date().toISOString() },
                 { id: "mock-3", title: "New Interactive Reading Curriculum Launched", category: "Academics", publishDate: new Date().toISOString() }
               ]).map((item: any, idx: number) => {
-                // Hardcoded high-res Unsplash images for a premium mock experience
-                const mockImages = [
-                  "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=2070&auto=format&fit=crop", // Sports/Activity
-                  "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=2070&auto=format&fit=crop", // Arts/Events
-                  "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop"  // Academics/Reading
+                const fallbackImages = [
+                  "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=1200&auto=format&fit=crop",
+                  "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=1200&auto=format&fit=crop",
+                  "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200&auto=format&fit=crop"
                 ]
-                const imageUrl = item.featuredImage?.url || mockImages[idx % mockImages.length]
+                const imageUrl = item.featuredImage?.url || fallbackImages[idx % fallbackImages.length]
 
                 return (
                   <StaggerItem key={item.id} className="h-full">
@@ -233,7 +290,7 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
                               {item.category}
                             </span>
                             <span className="text-xs text-white/90 font-bold drop-shadow-sm">
-                              {new Date(item.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {item.publishDate ? new Date(item.publishDate).toLocaleDateString(locale === "th" ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ""}
                             </span>
                           </div>
 
@@ -270,23 +327,20 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
                   
                   {/* Polaroid 1 */}
                   <div className="absolute top-0 left-0 bg-white p-3 pb-10 rounded-sm shadow-xl transform -rotate-6 z-10 w-44 hover:rotate-0 transition-transform cursor-pointer">
-                    {/* Tape */}
                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-white/50 backdrop-blur-md rotate-3 z-10 shadow-sm border border-black/5"></div>
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyKNAH0uMIHB7BsuRGJl2DIkH4CU_BioL8fq6YoUQPZuiOd9shQSfDZzyBqhWqMQ37j1yfDkdPBXFw7y1ud5RN-NW0BNnmrvVlUvfEsQj6a1vwKdw-9o87sgsUQt6_2teQA7YxPJo_j8nG8acwXjoFkKzdc1I5XeU_WvW410L_321eFLeY4d5j1T3slxA8opAH6iJOq7ehTB8BtS9Xp0v7a8YkqGH07bIEbRACICN-EtkHUeKphJI1YQ" alt="Students" className="w-full h-32 object-cover rounded-sm" />
+                    <img src={polaroid1} alt="Students" className="w-full h-32 object-cover rounded-sm" />
                   </div>
                   
                   {/* Polaroid 2 */}
                   <div className="absolute top-8 left-28 bg-white p-3 pb-10 rounded-sm shadow-2xl transform rotate-6 z-20 w-48 hover:-rotate-3 transition-transform cursor-pointer">
-                    {/* Tape */}
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-14 h-5 bg-[#fefce8]/80 backdrop-blur-md -rotate-6 z-10 shadow-sm border border-black/5"></div>
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4pFr4Rtg57zWkhknWtnKwDkVjjIQMY3ysqyC8fxM0_5yC5d6ftiv2JkfKscMoRrrTy_HNC0xwSiadwgdyXb_bV80CCTVPqalaNTdM2wmZHvf6Npf0381Or3KQY7LwH2SIFQVpj055Q22JPLzO8rONPxje913WGxb2yseMLLDZV5wxO8F9Tsd6fe-kfTpQQ7cCFTjzSBsFOxq6QcA7LA9PNpocYeDwhJBMZogAfK1v3Z02zY2hdn7Vtw" alt="School" className="w-full h-32 object-cover rounded-sm" />
+                    <img src={polaroid2} alt="School Campus" className="w-full h-32 object-cover rounded-sm" />
                   </div>
                   
                   {/* Polaroid 3 */}
                   <div className="absolute top-32 left-10 bg-white p-3 pb-10 rounded-sm shadow-xl transform -rotate-12 z-15 w-40 hover:rotate-0 transition-transform cursor-pointer">
-                    {/* Tape */}
                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-white/50 backdrop-blur-md rotate-2 z-10 shadow-sm border border-black/5"></div>
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPgYckw1dd3Rry3bG4OVMWG9EO2Z8QewT9Gv6eDvgWUpQs8vOCrsrJd-zA85ba7AMqoZ8cmangR_PjyB-bv0TJ3ezyE8b0d-N98Tun5CDGuldil3lzxrDeTc8A-2wI9cykizTD_xfbuoW37PW05YheFlvRe_t3yuL56MOmsKwaI4Ylx6aRj0xo4HD_qpmvlEGvKcyQ9e-dSK2NmgMETjAJ9mrmZSJYygd81GdtJKVbEFCocmE6_icWSA" alt="Event" className="w-full h-24 object-cover rounded-sm" />
+                    <img src={polaroid3} alt="Event Moments" className="w-full h-24 object-cover rounded-sm" />
                   </div>
 
                   {/* Decorative Hearts */}
@@ -297,25 +351,31 @@ export default function HomeClient({ news, events, gallery, programs = [], dict,
                 {/* Text Content */}
                 <div className="text-center md:text-left z-30 max-w-lg">
                   <h2 className="font-display-lg text-[32px] md:text-[40px] text-[#1e3a8a] font-extrabold mb-4 leading-tight">
-                    See Our School in Action
+                    {ctaHeading}
                   </h2>
                   <p className="text-on-surface-variant mb-8">
-                    Take a glimpse of our vibrant community, classrooms, and school life.
+                    {ctaBody}
                   </p>
-                  <Link href="/campus-life" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-white font-bold hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all">
-                    View Gallery <ArrowRight size={18} weight="bold" />
+                  <Link href={ctaButtonLink} className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-white font-bold hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all">
+                    {ctaButtonLabel} <ArrowRight size={18} weight="bold" />
                   </Link>
                 </div>
 
                 {/* Sherlina Calligraphy Text (Right) */}
                 <div className="hidden lg:flex items-center gap-3 transform -rotate-6 ml-10 select-none">
-                  {/* Accent rays */}
                   <div className="flex flex-col gap-1.5 text-secondary opacity-80">
                     <span className="w-5 h-[2.5px] bg-secondary rounded-full transform -rotate-12"></span>
                     <span className="w-4 h-[2.5px] bg-secondary rounded-full"></span>
                   </div>
                   <div className="font-sherlina text-5xl xl:text-6xl text-secondary leading-tight text-center drop-shadow-sm">
-                    Together <br/> We Grow
+                    {ctaScriptText.includes(" ") ? (
+                      <>
+                        {ctaScriptText.split(" ").slice(0, -1).join(" ")} <br/>
+                        {ctaScriptText.split(" ").slice(-1).join(" ")}
+                      </>
+                    ) : (
+                      ctaScriptText
+                    )}
                   </div>
                   <Heart size={28} weight="regular" className="text-primary self-center ml-1" />
                 </div>

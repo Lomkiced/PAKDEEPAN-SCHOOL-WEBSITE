@@ -1,6 +1,5 @@
 import { getPayload as getPayloadInstance } from "payload"
-import config from "@/payload.config"
-import { unstable_cache } from "next/cache"
+import configPromise from "@/payload.config"
 
 /**
  * Helper to get the Payload CMS instance for Local API access.
@@ -8,43 +7,31 @@ import { unstable_cache } from "next/cache"
  * directly from the database without HTTP overhead.
  */
 export const getPayload = async () => {
-  return await getPayloadInstance({ config })
+  return await getPayloadInstance({ config: configPromise })
 }
 
 /**
- * Cached fetcher for globals to enable ISR and revalidateTag
+ * Direct fetcher for globals with error handling and fallback
  */
-export const getCachedGlobal = async (slug: any, locale: "en" | "th", tags: string[]) => {
-  const payload = await getPayload()
-  return unstable_cache(
-    async () => {
-      try {
-        return await payload.findGlobal({ slug, locale })
-      } catch (error) {
-        console.error(`Error fetching global ${slug}:`, error)
-        return null
-      }
-    },
-    [slug, locale],
-    { tags }
-  )()
+export const getCachedGlobal = async (slug: any, locale: "en" | "th", _tags?: string[]) => {
+  try {
+    const payload = await getPayload()
+    return await payload.findGlobal({ slug, locale })
+  } catch (error) {
+    console.error(`Error fetching global ${slug}:`, error)
+    return null
+  }
 }
 
 /**
- * Cached fetcher for collections to enable ISR and revalidateTag
+ * Direct fetcher for collections with error handling and fallback
  */
-export const getCachedCollection = async (collection: any, locale: "en" | "th", tags: string[], queryArgs: any = {}) => {
-  const payload = await getPayload()
-  return unstable_cache(
-    async () => {
-      try {
-        return await payload.find({ collection, locale, ...queryArgs })
-      } catch (error) {
-        console.error(`Error fetching collection ${collection}:`, error)
-        return { docs: [] }
-      }
-    },
-    [collection, locale, JSON.stringify(queryArgs)],
-    { tags }
-  )()
+export const getCachedCollection = async (collection: any, locale: "en" | "th", _tags?: string[], queryArgs: any = {}) => {
+  try {
+    const payload = await getPayload()
+    return await payload.find({ collection, locale, ...queryArgs })
+  } catch (error) {
+    console.error(`Error fetching collection ${collection}:`, error)
+    return { docs: [] }
+  }
 }

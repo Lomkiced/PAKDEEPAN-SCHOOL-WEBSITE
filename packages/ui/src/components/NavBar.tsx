@@ -16,7 +16,19 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ] as const
 
-export function NavBar() {
+export interface NavBarProps {
+  ctaLabel?: string
+  ctaMobileLabel?: string
+  ctaLink?: string
+  schoolName?: string
+}
+
+export function NavBar({
+  ctaLabel = "Enroll Now",
+  ctaMobileLabel = "Enroll",
+  ctaLink = "/admissions",
+  schoolName = "Pakdeepan",
+}: NavBarProps = {}) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
   const pathname = usePathname()
@@ -56,14 +68,16 @@ export function NavBar() {
           <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 group relative z-[110]">
             <Image 
               src="/images/pakdeepan-logo.png" 
-              alt="Pakdeepan School Logo" 
+              alt={`${schoolName} Logo`} 
               width={48} 
               height={48} 
               className="group-hover:scale-105 transition-transform duration-500 drop-shadow-sm"
               priority
             />
             <div className="flex flex-col leading-none">
-              <span className="font-display-lg font-extrabold text-[22px] text-[#1e3a8a] transition-colors duration-500">Pakdeepan</span>
+              <span className="font-display-lg font-extrabold text-[22px] text-[#1e3a8a] transition-colors duration-500">
+                {schoolName}
+              </span>
             </div>
           </Link>
           
@@ -71,14 +85,14 @@ export function NavBar() {
           <div className="flex items-center gap-6 relative z-[110]">
             
             <Link 
-              href="/admissions" 
+              href={ctaLink} 
               onClick={() => setIsOpen(false)}
               className={cn(
                 "hidden md:inline-flex items-center justify-center px-6 py-2.5 text-[14px] font-bold rounded-full transition-all duration-500 active:scale-[0.97]",
                 "bg-[#1e3a8a] text-white hover:bg-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5"
               )}
             >
-              Enroll Now
+              {ctaLabel}
             </Link>
 
             {/* Menu Toggle (Magnetic/Architectural) */}
@@ -99,7 +113,7 @@ export function NavBar() {
         </div>
       </motion.header>
 
-      {/* Z-Index Fix: Dark Backdrop Overlay */}
+      {/* Dark Backdrop Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -164,22 +178,22 @@ export function NavBar() {
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold tracking-widest text-primary uppercase">Language</span>
                   <div className="flex gap-4">
-                    <button onClick={() => { document.cookie = "NEXT_LOCALE=en; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors">
+                    <button onClick={() => { document.cookie = "NEXT_LOCALE=en; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors cursor-pointer">
                       EN
                     </button>
                     <span className="text-slate-300">|</span>
-                    <button onClick={() => { document.cookie = "NEXT_LOCALE=th; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors">
+                    <button onClick={() => { document.cookie = "NEXT_LOCALE=th; path=/; max-age=31536000"; window.location.reload(); }} className="text-[#1e3a8a] hover:text-primary font-bold text-sm transition-colors cursor-pointer">
                       TH
                     </button>
                   </div>
                 </div>
                 
                 <Link 
-                  href="/admissions" 
+                  href={ctaLink} 
                   onClick={() => setIsOpen(false)}
                   className="md:hidden px-8 py-3 bg-[#1e3a8a] text-white text-[13px] font-bold rounded-full shadow-lg shadow-primary/20"
                 >
-                  Enroll
+                  {ctaMobileLabel}
                 </Link>
               </motion.div>
 

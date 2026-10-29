@@ -1,4 +1,4 @@
-import { getCachedCollection } from "@/lib/payload"
+import { getCachedCollection, getCachedGlobal } from "@/lib/payload"
 import ProgramsClient from "./ProgramsClient"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
@@ -14,6 +14,14 @@ export default async function ProgramsPage() {
   const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
   const locale = (localeStr === "th" ? "th" : "en") as "en" | "th"
   const dict = await getDictionary(locale)
+
+  // Fetch Programs Page CMS Global (Curriculum highlights & Daily schedule)
+  let programsPageData: any = null
+  try {
+    programsPageData = await getCachedGlobal("programs-page", locale, ["programs-page-cache", "programs-cache"])
+  } catch (e) {
+    console.error("Failed to load programs-page global:", e)
+  }
 
   // Fetch Published Programs
   const programsRes = await getCachedCollection("programs", locale, ["programs-cache"], {
@@ -35,6 +43,7 @@ export default async function ProgramsPage() {
   return (
     <ProgramsClient 
       programs={sortedPrograms}
+      programsPageData={programsPageData}
       dict={dict}
       locale={locale}
     />

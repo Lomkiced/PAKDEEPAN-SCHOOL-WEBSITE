@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
-import { Baby, Shapes, Student, Brain, Translate, Atom, Checks } from "@phosphor-icons/react"
+import { Baby, Shapes, Student, Brain, Translate, Atom, Book, Sparkle, Globe } from "@phosphor-icons/react"
 import { formatTHB } from "@/utils/currency"
 
 interface ProgramsClientProps {
   programs: any[];
+  programsPageData?: any;
   dict: any;
   locale: string;
 }
@@ -43,7 +44,80 @@ const getProgramColorClass = (level: string, isText = false, isBg = false) => {
   }
 }
 
-export default function ProgramsClient({ programs, dict, locale }: ProgramsClientProps) {
+// Map icon name string to Phosphor icon
+const renderHighlightIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Translate':
+      return <Translate size={32} weight="light" className="text-secondary" />
+    case 'Atom':
+      return <Atom size={32} weight="light" className="text-primary" />
+    case 'Book':
+      return <Book size={32} weight="light" className="text-primary" />
+    case 'Sparkle':
+      return <Sparkle size={32} weight="light" className="text-secondary" />
+    case 'Globe':
+      return <Globe size={32} weight="light" className="text-primary" />
+    case 'Brain':
+    default:
+      return <Brain size={32} weight="light" className="text-primary" />
+  }
+}
+
+const DEFAULT_HIGHLIGHTS = [
+  {
+    iconName: "Brain",
+    title: "Montessori-Inspired",
+    description: "Self-directed activity, hands-on learning, and collaborative play designed to foster independent thinking."
+  },
+  {
+    iconName: "Translate",
+    title: "Bilingual Program",
+    description: "Immersive language acquisition supporting cognitive flexibility and global awareness from day one."
+  },
+  {
+    iconName: "Atom",
+    title: "Early STEM",
+    description: "Introducing foundational science, technology, engineering, and math concepts through playful discovery."
+  }
+]
+
+const DEFAULT_SCHEDULE = [
+  {
+    time: "08:30 AM",
+    title: "Arrival & Morning Greeting",
+    description: "Welcoming students and setting a calm tone for the day."
+  },
+  {
+    time: "09:00 AM",
+    title: "Guided Learning Blocks",
+    description: "Focused sessions on literacy, numeracy, and thematic studies."
+  },
+  {
+    time: "10:30 AM",
+    title: "Outdoor Exploration",
+    description: "Physical activity and nature engagement in our secure gardens."
+  },
+  {
+    time: "12:00 PM",
+    title: "Lunch & Rest",
+    description: "Nutritious meals followed by a period of quiet reflection or sleep."
+  }
+]
+
+export default function ProgramsClient({ programs, programsPageData, dict, locale }: ProgramsClientProps) {
+  const heroTitle = programsPageData?.heroTitle || dict.programs?.title || "Academic Programs"
+  const heroDescription = programsPageData?.heroDescription || dict.programs?.description || "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum."
+  
+  const curriculumTitle = programsPageData?.curriculumTitle || "Curriculum Highlights"
+  const highlights = programsPageData?.highlights && programsPageData.highlights.length > 0 
+    ? programsPageData.highlights 
+    : DEFAULT_HIGHLIGHTS
+
+  const scheduleTitle = programsPageData?.scheduleTitle || "A Typical Day"
+  const scheduleItems = programsPageData?.scheduleItems && programsPageData.scheduleItems.length > 0 
+    ? programsPageData.scheduleItems 
+    : DEFAULT_SCHEDULE
+
   return (
     <div className="flex flex-col relative">
       <main className="flex-grow pt-[120px] pb-20 space-y-20">
@@ -52,10 +126,10 @@ export default function ProgramsClient({ programs, dict, locale }: ProgramsClien
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 text-center max-w-3xl mx-auto space-y-6">
           <FadeIn direction="up">
             <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4">
-              {dict.programs?.title || "Academic Programs"}
+              {heroTitle}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              {dict.programs?.description || "Nurturing curiosity and laying the foundation for a lifelong love of learning through our specialized early childhood curriculum."}
+              {heroDescription}
             </p>
           </FadeIn>
         </section>
@@ -87,7 +161,7 @@ export default function ProgramsClient({ programs, dict, locale }: ProgramsClien
                         <img 
                           className="object-cover w-full h-full absolute inset-0 group-hover:scale-105 transition-transform duration-500" 
                           alt={program.title} 
-                          src={program.featuredImage?.url || "https://lh3.googleusercontent.com/aida-public/AB6AXuCw60OJntiG4Naep-HcfVYFc8uGy0elhI0wVGUsLDCW93tsT8-dr0r4ux0W9rlC-VGRf-lR2X1XRWVuLlqBgsUQMDI9KUz1QZlFXeXF-Vv00aIpKowIxUo9y8v_kv2chuM3sawMbk3G6TUTgOKQreMOO2G1XUHhd2Hg4WnYe_DEPFw3h_8lLSqse9Tjxhn7FydYVsZ2p-F1t8yLecu6Akbm8Ux0U7Sq7pg0JHXeAslU38eMHWkUCwedLQ"}
+                          src={program.featuredImage?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop"}
                         />
                       </div>
                       <div className="flex-grow flex flex-col space-y-4 justify-center py-2">
@@ -150,38 +224,22 @@ export default function ProgramsClient({ programs, dict, locale }: ProgramsClien
         <section className="max-w-[1120px] mx-auto px-5 md:px-20">
           <FadeIn direction="up">
             <div className="bg-surface-container-low rounded-xl p-8 md:p-12 space-y-12 border border-outline-variant/20 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
-              <h2 className="font-headline-md text-headline-md text-primary text-center">Curriculum Highlights</h2>
+              <h2 className="font-headline-md text-headline-md text-primary text-center">
+                {curriculumTitle}
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
-                    <Brain size={32} weight="light" className="text-primary" />
+                {highlights.map((item: any, idx: number) => (
+                  <div key={idx} className="flex flex-col items-center text-center space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
+                      {renderHighlightIcon(item.iconName)}
+                    </div>
+                    <h3 className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">{item.title}</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant text-sm">
+                      {item.description}
+                    </p>
                   </div>
-                  <h3 className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Montessori-Inspired</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-                    Self-directed activity, hands-on learning, and collaborative play designed to foster independent thinking.
-                  </p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
-                    <Translate size={32} weight="light" className="text-secondary" />
-                  </div>
-                  <h3 className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Bilingual Program</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-                    Immersive language acquisition supporting cognitive flexibility and global awareness from day one.
-                  </p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
-                    <Atom size={32} weight="light" className="text-primary" />
-                  </div>
-                  <h3 className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Early STEM</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-                    Introducing foundational science, technology, engineering, and math concepts through playful discovery.
-                  </p>
-                </div>
+                ))}
               </div>
             </div>
           </FadeIn>
@@ -190,55 +248,29 @@ export default function ProgramsClient({ programs, dict, locale }: ProgramsClien
         {/* Daily Schedule Visual Timeline */}
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 space-y-12">
           <FadeIn direction="up">
-            <h2 className="font-headline-md text-headline-md text-primary text-center">A Typical Day</h2>
+            <h2 className="font-headline-md text-headline-md text-primary text-center">
+              {scheduleTitle}
+            </h2>
           </FadeIn>
           
           <StaggerContainer className="max-w-2xl mx-auto space-y-6">
-            
-            <StaggerItem>
-              <div className="flex items-start gap-6 relative">
-                <div className="w-24 flex-shrink-0 text-right font-label-caps text-label-caps text-on-surface-variant pt-1">08:30 AM</div>
-                <div className="w-4 h-4 rounded-full bg-primary-container mt-1 flex-shrink-0 z-10 shadow-sm"></div>
-                <div className="flex-grow pb-8 border-l-2 border-surface-container-high pl-6 -ml-[25px]">
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface text-lg mb-1">Arrival & Morning Greeting</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">Welcoming students and setting a calm tone for the day.</p>
-                </div>
-              </div>
-            </StaggerItem>
+            {scheduleItems.map((item: any, idx: number) => {
+              const dotColor = idx % 2 === 0 ? "bg-primary" : "bg-secondary"
+              const isLast = idx === scheduleItems.length - 1
 
-            <StaggerItem>
-              <div className="flex items-start gap-6 relative">
-                <div className="w-24 flex-shrink-0 text-right font-label-caps text-label-caps text-on-surface-variant pt-1">09:00 AM</div>
-                <div className="w-4 h-4 rounded-full bg-secondary-container mt-1 flex-shrink-0 z-10 shadow-sm"></div>
-                <div className="flex-grow pb-8 border-l-2 border-surface-container-high pl-6 -ml-[25px]">
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface text-lg mb-1">Guided Learning Blocks</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">Focused sessions on literacy, numeracy, and thematic studies.</p>
-                </div>
-              </div>
-            </StaggerItem>
-
-            <StaggerItem>
-              <div className="flex items-start gap-6 relative">
-                <div className="w-24 flex-shrink-0 text-right font-label-caps text-label-caps text-on-surface-variant pt-1">10:30 AM</div>
-                <div className="w-4 h-4 rounded-full bg-primary mt-1 flex-shrink-0 z-10 shadow-sm"></div>
-                <div className="flex-grow pb-8 border-l-2 border-surface-container-high pl-6 -ml-[25px]">
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface text-lg mb-1">Outdoor Exploration</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">Physical activity and nature engagement in our secure gardens.</p>
-                </div>
-              </div>
-            </StaggerItem>
-
-            <StaggerItem>
-              <div className="flex items-start gap-6 relative">
-                <div className="w-24 flex-shrink-0 text-right font-label-caps text-label-caps text-on-surface-variant pt-1">12:00 PM</div>
-                <div className="w-4 h-4 rounded-full bg-secondary mt-1 flex-shrink-0 z-10 shadow-sm"></div>
-                <div className="flex-grow pl-6 -ml-[25px]">
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface text-lg mb-1">Lunch & Rest</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant text-sm">Nutritious meals followed by a period of quiet reflection or sleep.</p>
-                </div>
-              </div>
-            </StaggerItem>
-            
+              return (
+                <StaggerItem key={idx}>
+                  <div className="flex items-start gap-6 relative">
+                    <div className="w-24 flex-shrink-0 text-right font-label-caps text-label-caps text-on-surface-variant pt-1">{item.time}</div>
+                    <div className={`w-4 h-4 rounded-full ${dotColor} mt-1 flex-shrink-0 z-10 shadow-sm`}></div>
+                    <div className={`flex-grow ${isLast ? 'pl-6' : 'pb-8 border-l-2 border-surface-container-high pl-6'} -ml-[25px]`}>
+                      <h4 className="font-headline-sm text-headline-sm text-on-surface text-lg mb-1">{item.title}</h4>
+                      <p className="font-body-md text-body-md text-on-surface-variant text-sm">{item.description}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              )
+            })}
           </StaggerContainer>
         </section>
 

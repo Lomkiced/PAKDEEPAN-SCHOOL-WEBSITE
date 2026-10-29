@@ -24,13 +24,38 @@ type InquiryFormValues = z.infer<typeof inquirySchema>
 
 interface AdmissionsClientProps {
   programs: any[];
+  admissionsPageData?: any;
   dict: any;
   locale: string;
 }
 
-export default function AdmissionsClient({ programs, dict, locale }: AdmissionsClientProps) {
+const DEFAULT_STEPS = [
+  { stepNumber: 1, title: "Inquiry", desc: "Submit your initial details to connect with our admissions team." },
+  { stepNumber: 2, title: "School Tour", desc: "Experience our campus and meet our dedicated educators." },
+  { stepNumber: 3, title: "Assessment", desc: "A gentle evaluation to ensure we meet your child's needs." },
+  { stepNumber: 4, title: "Enrollment", desc: "Finalize documentation and prepare for the academic year." },
+]
+
+export default function AdmissionsClient({ programs, admissionsPageData, dict, locale }: AdmissionsClientProps) {
   const [isSubmitted, setIsSubmitted] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
+
+  // Configurable fields from CMS Global
+  const heroBadge = admissionsPageData?.heroBadge || "Join Our Community"
+  const heroTitle = admissionsPageData?.heroTitle || "Admissions & Enrollment"
+  const heroDescription = admissionsPageData?.heroDescription || "Join a community dedicated to excellence, inquiry, and holistic growth. Begin your journey with Pakdeepan Kindergarten School today."
+  
+  const stepsList = admissionsPageData?.steps && admissionsPageData.steps.length > 0 
+    ? admissionsPageData.steps 
+    : DEFAULT_STEPS
+
+  const formTitle = admissionsPageData?.formTitle || "Inquiry Form"
+  const formSubtitle = admissionsPageData?.formSubtitle || "Please provide your details below, and our admissions team will contact you shortly to guide you through the next steps."
+  const consentLabel = admissionsPageData?.consentLabel || "I consent to Pakdeepan Kindergarten School collecting and processing my data for admissions purposes in accordance with the Privacy Policy."
+  const submitButtonLabel = admissionsPageData?.submitButtonLabel || "Submit Inquiry"
+  const successTitle = admissionsPageData?.successTitle || "Inquiry Received"
+  const successMessage = admissionsPageData?.successMessage || "Thank you for your interest in Pakdeepan Kindergarten School. Our admissions team will review your details and contact you shortly."
+  const floatingTourLabel = admissionsPageData?.floatingTourLabel || "Schedule a Tour"
 
   const {
     register,
@@ -53,6 +78,10 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
     }
   }
 
+  const scrollToInquiry = () => {
+    document.getElementById("inquiry")?.scrollIntoView({ behavior: "smooth" })
+  }
+
   return (
     <div className="flex flex-col relative">
       <main className="flex-grow pt-[120px] pb-20">
@@ -61,13 +90,13 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
         <section className="max-w-[1120px] mx-auto px-5 md:px-20 mb-20">
           <FadeIn direction="up" className="text-center mb-12">
             <span className="inline-block px-4 py-2 bg-secondary-container/30 text-on-secondary-container font-label-caps text-label-caps rounded-full mb-6">
-              Join Our Community
+              {heroBadge}
             </span>
             <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4">
-              Admissions & Enrollment
+              {heroTitle}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              Join a community dedicated to excellence, inquiry, and holistic growth. Begin your journey with Pakdeepan Kindergarten School today.
+              {heroDescription}
             </p>
           </FadeIn>
         </section>
@@ -79,22 +108,22 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
             <div className="hidden md:block absolute top-6 left-12 right-12 h-[2px] bg-surface-variant z-0"></div>
             
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-              {[
-                { step: 1, title: "Inquiry", desc: "Submit your initial details to connect with our admissions team.", active: true },
-                { step: 2, title: "School Tour", desc: "Experience our campus and meet our dedicated educators.", active: false },
-                { step: 3, title: "Assessment", desc: "A gentle evaluation to ensure we meet your child's needs.", active: false },
-                { step: 4, title: "Enrollment", desc: "Finalize documentation and prepare for the academic year.", active: false },
-              ].map((item, idx) => (
-                <StaggerItem key={idx}>
-                  <div className="bg-surface rounded-xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)] text-center flex flex-col items-center relative z-10 hover:-translate-y-1 transition-transform duration-300">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-display-lg text-headline-sm mb-4 border-4 border-surface shadow-sm ${item.active ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
-                      {item.step}
+              {stepsList.map((item: any, idx: number) => {
+                const stepNum = item.stepNumber || idx + 1
+                const isActive = idx === 0
+
+                return (
+                  <StaggerItem key={idx}>
+                    <div className="bg-surface rounded-xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)] text-center flex flex-col items-center relative z-10 hover:-translate-y-1 transition-transform duration-300">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-display-lg text-headline-sm mb-4 border-4 border-surface shadow-sm ${isActive ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                        {stepNum}
+                      </div>
+                      <h3 className="font-headline-sm text-headline-sm text-primary mb-2">{item.title}</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant text-sm">{item.desc}</p>
                     </div>
-                    <h3 className="font-headline-sm text-headline-sm text-primary mb-2">{item.title}</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant text-sm">{item.desc}</p>
-                  </div>
-                </StaggerItem>
-              ))}
+                  </StaggerItem>
+                )
+              })}
             </StaggerContainer>
           </div>
         </section>
@@ -157,9 +186,9 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
                   <div className="w-20 h-20 bg-tertiary-container rounded-full flex items-center justify-center text-on-tertiary-container mb-6">
                     <CheckCircle size={48} weight="fill" />
                   </div>
-                  <h2 className="font-headline-md text-headline-md text-primary mb-4">Inquiry Received</h2>
+                  <h2 className="font-headline-md text-headline-md text-primary mb-4">{successTitle}</h2>
                   <p className="font-body-md text-body-md text-on-surface-variant mb-8 max-w-md mx-auto">
-                    Thank you for your interest in Pakdeepan Kindergarten School. Our admissions team will review your details and contact you shortly.
+                    {successMessage}
                   </p>
                   <button 
                     onClick={() => setIsSubmitted(false)}
@@ -170,9 +199,9 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
                 </div>
               ) : (
                 <>
-                  <h2 className="font-headline-md text-headline-md text-primary mb-3 text-center">Inquiry Form</h2>
+                  <h2 className="font-headline-md text-headline-md text-primary mb-3 text-center">{formTitle}</h2>
                   <p className="font-body-md text-body-md text-on-surface-variant mb-8 text-center max-w-lg mx-auto">
-                    Please provide your details below, and our admissions team will contact you shortly to guide you through the next steps.
+                    {formSubtitle}
                   </p>
                   
                   {serverError && (
@@ -211,7 +240,7 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Child's Name</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">Child&apos;s Name</label>
                         <input 
                           {...register("childName")}
                           className={`w-full rounded-md border ${errors.childName ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors`} 
@@ -222,7 +251,7 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="font-label-caps text-label-caps text-on-surface">Child's Age / Expected Grade</label>
+                        <label className="font-label-caps text-label-caps text-on-surface">Child&apos;s Age / Expected Grade</label>
                         <select 
                           {...register("grade")}
                           className={`w-full rounded-md border ${errors.grade ? 'border-error' : 'border-outline/30'} focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-bright text-on-surface p-3 outline-none transition-colors cursor-pointer`}
@@ -253,7 +282,7 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
                           type="checkbox"
                         />
                         <label className="font-body-md text-body-md text-on-surface-variant text-sm cursor-pointer" htmlFor="consent">
-                          I consent to Pakdeepan Kindergarten School collecting and processing my data for admissions purposes in accordance with the Privacy Policy.
+                          {consentLabel}
                         </label>
                       </div>
                       {errors.consent && <span className="text-error text-xs">{errors.consent.message}</span>}
@@ -261,10 +290,10 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
 
                     <button 
                       disabled={isSubmitting}
-                      className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-full hover:opacity-90 transition-opacity mt-8 shadow-md disabled:opacity-50 disabled:cursor-not-allowed" 
+                      className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-full hover:opacity-90 transition-opacity mt-8 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" 
                       type="submit"
                     >
-                      {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+                      {isSubmitting ? "Submitting..." : submitButtonLabel}
                     </button>
                   </form>
                 </>
@@ -275,9 +304,12 @@ export default function AdmissionsClient({ programs, dict, locale }: AdmissionsC
       </main>
 
       {/* Floating CTA */}
-      <button className="fixed bottom-6 right-6 md:bottom-12 md:right-12 bg-secondary text-on-secondary shadow-[0_10px_30px_rgba(0,0,0,0.15)] rounded-full px-6 py-4 flex items-center gap-2 hover:opacity-90 transition-transform hover:-translate-y-1 z-40 cursor-pointer">
+      <button 
+        onClick={scrollToInquiry}
+        className="fixed bottom-6 right-6 md:bottom-12 md:right-12 bg-secondary text-on-secondary shadow-[0_10px_30px_rgba(0,0,0,0.15)] rounded-full px-6 py-4 flex items-center gap-2 hover:opacity-90 transition-transform hover:-translate-y-1 z-40 cursor-pointer active:scale-95"
+      >
         <CalendarBlank size={24} weight="fill" />
-        <span className="font-label-caps text-label-caps">Schedule a Tour</span>
+        <span className="font-label-caps text-label-caps">{floatingTourLabel}</span>
       </button>
     </div>
   )

@@ -17,6 +17,11 @@ import { Programs } from "@/collections/Programs"
 // Globals
 import { SiteSettings } from "@/globals/SiteSettings"
 import { AboutPage } from "@/globals/AboutPage"
+import { HomePage } from "@/globals/HomePage"
+import { ProgramsPage } from "@/globals/ProgramsPage"
+import { AdmissionsPage } from "@/globals/AdmissionsPage"
+import { CampusLifePage } from "@/globals/CampusLifePage"
+import { PrivacyPage } from "@/globals/PrivacyPage"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -34,8 +39,8 @@ export default buildConfig({
   },
 
   localization: {
-    locales: ['en', 'th'],
-    defaultLocale: 'en',
+    locales: ["en", "th"],
+    defaultLocale: "en",
     fallback: true,
   },
 
@@ -57,7 +62,15 @@ export default buildConfig({
     Inquiries,
   ],
 
-  globals: [SiteSettings, AboutPage],
+  globals: [
+    HomePage,
+    AboutPage,
+    ProgramsPage,
+    AdmissionsPage,
+    CampusLifePage,
+    PrivacyPage,
+    SiteSettings,
+  ],
 
   secret: process.env.PAYLOAD_SECRET || "default-dev-secret-change-me",
 

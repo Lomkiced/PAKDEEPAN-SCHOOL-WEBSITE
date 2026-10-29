@@ -5,14 +5,14 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { ArrowRight, CaretDown, X, Play, CaretLeft, CaretRight, CalendarBlank, MapPin, Clock } from "@phosphor-icons/react"
 import { cn } from "@pakdeepan/ui/src/utils/cn"
 
-export default function CampusLifeClient({ initialNews, initialEvents, initialGallery }: any) {
-  // Use CMS data exclusively (no fallbacks to mock data)
+export default function CampusLifeClient({ initialNews, initialEvents, initialGallery, campusLifePageData, locale = "en" }: any) {
+  // Use CMS data exclusively
   const newsItems = (initialNews || []).map((n: any, idx: number) => ({
     id: n.id,
     title: n.title,
-    date: new Date(n.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    date: new Date(n.publishDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     category: n.category,
-    color: "bg-primary-container/90 text-on-primary-container", // Default color for now
+    color: "bg-primary-container/90 text-on-primary-container",
     excerpt: n.excerpt,
     image: n.featuredImage?.url,
   }));
@@ -30,12 +30,14 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
     id: e.id,
     title: e.title,
     rawDate: e.eventDate,
-    date: new Date(e.eventDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    shortMonth: new Date(e.eventDate).toLocaleDateString('en-US', { month: 'short' }),
-    day: new Date(e.eventDate).toLocaleDateString('en-US', { day: '2-digit' }),
-    time: new Date(e.eventDate).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    date: new Date(e.eventDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    shortMonth: new Date(e.eventDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { month: 'short' }),
+    day: new Date(e.eventDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { day: '2-digit' }),
+    time: new Date(e.eventDate).toLocaleTimeString(locale === 'th' ? 'th-TH' : 'en-US', { hour: 'numeric', minute: '2-digit' }),
     location: e.location,
     category: e.category,
+    image: e.coverImage?.url || campusLifePageData?.modalFallbackImage?.url || "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=800&auto=format&fit=crop",
+    description: typeof e.description === 'string' ? e.description : "",
     isToday: new Date(e.eventDate).toDateString() === new Date().toDateString()
   }));
 
@@ -90,13 +92,22 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
   const openLightbox = (index: number) => {
     setCurrentGalleryIndex(index)
     setLightboxOpen(true)
-    document.body.style.overflow = 'hidden'
   }
 
   const closeLightbox = () => {
     setLightboxOpen(false)
-    document.body.style.overflow = ''
   }
+
+  React.useEffect(() => {
+    if (lightboxOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [lightboxOpen])
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -128,10 +139,10 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
           <FadeIn direction="up">
             <header className="mb-12 text-center md:text-left">
               <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4">
-                Campus Life & News
+                {campusLifePageData?.title || "Campus Life & News"}
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-                Stay updated with the latest happenings, academic achievements, and community events at Pakdeepan Kindergarten School.
+                {campusLifePageData?.subtitle || "Stay updated with the latest happenings, academic achievements, and community events at Pakdeepan Kindergarten School."}
               </p>
             </header>
           </FadeIn>
@@ -364,10 +375,10 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
             <FadeIn direction="up">
               <header className="mb-12 text-center md:text-left">
                 <h2 className="font-display-lg text-[32px] md:text-[48px] text-primary mb-4 tracking-tight">
-                  Gallery
+                  {campusLifePageData?.galleryTitle || "Gallery"}
                 </h2>
                 <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto md:mx-0">
-                  Explore the vibrant daily experiences, modern learning environments, and joyous moments that define our campus.
+                  {campusLifePageData?.gallerySubtitle || "Explore the vibrant daily experiences, modern learning environments, and joyous moments that define our campus."}
                 </p>
               </header>
             </FadeIn>
@@ -441,7 +452,7 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
             <div className="w-full md:w-2/5 h-48 md:h-auto relative">
               <div 
                 className="bg-cover bg-center w-full h-full absolute inset-0"
-                style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGH2WKnBz_xxfq5VaoJRftGErndJ87u8Kz7sXYRC8bWL1G8QNFK7zNwcmKA7BTxONfpDc5O_bJYsEcmz2bykWsGvOXFTDn0ud6NBRUlchBCNij6Lz2zLNoDLsgHLcoEOEWNCKfKRRDziAoTMewI_U7YRFGpV5no0yeudwR4mmqCl1LnFx0LiASGQjomeJU3SpVnjbTfiDdulf_zpgVduMIaUXK3NlE3Yos2h0R8Tzd0mHSrs1sjLKhZA')` }}
+                style={{ backgroundImage: `url('${selectedEvent.image}')` }}
               />
             </div>
             <div className="w-full md:w-3/5 p-8 flex flex-col bg-surface">
@@ -456,7 +467,9 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
               </div>
               
               <h3 className="font-display-lg-mobile text-[24px] text-on-surface mb-2 tracking-tight">{selectedEvent.title}</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant mb-6">Join us for this wonderful event at Pakdeepan Kindergarten.</p>
+              <p className="font-body-md text-body-md text-on-surface-variant mb-6">
+                {selectedEvent.description || campusLifePageData?.eventModalDefaultText || "Join us for this wonderful event at Pakdeepan Kindergarten."}
+              </p>
               
               <div className="flex flex-col gap-3 mb-8">
                 <div className="flex items-center gap-3 text-on-surface">
@@ -474,8 +487,8 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
               </div>
               
               <div className="mt-auto flex gap-4 pt-6 border-t border-outline-variant/30">
-                <button className="flex-1 py-3 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps hover:opacity-90 transition-opacity active:scale-95">
-                  RSVP Now
+                <button className="flex-1 py-3 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps hover:opacity-90 transition-opacity active:scale-95 cursor-pointer">
+                  {campusLifePageData?.rsvpButtonLabel || "RSVP Now"}
                 </button>
               </div>
             </div>

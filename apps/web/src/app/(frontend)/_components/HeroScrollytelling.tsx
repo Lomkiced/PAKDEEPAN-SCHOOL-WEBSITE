@@ -5,7 +5,32 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "@phosphor-icons/react"
 
-export function HeroScrollytelling() {
+export interface HeroScrollytellingProps {
+  tagline?: string
+  titlePrefix?: string
+  titleHighlight?: string
+  titleSuffix?: string
+  body?: string
+  primaryCtaLabel?: string
+  primaryCtaLink?: string
+  secondaryCtaLabel?: string
+  secondaryCtaLink?: string
+}
+
+export function HeroScrollytelling({
+  tagline = "Learn · Grow · Build Your Future",
+  titlePrefix = "Welcome to",
+  titleHighlight = "Pakdeepan",
+  titleSuffix = "School",
+  body = "Every great journey begins by opening a book. We cultivate joyful curiosity, strong bilingual foundations, and creative inquiry in every young child.",
+  primaryCtaLabel = "Discover Our School",
+  primaryCtaLink = "/about",
+  secondaryCtaLabel = "Admissions",
+  secondaryCtaLink = "/admissions",
+}: HeroScrollytellingProps) {
+  // If tagline contains separator '·' or '•', split into decorated words
+  const taglineItems = tagline ? tagline.split(/\s*[·•]\s*/) : ["Learn", "Grow", "Build Your Future"]
+
   return (
     <div className="relative w-full overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-10 md:py-16">
 
@@ -54,41 +79,49 @@ export function HeroScrollytelling() {
             
             {/* Signature Sherlina Script Tagline */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4 font-sherlina text-[20px] sm:text-[24px] lg:text-[32px] text-secondary leading-normal drop-shadow-sm">
-              <span className="font-bold">Learn</span>
-              <span className="text-primary/60 text-lg">·</span>
-              <span className="font-bold">Grow</span>
-              <span className="text-primary/60 text-lg">·</span>
-              <span className="font-bold">Build Your Future</span>
+              {taglineItems.map((item, idx) => (
+                <React.Fragment key={idx}>
+                  <span className="font-bold">{item}</span>
+                  {idx < taglineItems.length - 1 && (
+                    <span className="text-primary/60 text-lg">·</span>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
             
             <h1 className="font-display-lg text-[40px] sm:text-[56px] lg:text-[76px] leading-[1.05] text-[#1e3a8a] mb-6 tracking-tight font-extrabold drop-shadow-sm">
-              Welcome to <br />
+              {titlePrefix} <br />
               <span className="text-primary relative inline-block">
-                Pakdeepan 
+                {titleHighlight} 
                 {/* Subtle underline flourish */}
                 <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                 </svg>
-              </span><br/> School
+              </span>
+              {titleSuffix && (
+                <>
+                  <br /> {titleSuffix}
+                </>
+              )}
             </h1>
             
             <p className="font-body-lg text-[16px] sm:text-[18px] lg:text-[20px] text-on-surface-variant mb-8 max-w-xl leading-relaxed font-medium">
-              Every great journey begins by opening a book. We cultivate joyful curiosity, strong bilingual foundations, and creative inquiry in every young child.
+              {body}
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
               <Link 
-                href="/about" 
+                href={primaryCtaLink} 
                 className="flex items-center justify-center gap-2 px-8 py-3.5 w-full sm:w-auto rounded-full bg-primary text-white font-bold text-[15px] hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 transition-all active:scale-95"
               >
-                Discover Our School <ArrowRight size={18} weight="bold" />
+                {primaryCtaLabel} <ArrowRight size={18} weight="bold" />
               </Link>
               
               <Link 
-                href="/admissions" 
+                href={secondaryCtaLink} 
                 className="flex items-center justify-center gap-2 px-8 py-3.5 w-full sm:w-auto rounded-full bg-white text-[#1e3a8a] font-bold text-[15px] border border-slate-200 hover:border-[#1e3a8a]/30 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95"
               >
-                Admissions
+                {secondaryCtaLabel}
               </Link>
             </div>
           </motion.div>

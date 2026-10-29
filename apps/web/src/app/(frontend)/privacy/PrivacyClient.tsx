@@ -4,36 +4,80 @@ import * as React from "react"
 import { FadeIn } from "@pakdeepan/ui"
 import { cn } from "@pakdeepan/ui/src/utils/cn"
 
-export default function PrivacyClient({ dict, locale }: { dict: any, locale: string }) {
-  const SECTIONS = [
-    { id: "information-collection", title: dict.privacy?.informationCollection || "Information Collection" },
-    { id: "use-of-information", title: dict.privacy?.useOfInformation || "Use of Information" },
-    { id: "data-protection", title: dict.privacy?.dataProtection || "Data Protection" },
-    { id: "child-privacy", title: dict.privacy?.childPrivacy || "Child Privacy" },
-    { id: "contact-us", title: dict.privacy?.contactUs || "Contact Us" },
-  ]
+const DEFAULT_SECTIONS = [
+  {
+    sectionId: "information-collection",
+    title: "Information Collection",
+    description: "We collect information that is necessary for educational, administrative, and safeguarding purposes. This may include:",
+    bullets: [
+      { text: "Personal identification details (names, dates of birth, addresses)." },
+      { text: "Academic records and progress reports." },
+      { text: "Medical and health information required for student welfare." },
+      { text: "Communications and correspondence with the school." }
+    ]
+  },
+  {
+    sectionId: "use-of-information",
+    title: "Use of Information",
+    description: "The information we collect is strictly utilized to provide a nurturing and effective educational environment. Specifically, we use personal data to:",
+    bullets: [
+      { text: "Facilitate admissions and enrollment processes." },
+      { text: "Monitor academic progress and tailor educational support." },
+      { text: "Ensure the health, safety, and well-being of all students." },
+      { text: "Communicate essential school updates, events, and reports to parents and guardians." }
+    ]
+  },
+  {
+    sectionId: "data-protection",
+    title: "Data Protection",
+    description: "We employ robust security measures to protect your data against unauthorized access, alteration, disclosure, or destruction. Our data handling practices are regularly reviewed to ensure compliance with relevant data protection regulations and to maintain the highest standards of confidentiality.",
+    bullets: []
+  },
+  {
+    sectionId: "child-privacy",
+    title: "Child Privacy",
+    description: "Protecting the privacy of children is our utmost priority. We do not knowingly collect personal information from children under the age of 13 without verifiable parental consent. All data concerning students is handled with extreme sensitivity and is only accessible to authorized personnel who require it for educational or safeguarding purposes.",
+    bullets: []
+  },
+  {
+    sectionId: "contact-us",
+    title: "Contact Us",
+    description: "If you have any questions or concerns regarding this Privacy Policy or our data practices, please do not hesitate to contact our administrative office at admissions@pakdeepan.ac.th.",
+    bullets: []
+  }
+]
 
-  const [activeSection, setActiveSection] = React.useState(SECTIONS[0].id)
+export default function PrivacyClient({ privacyPageData, dict, locale }: { privacyPageData?: any, dict: any, locale: string }) {
+  const title = privacyPageData?.title || dict.privacy?.title || "Privacy Policy"
+  const lastUpdated = privacyPageData?.lastUpdated || dict.privacy?.lastUpdated || "October 24, 2024"
+  const intro = privacyPageData?.intro || dict.privacy?.intro || "At Pakdeepan Kindergarten School, we are committed to protecting the privacy and security of our students, parents, staff, and broader community. This Privacy Policy outlines how we collect, use, and safeguard personal information in a manner that aligns with our core values of transparency and trust."
+
+  const sections = privacyPageData?.sections && privacyPageData.sections.length > 0 
+    ? privacyPageData.sections 
+    : DEFAULT_SECTIONS
+
+  const [activeSection, setActiveSection] = React.useState(sections[0]?.sectionId || "information-collection")
 
   React.useEffect(() => {
     const handleScroll = () => {
-      const sectionElements = SECTIONS.map(s => document.getElementById(s.id))
-      
-      let currentActive = SECTIONS[0].id
-      for (const el of sectionElements) {
+      let currentActive = sections[0]?.sectionId || ""
+      for (const s of sections) {
+        const el = document.getElementById(s.sectionId)
         if (el) {
           const rect = el.getBoundingClientRect()
-          if (rect.top <= 150) { // 150px offset for sticky header
-            currentActive = el.id
+          if (rect.top <= 150) {
+            currentActive = s.sectionId
           }
         }
       }
-      setActiveSection(currentActive)
+      if (currentActive) {
+        setActiveSection(currentActive)
+      }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [sections])
 
   return (
     <div className="flex flex-col relative min-h-screen">
@@ -42,10 +86,10 @@ export default function PrivacyClient({ dict, locale }: { dict: any, locale: str
         <FadeIn direction="up">
           <header className="mb-16">
             <h1 className="font-display-lg text-[40px] md:text-[56px] text-primary tracking-tight mb-4">
-              {dict.privacy?.title || "Privacy Policy"}
+              {title}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-              {dict.privacy?.lastUpdated || "Last updated"}: October 24, 2024
+              Last updated: {lastUpdated}
             </p>
           </header>
         </FadeIn>
@@ -59,17 +103,17 @@ export default function PrivacyClient({ dict, locale }: { dict: any, locale: str
                 <span className="font-label-caps text-[12px] uppercase tracking-wider text-primary mb-4">
                   {dict.privacy?.contents || "Contents"}
                 </span>
-                {SECTIONS.map((section) => (
+                {sections.map((section: any) => (
                   <a 
-                    key={section.id}
-                    href={`#${section.id}`}
+                    key={section.sectionId}
+                    href={`#${section.sectionId}`}
                     onClick={(e) => {
                       e.preventDefault()
-                      document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth" })
+                      document.getElementById(section.sectionId)?.scrollIntoView({ behavior: "smooth" })
                     }}
                     className={cn(
-                      "font-body-md text-body-md pl-4 py-1 border-l-2 transition-all",
-                      activeSection === section.id 
+                      "font-body-md text-body-md pl-4 py-1 border-l-2 transition-all cursor-pointer",
+                      activeSection === section.sectionId 
                         ? "text-primary font-bold border-primary" 
                         : "text-on-surface-variant hover:text-primary border-transparent"
                     )}
@@ -87,67 +131,31 @@ export default function PrivacyClient({ dict, locale }: { dict: any, locale: str
               
               <div className="space-y-8">
                 <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light">
-                  {dict.privacy?.intro || "At Pakdeepan Kindergarten School, we are committed to protecting the privacy and security of our students, parents, staff, and broader community. This Privacy Policy outlines how we collect, use, and safeguard personal information in a manner that aligns with our core values of transparency and trust."}
+                  {intro}
                 </p>
 
-                <section id="information-collection" className="scroll-mt-32">
-                  <h2 className="font-headline-sm text-[24px] text-primary mb-4">{SECTIONS[0].title}</h2>
-                  <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light mb-4">
-                    We collect information that is necessary for educational, administrative, and safeguarding purposes. This may include:
-                  </p>
-                  <ul className="space-y-2 pl-4">
-                    {[
-                      "Personal identification details (names, dates of birth, addresses).",
-                      "Academic records and progress reports.",
-                      "Medical and health information required for student welfare.",
-                      "Communications and correspondence with the school."
-                    ].map((item, i) => (
-                      <li key={i} className="font-body-md text-[16px] text-on-surface-variant leading-relaxed relative before:content-['•'] before:absolute before:-left-4 before:text-secondary before:text-xl flex items-center">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section id="use-of-information" className="scroll-mt-32">
-                  <h2 className="font-headline-sm text-[24px] text-primary mb-4">{SECTIONS[1].title}</h2>
-                  <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light mb-4">
-                    The information we collect is strictly utilized to provide a nurturing and effective educational environment. Specifically, we use personal data to:
-                  </p>
-                  <ul className="space-y-2 pl-4">
-                    {[
-                      "Facilitate admissions and enrollment processes.",
-                      "Monitor academic progress and tailor educational support.",
-                      "Ensure the health, safety, and well-being of all students.",
-                      "Communicate essential school updates, events, and reports to parents and guardians."
-                    ].map((item, i) => (
-                      <li key={i} className="font-body-md text-[16px] text-on-surface-variant leading-relaxed relative before:content-['•'] before:absolute before:-left-4 before:text-secondary before:text-xl flex items-center">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section id="data-protection" className="scroll-mt-32">
-                  <h2 className="font-headline-sm text-[24px] text-primary mb-4">{SECTIONS[2].title}</h2>
-                  <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light">
-                    We employ robust security measures to protect your data against unauthorized access, alteration, disclosure, or destruction. Our data handling practices are regularly reviewed to ensure compliance with relevant data protection regulations and to maintain the highest standards of confidentiality.
-                  </p>
-                </section>
-
-                <section id="child-privacy" className="scroll-mt-32">
-                  <h2 className="font-headline-sm text-[24px] text-primary mb-4">{SECTIONS[3].title}</h2>
-                  <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light">
-                    Protecting the privacy of children is our utmost priority. We do not knowingly collect personal information from children under the age of 13 without verifiable parental consent. All data concerning students is handled with extreme sensitivity and is only accessible to authorized personnel who require it for educational or safeguarding purposes.
-                  </p>
-                </section>
-
-                <section id="contact-us" className="scroll-mt-32">
-                  <h2 className="font-headline-sm text-[24px] text-primary mb-4">{SECTIONS[4].title}</h2>
-                  <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light">
-                    If you have any questions or concerns regarding this Privacy Policy or our data practices, please do not hesitate to contact our Data Protection Officer at <a href="mailto:privacy@pakdeepan.edu" className="text-secondary hover:underline">privacy@pakdeepan.edu</a>.
-                  </p>
-                </section>
+                {sections.map((section: any) => (
+                  <section key={section.sectionId} id={section.sectionId} className="scroll-mt-32">
+                    <h2 className="font-headline-sm text-[24px] text-primary mb-4">{section.title}</h2>
+                    {section.description && (
+                      <p className="font-body-lg text-[18px] text-on-surface-variant leading-relaxed font-light mb-4">
+                        {section.description}
+                      </p>
+                    )}
+                    {section.bullets && section.bullets.length > 0 && (
+                      <ul className="space-y-2 pl-4">
+                        {section.bullets.map((b: any, bIdx: number) => {
+                          const bulletText = typeof b === "string" ? b : b.text
+                          return (
+                            <li key={bIdx} className="font-body-md text-[16px] text-on-surface-variant leading-relaxed relative before:content-['•'] before:absolute before:-left-4 before:text-secondary before:text-xl flex items-center">
+                              {bulletText}
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </section>
+                ))}
 
               </div>
             </article>

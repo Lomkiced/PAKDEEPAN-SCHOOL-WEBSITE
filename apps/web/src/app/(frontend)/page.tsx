@@ -4,6 +4,7 @@ import HomeClient from "./HomeClient"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
 import { getDictionary } from "@/lib/i18n"
+import { getCachedGlobal } from "@/lib/payload"
 
 export const metadata: Metadata = {
   title: "Pakdeepan Kindergarten School | A Foundation for a Beautiful Future",
@@ -17,6 +18,14 @@ export default async function HomePage() {
   const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
   const locale = (localeStr === "th" ? "th" : "en") as "en" | "th"
   const dict = await getDictionary(locale)
+
+  // Fetch Home Page content from CMS
+  let homeData: any = null
+  try {
+    homeData = await getCachedGlobal("home-page", locale, ["home-page-cache", "home-cache"])
+  } catch (e) {
+    console.error("Failed to load home page global from CMS:", e)
+  }
 
   // Fetch top 3 latest published news
   const newsRes = await payload.find({
@@ -83,6 +92,7 @@ export default async function HomePage() {
       events={eventsRes.docs} 
       gallery={galleryRes.docs}
       programs={sortedPrograms}
+      homeData={homeData}
       dict={dict}
       locale={locale}
     />

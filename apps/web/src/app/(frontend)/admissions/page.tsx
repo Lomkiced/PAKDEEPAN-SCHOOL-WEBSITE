@@ -1,4 +1,4 @@
-import { getPayload } from "@/lib/payload"
+import { getPayload, getCachedGlobal } from "@/lib/payload"
 import AdmissionsClient from "./AdmissionsClient"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
@@ -16,6 +16,14 @@ export default async function AdmissionsPage() {
   const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
   const locale = (localeStr === "th" ? "th" : "en") as "en" | "th"
   const dict = await getDictionary(locale)
+
+  // Fetch Admissions Page CMS Global (Hero, Stepper, Form Messages)
+  let admissionsPageData: any = null
+  try {
+    admissionsPageData = await getCachedGlobal("admissions-page", locale, ["admissions-page-cache", "admissions-cache"])
+  } catch (e) {
+    console.error("Failed to load admissions-page global:", e)
+  }
 
   // Fetch Published Programs for the tuition table and form dropdown
   const programsRes = await payload.find({
@@ -39,6 +47,7 @@ export default async function AdmissionsPage() {
   return (
     <AdmissionsClient 
       programs={sortedPrograms}
+      admissionsPageData={admissionsPageData}
       dict={dict}
       locale={locale}
     />

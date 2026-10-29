@@ -65,13 +65,13 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
     }
   }
 
-  // Extract contact details from CMS or use fallbacks
+  // Extract contact details from CMS or use unified Thai school fallbacks
   const contact = siteSettings?.contact || {}
-  const phone = contact.phone || "+1 (555) 123-4567"
-  const email = contact.email || "admissions@pakdeepan.edu"
-  const address = contact.address || "1200 Education Drive\nInnovation District, 1201"
+  const phone = contact.phone || "+66 39 123 4567"
+  const email = contact.email || "admissions@pakdeepan.ac.th"
+  const address = contact.address || "Chanthaburi, Thailand"
   const mapsUrl = contact.mapsUrl || "https://maps.google.com"
-  const mapsImage = contact.mapsImage?.url || "https://lh3.googleusercontent.com/aida-public/AB6AXuDFXW_lT6hQ8N1L0n_M0z1d2R2rP0pWv5qYxT4H-H1pQ1cM2lXU2eP3QhA8Q3T-WvV-QyZ9J5pZ2T3n1Z4QZ2rF2g3QZ2T3n1Z4QZ2rF2g3QZ2T3n1Z4QZ2rF2g3QZ2T3n1Z4Q"
+  const mapsImage = contact.mapsImage?.url || "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop"
   
   const officeDays = siteSettings?.officeHours?.days || "Monday – Friday"
   const officeHoursTime = siteSettings?.officeHours?.hours || "8:00 AM – 4:00 PM (Local Time)"
@@ -89,7 +89,7 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
               Connect With Us
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              We welcome your inquiries and look forward to discussing how Pakdeepan Kindergarten School can be part of your family's educational journey.
+              We welcome your inquiries and look forward to discussing how Pakdeepan Kindergarten School can be part of your family&apos;s educational journey.
             </p>
           </FadeIn>
         </section>

@@ -14,7 +14,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
   const heroBadge = aboutData?.heroBadge || dict.about?.heroBadge || "Our Story";
   const heroTitle = aboutData?.heroTitle || dict.about?.heroTitle || "Nurturing Excellence in Early Education";
   const heroDescription = aboutData?.heroDescription || dict.about?.heroDescription || "At Pakdeepan Kindergarten School, we believe in cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.";
-  const heroImage = aboutData?.heroImage?.url || "https://lh3.googleusercontent.com/aida-public/AB6AXuDEBTwDrFrhfcbLdTJzFp9mgPWUjivefzKOy73OgQYPmWCU7LFU2rXiU9Y_jdUlBMZAZgXIWCBBkq-9m34Wvp0l1zKRue2FkfbWrxF8lzTPI6IRbrUvFm-ptZjNzOw-QIwCZolNOnBHaX55jt8tBzub-sJbS4W3a5XKLjkSXw1SxMt5DgDUoVTZl9cPotKxdKwv1zpUK-RHg8IuxmnQCZN3oYMEB_lorTaH7rVDWriPSjOOBrOzPF4_aQ";
+  const heroImage = aboutData?.heroImage?.url || "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop";
 
   const vision = aboutData?.vision || dict.about?.vision || "To be the premier international early years institution, recognized globally for fostering innovative thinkers and compassionate leaders from their very first steps in education.";
   const mission = aboutData?.mission || dict.about?.mission || "We provide a holistic, child-centered curriculum within a safe, inspiring, and culturally diverse environment, empowering each child to reach their unique potential through inquiry and joyful discovery.";
@@ -22,7 +22,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
   const principalName = aboutData?.principalName || "Dr. Elena Rostova";
   const principalTitle = aboutData?.principalTitle || dict.about?.principalTitle || "Ph.D. in Early Education";
   const principalMessage = aboutData?.principalMessage || dict.about?.principalMessage || "\"Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child's lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth.\"";
-  const principalPhoto = aboutData?.principalPhoto?.url || "https://lh3.googleusercontent.com/aida-public/AB6AXuCEqJr3sQ_LCIhsDqcrFiH1cRad-bKWjEL-Eq2YHlmUdPUO7EWSDNvnq-d9wV6_lsNa9zPgUcWLKOUC4Tu7u7hvtAYSBR3cxAd4yTe-jBIN0XgvXzU0bgQGw8lbmvMdT0V8jwzFfPiHo09YVTHjtaJWVB1_uoNO9cyxmnffkRp7hKoGMTVP6mu5LpW8JiJn2vBskdJsuSnV8AS2KVu0AasFp6kUiu27GkhZH7K3UQlHvbJS819seLzD5w";
+  const principalPhoto = aboutData?.principalPhoto?.url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop";
 
   return (
     <div className="flex flex-col bg-white">
@@ -140,7 +140,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
                   <div className="relative pl-6 md:pl-10 border-l-2 border-secondary/40 mb-12">
                     {/* Giant quotation mark in background */}
                     <span className="absolute -top-12 -left-4 font-serif text-[120px] text-slate-200 opacity-50 select-none pointer-events-none leading-none">
-                      "
+                      &ldquo;
                     </span>
                     <p className="font-body-md text-[18px] md:text-[20px] text-on-surface-variant leading-relaxed relative z-10 whitespace-pre-wrap">
                       {principalMessage.replace(/^"|"$/g, '')}
