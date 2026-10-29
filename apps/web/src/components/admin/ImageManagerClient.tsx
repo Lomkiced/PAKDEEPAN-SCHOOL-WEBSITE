@@ -25,8 +25,11 @@ import {
   HelpCircle,
   Maximize2,
   UploadCloud,
+  FileText,
+  Plus,
 } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
+import { NewsArticleEditorModal } from "@/components/admin/NewsArticleEditorModal"
 
 export interface ImageManagerClientProps {
   initialLocale?: "en" | "th"
@@ -102,6 +105,8 @@ export function ImageManagerClient({
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all")
   const [searchQuery, setSearchQuery] = React.useState<string>("")
   const [activeModalItem, setActiveModalItem] = React.useState<MediaCardItem | null>(null)
+  const [editingNewsArticle, setEditingNewsArticle] = React.useState<any | null>(null)
+  const [isNewsEditorOpen, setIsNewsEditorOpen] = React.useState(false)
   const [copiedId, setCopiedId] = React.useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null)
   const [toast, setToast] = React.useState<{ message: string; type: "success" | "error" } | null>(null)
@@ -833,14 +838,32 @@ export function ImageManagerClient({
 
                   {/* Card Footer Actions */}
                   <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveModalItem(item)}
-                      className="px-2.5 py-1.5 text-[11px] font-bold text-[#1e3a8a] hover:bg-blue-100/60 rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      <UploadCloud className="w-3 h-3" />
-                      <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveModalItem(item)}
+                        className="px-2.5 py-1.5 text-[11px] font-bold text-[#1e3a8a] hover:bg-blue-100/60 rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        <UploadCloud className="w-3 h-3" />
+                        <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
+                      </button>
+
+                      {item.category === "news" && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const orig = news.find((n) => String(n.id) === String(item.docId)) || item
+                            setEditingNewsArticle(orig)
+                            setIsNewsEditorOpen(true)
+                          }}
+                          className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200/60 rounded-lg transition-colors flex items-center gap-1"
+                          title={isTh ? "แก้ไขเนื้อหาข่าวฉบับเต็ม" : "Edit Full Story Content"}
+                        >
+                          <FileText className="w-3 h-3 text-[#1e3a8a]" />
+                          <span>{isTh ? "เนื้อหา" : "Story"}</span>
+                        </button>
+                      )}
+                    </div>
 
                     <div className="flex items-center gap-1">
                       {hasImage && (
@@ -978,6 +1001,24 @@ export function ImageManagerClient({
           </div>
         </div>
       )}
+
+      {/* Admin News Story & Content Editor Modal */}
+      <NewsArticleEditorModal
+        article={editingNewsArticle}
+        isOpen={isNewsEditorOpen}
+        onClose={() => {
+          setIsNewsEditorOpen(false)
+          setEditingNewsArticle(null)
+        }}
+        onSaved={() => {
+          setToast({
+            message: isTh ? "บันทึกและเผยแพร่เนื้อหาข่าวเรียบร้อยแล้ว!" : "News article saved and published!",
+            type: "success",
+          })
+          router.refresh()
+        }}
+        locale={locale}
+      />
     </div>
   )
 }

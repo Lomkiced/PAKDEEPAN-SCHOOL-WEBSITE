@@ -6,22 +6,21 @@ import { ArrowRight, CaretDown, X, Play, CaretLeft, CaretRight, CalendarBlank, M
 import { cn } from "@pakdeepan/ui/src/utils/cn"
 import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
+import { normalizeNewsItem, DEFAULT_NEWS_ITEMS, type NormalizedNewsItem } from "@/lib/newsData"
+import { NewsArticleModal } from "@/components/news/NewsArticleModal"
 
 export default function CampusLifeClient({ initialNews, initialEvents, initialGallery, campusLifePageData, locale: propLocale = "en" }: any) {
   const { locale: contextLocale } = useLanguage()
   const activeLocale = (contextLocale || propLocale || "en") as "en" | "th"
   const isTh = activeLocale === "th"
 
-  // Use CMS data exclusively with dynamic localization
-  const newsItems = (initialNews || []).map((n: any) => ({
-    id: n.id,
-    title: localizeData(n, 'title', activeLocale) || n.title,
-    date: new Date(n.publishDate).toLocaleDateString(isTh ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    category: localizeData(n, 'category', activeLocale) || n.category,
-    color: "bg-primary-container/90 text-on-primary-container",
-    excerpt: localizeData(n, 'excerpt', activeLocale) || n.excerpt,
-    image: n.featuredImage?.url,
-  }));
+  // Use CMS data with rich fallbacks and normalization
+  const rawNewsList = (initialNews && initialNews.length > 0) ? initialNews : DEFAULT_NEWS_ITEMS
+  const normalizedNewsList: NormalizedNewsItem[] = rawNewsList.map((n: any) =>
+    normalizeNewsItem(n, activeLocale)
+  )
+
+  const [selectedNewsArticle, setSelectedNewsArticle] = React.useState<NormalizedNewsItem | null>(null)
 
   const galleryItems = (initialGallery || []).map((g: any) => ({
     id: g.id,
@@ -108,9 +107,10 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
     ? ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."]
     : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-  const filteredNews = newsItems.filter((item: any) =>
+  const filteredNews = normalizedNewsList.filter((item: NormalizedNewsItem) =>
     activeFilter === "ALL" || (item.category && item.category.toLowerCase().includes(activeFilter.toLowerCase()))
   )
+  const featuredNews = filteredNews[0] || normalizedNewsList[0]
 
   const filteredGallery = galleryItems.filter((item: any) =>
     activeGalleryFilter === "ALL" || (item.category && item.category.toLowerCase().includes(activeGalleryFilter.toLowerCase()))
@@ -176,31 +176,36 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
 
           <FadeIn direction="up" delay={0.1}>
             {/* Featured News Banner */}
-            <div className="mb-12 rounded-xl overflow-hidden relative shadow-[0_10px_30px_rgba(0,0,0,0.04)] group cursor-pointer">
+            {featuredNews && (
               <div
-                className="bg-cover bg-center w-full h-[400px] md:h-[500px] transition-transform duration-700 group-hover:scale-105"
-                style={{ backgroundImage: `url('${newsItems[0]?.image}')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full md:w-2/3">
-                <span className="inline-block bg-primary-container/30 backdrop-blur-sm text-on-primary font-label-caps text-label-caps px-3 py-1 rounded-full mb-4 border border-primary-container/50">
-                  {newsItems[0]?.category}
-                </span>
-                <h2 className="font-headline-md text-headline-sm md:text-headline-md text-white mb-4">
-                  {newsItems[0]?.title}
-                </h2>
-                <p className="font-body-md text-body-md text-white/80 mb-4 hidden md:block">
-                  {newsItems[0]?.excerpt}
-                </p>
-                <div className="flex items-center text-white/60 font-label-caps text-label-caps">
-                  <span>{newsItems[0]?.date}</span>
-                  <span className="mx-2">•</span>
-                  <span className="flex items-center hover:text-white transition-colors group-hover:translate-x-1 duration-300">
-                    {isTh ? "อ่านบทความฉบับเต็ม" : "Read Full Story"} <ArrowRight className="ml-1" size={16} />
+                onClick={() => setSelectedNewsArticle(featuredNews)}
+                className="mb-12 rounded-2xl overflow-hidden relative shadow-[0_10px_30px_rgba(0,0,0,0.04)] group cursor-pointer border border-slate-200/70"
+              >
+                <div
+                  className="bg-cover bg-center w-full h-[400px] md:h-[500px] transition-transform duration-700 group-hover:scale-105"
+                  style={{ backgroundImage: `url('${featuredNews.imageUrl}')` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full md:w-2/3">
+                  <span className="inline-block bg-primary-container/40 backdrop-blur-md text-on-primary font-label-caps text-label-caps px-3.5 py-1 rounded-full mb-4 border border-primary-container/50 shadow-sm">
+                    {featuredNews.category}
                   </span>
+                  <h2 className="font-headline-md text-headline-sm md:text-headline-md text-white mb-4 line-clamp-2">
+                    {featuredNews.title}
+                  </h2>
+                  <p className="font-body-md text-body-md text-white/80 mb-4 hidden md:block line-clamp-2">
+                    {featuredNews.excerpt}
+                  </p>
+                  <div className="flex items-center text-white/70 font-label-caps text-label-caps gap-2">
+                    <span>{featuredNews.formattedDate}</span>
+                    <span>•</span>
+                    <span className="flex items-center text-white font-bold hover:text-primary-container transition-colors group-hover:translate-x-1 duration-300">
+                      {isTh ? "อ่านบทความฉบับเต็ม" : "Read Full Story"} <ArrowRight className="ml-1" size={16} />
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </FadeIn>
 
           <FadeIn direction="up" delay={0.2}>
@@ -224,28 +229,31 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
 
             {/* News Grid */}
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {filteredNews.slice(1, 4).map((news: any) => (
+              {filteredNews.slice(1).map((news: NormalizedNewsItem) => (
                 <StaggerItem key={news.id}>
-                  <article className="bg-surface-container-lowest rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col h-full group cursor-pointer hover:-translate-y-1 transition-transform duration-300 border border-outline-variant/30">
-                    <div className="h-48 overflow-hidden relative">
+                  <article
+                    onClick={() => setSelectedNewsArticle(news)}
+                    className="bg-surface-container-lowest rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col h-full group cursor-pointer hover:-translate-y-1 transition-all duration-300 border border-outline-variant/30 hover:shadow-md"
+                  >
+                    <div className="h-48 overflow-hidden relative bg-slate-100">
                       <img
-                        src={news.image}
+                        src={news.imageUrl}
                         alt={news.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <div className={cn("absolute top-4 left-4 backdrop-blur-sm font-label-caps text-label-caps px-3 py-1 rounded-full", news.color)}>
+                      <div className="absolute top-4 left-4 backdrop-blur-md bg-white/90 text-[#1e3a8a] font-label-caps text-label-caps px-3 py-1 rounded-full shadow-xs">
                         {news.category}
                       </div>
                     </div>
                     <div className="p-6 flex flex-col flex-grow">
-                      <div className="text-on-surface-variant font-label-caps text-label-caps mb-2">{news.date}</div>
-                      <h3 className="font-headline-sm text-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors">
+                      <div className="text-on-surface-variant font-label-caps text-label-caps mb-2">{news.formattedDate}</div>
+                      <h3 className="font-headline-sm text-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors line-clamp-2">
                         {news.title}
                       </h3>
-                      <p className="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow line-clamp-3">
+                      <p className="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow line-clamp-3 leading-relaxed">
                         {news.excerpt}
                       </p>
-                      <div className="flex items-center text-primary font-label-caps text-label-caps group-hover:translate-x-1 transition-transform duration-300">
+                      <div className="flex items-center text-primary font-label-caps text-label-caps font-bold group-hover:translate-x-1 transition-transform duration-300">
                         {isTh ? "อ่านเพิ่มเติม" : "Read More"} <ArrowRight className="ml-1" size={16} />
                       </div>
                     </div>
@@ -580,6 +588,13 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
     </div>
   )}
       
+      {/* Interactive News Article Reader Modal */}
+      <NewsArticleModal
+        article={selectedNewsArticle}
+        isOpen={!!selectedNewsArticle}
+        onClose={() => setSelectedNewsArticle(null)}
+        locale={activeLocale}
+      />
     </div>
   )
 }

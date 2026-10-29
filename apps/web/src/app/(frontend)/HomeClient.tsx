@@ -8,6 +8,8 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { HeroScrollytelling } from "./_components/HeroScrollytelling"
 import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
+import { normalizeNewsItem, DEFAULT_NEWS_ITEMS, type NormalizedNewsItem } from "@/lib/newsData"
+import { NewsArticleModal } from "@/components/news/NewsArticleModal"
 
 interface HomeClientProps {
   news: any[];
@@ -75,6 +77,14 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
   const { locale: contextLocale } = useLanguage()
   const activeLocale = (contextLocale || locale || "en") as "en" | "th"
   const isTh = activeLocale === "th"
+
+  const [selectedNewsArticle, setSelectedNewsArticle] = React.useState<NormalizedNewsItem | null>(null)
+
+  // Curate display news with fallback
+  const rawNews = (news && news.length > 0) ? news : DEFAULT_NEWS_ITEMS
+  const displayNews: NormalizedNewsItem[] = rawNews.slice(0, 3).map((item: any) =>
+    normalizeNewsItem(item, activeLocale)
+  )
 
   // Extract marquee items from CMS if configured
   const marqueeItems: string[] = 
@@ -338,61 +348,52 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
             </div>
 
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {(news.length > 0 ? news.slice(0, 3) : mockNews).map((item: any, idx: number) => {
-                const fallbackImages = [
-                  "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=1200&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=1200&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200&auto=format&fit=crop"
-                ]
-                const imageUrl = item.featuredImage?.url || fallbackImages[idx % fallbackImages.length]
-                const itemTitle = localizeData(item, 'title', activeLocale) || item.title
-                const itemCategory = localizeData(item, 'category', activeLocale) || item.category
-
+              {displayNews.map((item: NormalizedNewsItem) => {
                 return (
                   <StaggerItem key={item.id} className="h-full">
-                    <Link href={`/campus-life#news`} className="block w-full h-full">
-                      <div className="relative w-full h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500">
-                        
-                        {/* Full-bleed Background Image */}
-                        <div className="absolute inset-0 w-full h-full z-0">
-                          <img 
-                            src={imageUrl} 
-                            alt={itemTitle} 
-                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
-                          />
-                        </div>
-
-                        {/* Glassmorphic Dark Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a8a]/95 via-[#1e3a8a]/40 to-transparent z-10 group-hover:from-[#1e3a8a] group-hover:via-[#1e3a8a]/60 transition-all duration-500" />
-
-                        {/* Content Container (Pinned to Bottom) */}
-                        <div className="absolute inset-0 z-20 flex flex-col justify-end p-8">
-                          
-                          {/* Top Meta (Date & Category) */}
-                          <div className="flex justify-between items-center mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                            <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
-                              {itemCategory}
-                            </span>
-                            <span className="text-xs text-white/90 font-bold drop-shadow-sm">
-                              {item.publishDate ? new Date(item.publishDate).toLocaleDateString(activeLocale === "th" ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ""}
-                            </span>
-                          </div>
-
-                          {/* Title */}
-                          <h4 className="font-display-lg text-2xl font-bold text-white mb-2 line-clamp-2 drop-shadow-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                            {itemTitle}
-                          </h4>
-
-                          {/* Hidden Read More Button (Revealed on Hover) */}
-                          <div className="h-0 overflow-hidden group-hover:h-[40px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out mt-1">
-                            <span className="inline-flex items-center gap-2 text-blue-200 font-bold text-sm hover:text-white">
-                              {isTh ? "อ่านเพิ่มเติม" : "Read More"} <ArrowRight size={14} weight="bold" />
-                            </span>
-                          </div>
-                          
-                        </div>
+                    <div
+                      onClick={() => setSelectedNewsArticle(item)}
+                      className="relative w-full h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 block"
+                    >
+                      {/* Full-bleed Background Image */}
+                      <div className="absolute inset-0 w-full h-full z-0">
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
+                        />
                       </div>
-                    </Link>
+
+                      {/* Glassmorphic Dark Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a8a]/95 via-[#1e3a8a]/40 to-transparent z-10 group-hover:from-[#1e3a8a] group-hover:via-[#1e3a8a]/60 transition-all duration-500" />
+
+                      {/* Content Container (Pinned to Bottom) */}
+                      <div className="absolute inset-0 z-20 flex flex-col justify-end p-8">
+                        
+                        {/* Top Meta (Date & Category) */}
+                        <div className="flex justify-between items-center mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                          <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
+                            {item.category}
+                          </span>
+                          <span className="text-xs text-white/90 font-bold drop-shadow-sm">
+                            {item.formattedDate}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h4 className="font-display-lg text-2xl font-bold text-white mb-2 line-clamp-2 drop-shadow-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                          {item.title}
+                        </h4>
+
+                        {/* Read More Trigger on Hover */}
+                        <div className="h-0 overflow-hidden group-hover:h-[40px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out mt-1">
+                          <span className="inline-flex items-center gap-2 text-blue-200 font-bold text-sm hover:text-white">
+                            {isTh ? "อ่านบทความฉบับเต็ม" : "Read Full Story"} <ArrowRight size={14} weight="bold" />
+                          </span>
+                        </div>
+                        
+                      </div>
+                    </div>
                   </StaggerItem>
                 )
               })}
@@ -469,6 +470,14 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
         </section>
 
       </main>
+
+      {/* Interactive News Article Reader Modal */}
+      <NewsArticleModal
+        article={selectedNewsArticle}
+        isOpen={!!selectedNewsArticle}
+        onClose={() => setSelectedNewsArticle(null)}
+        locale={activeLocale}
+      />
     </div>
   )
 }

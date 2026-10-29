@@ -86,7 +86,15 @@
       "title": "Campus News & Events",
       "link": "View All Activity",
       "emptyText": "Check back soon for the latest campus news!",
-      "emptyLink": "Add News in CMS"
+      "emptyLink": "Add News in CMS",
+      "readFullStory": "Read Full Story",
+      "readMore": "Read More",
+      "shareArticle": "Share / Copy Link",
+      "linkCopied": "Link Copied!",
+      "openFullPage": "Open Full Page",
+      "backToNews": "Back to Campus Life & News",
+      "moreNews": "More Campus Life & News",
+      "close": "Close"
     },
     "events": {
       "badge": "Next Upcoming Event",

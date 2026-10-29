@@ -113,12 +113,26 @@ async function seed() {
     await payload.create({
       collection: "news",
       data: {
-        title: "เปิดรับสมัครนักเรียนใหม่ ประจำปีการศึกษา 2568 (Admissions Open)",
+        title: "Admissions Open for Academic Year 2025–2026",
+        title_th: "เปิดรับสมัครนักเรียนใหม่ ประจำปีการศึกษา 2568–2569",
         slug: "admissions-open-2025",
         category: "announcements",
+        category_th: "ประกาศสำคัญ",
         status: "published",
         isFeatured: true,
-        excerpt: "โรงเรียนอนุบาลภักดีพรรณเปิดรับสมัครนักเรียนระดับเตรียมอนุบาลและอนุบาล 1-3 ผู้ปกครองสามารถลงทะเบียนออนไลน์ได้แล้ววันนี้",
+        excerpt: "Pakdeepan Kindergarten School is now accepting new students for Pre-K and Kindergarten 1–3. Schedule a private campus walkthrough today.",
+        excerpt_th: "โรงเรียนอนุบาลภักดีพรรณเปิดรับสมัครนักเรียนระดับเตรียมอนุบาลและอนุบาล 1–3 ผู้ปกครองสามารถลงทะเบียนนัดหมายเยี่ยมชมโรงเรียนได้แล้ววันนี้",
+        content: `We are delighted to announce that admissions are officially open for the upcoming academic year 2025–2026 at Pakdeepan Kindergarten School.
+
+Our school provides a safe, nurturing, and intellectually stimulating environment where young children cultivate critical thinking, emotional agility, and a genuine love for lifelong learning. With a blend of child-centered inquiry, Montessori-inspired practical life blocks, and immersive English-Thai bilingual development, our students are empowered to flourish from day one.
+
+During the admissions period, parents are warmly invited to book a personalized campus walkthrough with our School Director and faculty.`,
+        content_th: `โรงเรียนอนุบาลภักดีพรรณมีความยินดีเป็นอย่างยิ่งที่จะประกาศเปิดรับสมัครนักเรียนใหม่ สำหรับปีการศึกษา 2568–2569 อย่างเป็นทางการแล้ววันนี้
+
+โรงเรียนของเรามุ่งมั่นในการสร้างสภาพแวดล้อมที่ปลอดภัย อบอุ่น และเต็มเปี่ยมด้วยแรงบันดาลใจในการเรียนรู้ ผ่านการบูรณาการหลักสูตรปฐมวัยที่เน้นผู้เรียนเป็นศูนย์กลาง ผสานแนวคิดมอนเตสซอรี่ และการเรียนรู้สองภาษา (English-Thai Bilingual) อย่างเป็นธรรมชาติ
+
+ในช่วงเวลานี้ ผู้ปกครองสามารถลงทะเบียนนัดหมายเพื่อเข้าเยี่ยมชมโรงเรียนแบบส่วนตัว เพื่อสัมผัสบรรยากาศการเรียนรู้จริงและพบปะกับผู้อำนวยการโรงเรียน`,
+        imageUrl: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop",
         publishDate: today.toISOString(),
       } as any,
     })
@@ -126,12 +140,22 @@ async function seed() {
     await payload.create({
       collection: "news",
       data: {
-        title: "สัปดาห์กิจกรรมการทดลองวิทยาศาสตร์แสนสนุก (Junior Science Week)",
+        title: "Junior Science & Nature Discovery Week Highlights",
+        title_th: "ไฮไลท์สัปดาห์กิจกรรมการทดลองวิทยาศาสตร์และธรรมชาติศึกษา",
         slug: "junior-science-week",
         category: "academics",
+        category_th: "วิชาการ",
         status: "published",
         isFeatured: false,
-        excerpt: "เด็กๆ ได้ร่วมทำการทดลองวิทยาศาสตร์เบื้องต้น เรียนรู้เรื่องแรงโน้มถ่วง สีสัน และธรรมชาติรอบตัวผ่านการลงมือทำจริง",
+        excerpt: "Our young explorers engaged in hands-on physics, seed germination workshops, and botanical garden exploration during our annual Junior Science Discovery Week.",
+        excerpt_th: "เด็กๆ ได้ร่วมทำการทดลองวิทยาศาสตร์เบื้องต้น ปลูกเมล็ดพันธุ์พืช และสังเกตปรากฏการณ์ธรรมชาติผ่านการลงมือปฏิบัติจริง",
+        content: `Curiosity is the engine of early childhood education. This week, Pakdeepan transformed into an interactive discovery center during our annual Junior Science & Nature Discovery Week.
+
+Students from Pre-K through K3 participated in guided experiments designed to introduce fundamental concepts of light, density, magnetism, and seed life cycles. In the school garden, each student planted their own organic herb pot to track germination over the upcoming weeks.`,
+        content_th: `ความอยากรู้อยากเห็นคือหัวใจสำคัญของการเรียนรู้ในวัยเด็ก สัปดาห์นี้ โรงเรียนภักดีพรรณได้เปลี่ยนพื้นที่โรงเรียนให้กลายเป็นห้องทดลองวิทยาศาสตร์ธรรมชาติแสนสนุก
+
+นักเรียนตั้งแต่ระดับเตรียมอนุบาลถึงอนุบาล 3 ได้มีโอกาสลงมือทำการทดลองด้วยตนเอง เช่น การทดลองความหนาแน่นของของเหลว แรงแม่เหล็ก การจำแนกแสงสี และวงจรการเจริญเติบโตของเมล็ดพันธุ์พืช`,
+        imageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop",
         publishDate: today.toISOString(),
       } as any,
     })
