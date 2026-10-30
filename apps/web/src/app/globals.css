@@ -8,20 +8,27 @@
   font-family: var(--font-sherlina), cursive;
 }
 
-/* Accessibility Font Scaler for Thai Admin CMS */
-[data-admin-font-scale="normal"] {
+/* Accessibility Font Scaler for Thai Admin CMS & Visual Assets Studio */
+html[data-admin-font-scale="normal"],
+:root[data-admin-font-scale="normal"] {
   --admin-font-scale: 100%;
+  font-size: 16px !important;
 }
 
-[data-admin-font-scale="large"] {
-  --admin-font-scale: 112%;
+html[data-admin-font-scale="large"],
+:root[data-admin-font-scale="large"] {
+  --admin-font-scale: 112.5%;
+  font-size: 18px !important;
 }
 
-[data-admin-font-scale="xlarge"] {
+html[data-admin-font-scale="xlarge"],
+:root[data-admin-font-scale="xlarge"] {
   --admin-font-scale: 125%;
+  font-size: 20px !important;
 }
 
 .admin-shell {
   font-family: 'Prompt', 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: var(--admin-font-scale, 100%);
+  transition: font-size 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

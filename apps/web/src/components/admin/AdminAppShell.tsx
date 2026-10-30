@@ -6,13 +6,9 @@ import { useRouter } from "next/navigation"
 import {
   ExternalLink,
   LogOut,
-  ShieldCheck,
   AlertTriangle,
   Loader2,
-  CalendarDays,
-  Languages,
   LayoutDashboard,
-  Sparkles,
 } from "lucide-react"
 
 export interface AdminAppShellProps {
@@ -92,10 +88,24 @@ export function AdminAppShell({
       if (stored === "normal" || stored === "large" || stored === "xlarge") {
         setFontSize(stored)
         document.documentElement.setAttribute("data-admin-font-scale", stored)
+        document.documentElement.style.fontSize = stored === "large" ? "18px" : stored === "xlarge" ? "20px" : "16px"
       }
     } catch {
       // Ignore
     }
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "pakdeepan_admin_font_size" && (e.newValue === "normal" || e.newValue === "large" || e.newValue === "xlarge")) {
+        setFontSize(e.newValue)
+        document.documentElement.setAttribute("data-admin-font-scale", e.newValue)
+        document.documentElement.style.fontSize = e.newValue === "large" ? "18px" : e.newValue === "xlarge" ? "20px" : "16px"
+      }
+      if (e.key === "pakdeepan_locale" && (e.newValue === "th" || e.newValue === "en")) {
+        setLocale(e.newValue)
+      }
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
   }, [locale])
 
   const isTh = locale === "th"
@@ -111,12 +121,13 @@ export function AdminAppShell({
     window.location.reload()
   }
 
-  // Set font scale
+  // Set font scale (Scales root HTML font-size so all rem units across the entire app scale dynamically)
   const handleSetFontSize = (scale: "normal" | "large" | "xlarge") => {
     setFontSize(scale)
     try {
       localStorage.setItem("pakdeepan_admin_font_size", scale)
       document.documentElement.setAttribute("data-admin-font-scale", scale)
+      document.documentElement.style.fontSize = scale === "large" ? "18px" : scale === "xlarge" ? "20px" : "16px"
     } catch {
       // Ignore
     }
@@ -148,26 +159,19 @@ export function AdminAppShell({
     window.location.href = "/admin/login"
   }
 
-  const fontScaleStyles: Record<"normal" | "large" | "xlarge", React.CSSProperties> = {
-    normal: { fontSize: "16px" },
-    large: { fontSize: "18px" },
-    xlarge: { fontSize: "20px" },
-  }
-
   return (
     <div
       data-admin-font-scale={fontSize}
-      style={fontScaleStyles[fontSize]}
       className="admin-shell min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900"
       suppressHydrationWarning
     >
       {/* ─── CONSOLIDATED SINGLE STICKY TOPBAR (FULL-WIDTH, NO SIDEBAR) ─── */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5" suppressHydrationWarning>
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5" suppressHydrationWarning>
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
           
           {/* Left Side: School Badge + Title + Subtitle with Date & Sync Status */}
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 flex items-center justify-center text-white shadow-md shadow-blue-600/25 shrink-0 font-black text-xl tracking-tight">
+            <div className="w-11 h-11 rounded-xl bg-[#1e3a8a] flex items-center justify-center text-white shrink-0 font-bold text-xl tracking-tight shadow-sm">
               ภ
             </div>
 
@@ -176,19 +180,18 @@ export function AdminAppShell({
                 <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug truncate" suppressHydrationWarning>
                   {title || (isTh ? "ระบบจัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Media Manager")}
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200" suppressHydrationWarning>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200" suppressHydrationWarning>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span>{isTh ? "ซิงค์สด" : "Live Sync"}</span>
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 mt-0.5 text-xs sm:text-sm font-medium text-slate-500 flex-wrap">
-                <span className="text-slate-600 font-semibold truncate" suppressHydrationWarning>
+              <div className="flex items-center gap-2 mt-0.5 text-xs sm:text-sm font-medium text-slate-600 flex-wrap">
+                <span className="text-slate-700 font-semibold truncate" suppressHydrationWarning>
                   {subtitle || (isTh ? "อัปโหลดและเปลี่ยนภาพหน้าเว็บแบบซิงค์สดทันที" : "Real-Time Visual Asset Replacement")}
                 </span>
                 <span className="text-slate-300 hidden md:inline">•</span>
-                <span className="hidden md:inline-flex items-center gap-1.5 text-slate-500" suppressHydrationWarning>
-                  <CalendarDays className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <span className="hidden md:inline-flex items-center text-slate-500 font-medium" suppressHydrationWarning>
                   <span>{currentDateFormatted}</span>
                 </span>
               </div>
@@ -196,7 +199,7 @@ export function AdminAppShell({
           </div>
 
           {/* Right Side Controls (In One Clean Row) */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
             
             {/* 1. Accessible Font Size Scaler */}
             <div
@@ -207,11 +210,11 @@ export function AdminAppShell({
             >
               <button
                 type="button"
-                onClick={() => setFontSize("normal")}
+                onClick={() => handleSetFontSize("normal")}
                 title={isTh ? "ขนาดปกติ (100%)" : "Normal Size (100%)"}
-                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                   fontSize === "normal"
-                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    ? "bg-white text-slate-900 shadow-xs border border-slate-200"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
@@ -220,11 +223,11 @@ export function AdminAppShell({
 
               <button
                 type="button"
-                onClick={() => setFontSize("large")}
-                title={isTh ? "ขนาดใหญ่ (112%)" : "Large Size (112%)"}
-                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                onClick={() => handleSetFontSize("large")}
+                title={isTh ? "ขนาดใหญ่ (112.5%)" : "Large Size (112.5%)"}
+                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                   fontSize === "large"
-                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    ? "bg-white text-slate-900 shadow-xs border border-slate-200"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
@@ -233,11 +236,11 @@ export function AdminAppShell({
 
               <button
                 type="button"
-                onClick={() => setFontSize("xlarge")}
+                onClick={() => handleSetFontSize("xlarge")}
                 title={isTh ? "ขนาดใหญ่มาก (125%)" : "Extra Large Size (125%)"}
-                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                   fontSize === "xlarge"
-                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    ? "bg-white text-slate-900 shadow-xs border border-slate-200"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
@@ -245,20 +248,19 @@ export function AdminAppShell({
               </button>
             </div>
 
-            {/* 2. Clean Bilingual Language Switcher (Languages Icon + ไทย | EN) */}
+            {/* 2. Clean Bilingual Language Switcher (ไทย | EN) */}
             <div
-              className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs gap-0.5"
+              className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs"
               role="group"
               aria-label="Admin Language Toggle"
               suppressHydrationWarning
             >
-              <Languages className="w-4 h-4 text-slate-500 ml-1.5 mr-0.5 shrink-0" />
               <button
                 type="button"
                 onClick={() => switchLocale("th")}
-                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                   isTh
-                    ? "bg-white text-blue-800 shadow-xs border border-slate-200"
+                    ? "bg-white text-slate-900 shadow-xs border border-slate-200"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -267,9 +269,9 @@ export function AdminAppShell({
               <button
                 type="button"
                 onClick={() => switchLocale("en")}
-                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                   !isTh
-                    ? "bg-white text-blue-800 shadow-xs border border-slate-200"
+                    ? "bg-white text-slate-900 shadow-xs border border-slate-200"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -282,29 +284,30 @@ export function AdminAppShell({
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition-colors flex items-center gap-1.5 shadow-2xs"
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors flex items-center gap-1.5 shadow-2xs"
             >
-              <ExternalLink className="w-4 h-4 text-blue-600" />
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
               <span>{isTh ? "ดูหน้าเว็บจริง" : "View Live Site"}</span>
             </Link>
 
             {/* 4. Link to Payload CMS Dashboard */}
-            <Link
+            <a
               href="/admin"
-              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors border border-slate-200"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors border border-slate-200 shadow-2xs"
               title={isTh ? "กลับสู่แผงควบคุมระบบหลัก" : "Return to Payload CMS"}
             >
-              <LayoutDashboard className="w-4 h-4 text-slate-600" />
+              <LayoutDashboard className="w-3.5 h-3.5 text-slate-500" />
               <span>{isTh ? "แผงควบคุม CMS" : "Payload CMS"}</span>
-            </Link>
+            </a>
 
-            {/* 5. Log Out Button */}
+            {/* 5. Log Out Button (Quiet Neutral Ghost) */}
             <button
               type="button"
               onClick={() => setLogoutModalOpen(true)}
-              className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shadow-2xs"
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-2xs"
+              title={isTh ? "ออกจากระบบ" : "Log Out"}
             >
-              <LogOut className="w-4 h-4 text-rose-600" />
+              <LogOut className="w-3.5 h-3.5 text-slate-500" />
               <span>{isTh ? "ออกจากระบบ" : "Log Out"}</span>
             </button>
           </div>

@@ -4,22 +4,14 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Layers,
-  Sparkles,
   Search,
   Copy,
   Check,
   Trash2,
-  ExternalLink,
   Image as ImageIcon,
   CheckCircle2,
   AlertCircle,
   X,
-  GraduationCap,
-  Newspaper,
-  Calendar,
-  Eye,
-  FolderOpen,
   UploadCloud,
   Plus,
   AlertTriangle,
@@ -549,92 +541,94 @@ export function ImageManagerClient({
         </div>
       )}
 
-      {/* KPI & Status Overview Cards */}
+      {/* KPI & Status Overview Cards (Unified Restrained Palette, Distilled Icons) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              {isTh ? "รูปภาพทั้งหมดในระบบ" : "Total Visual Assets"}
+        {/* Card 1: Total Assets */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
+          <p className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">
+            {isTh ? "รูปภาพทั้งหมดในระบบ" : "Total Visual Assets"}
+          </p>
+          <div className="mt-2.5">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{totalAssets}</h3>
+            <p className="text-sm sm:text-base text-slate-600 mt-1.5 font-medium">
+              {isTh ? "ครอบคลุมทุกส่วนของเว็บไซต์" : "Across all school sections"}
             </p>
-            <h3 className="text-3xl font-black text-slate-900 mt-1">{totalAssets}</h3>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
-            <Layers className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              {isTh ? "กำหนดภาพเรียบร้อย" : "Configured Assets"}
-            </p>
-            <h3 className="text-3xl font-black text-emerald-600 mt-1">
-              {configuredAssets} <span className="text-base font-semibold text-slate-400">/ {totalAssets}</span>
+        {/* Card 2: Configured Assets */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
+          <p className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">
+            {isTh ? "กำหนดภาพเรียบร้อย" : "Configured Assets"}
+          </p>
+          <div className="mt-2.5">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              {configuredAssets} <span className="text-lg sm:text-xl font-medium text-slate-400">/ {totalAssets}</span>
             </h3>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-            <CheckCircle2 className="w-6 h-6" />
+            <p className="text-sm sm:text-base text-slate-600 mt-1.5 font-medium">
+              {isTh ? "พร้อมแสดงผลสู่สาธารณะ" : "Live & published to visitors"}
+            </p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              {isTh ? "หมวดหมู่เว็บไซต์" : "Website Sections"}
+        {/* Card 3: Website Sections */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
+          <p className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">
+            {isTh ? "หมวดหมู่เว็บไซต์" : "Website Sections"}
+          </p>
+          <div className="mt-2.5">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">6</h3>
+            <p className="text-sm sm:text-base text-slate-600 mt-1.5 font-medium">
+              {isTh ? "หน้าหลัก, หลักสูตร, ข่าวสาร ฯลฯ" : "Hero, Programs, News, Events..."}
             </p>
-            <h3 className="text-3xl font-black text-slate-900 mt-1">6</h3>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-            <FolderOpen className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              {isTh ? "ระบบซิงค์สด" : "Real-Time Pipeline"}
-            </p>
-            <div className="text-base font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 mt-1.5 inline-flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+        {/* Card 4: Real-Time Pipeline */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
+          <p className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">
+            {isTh ? "ระบบซิงค์สด" : "Real-Time Pipeline"}
+          </p>
+          <div className="mt-2.5">
+            <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
               <span>{isTh ? "ทำงานปกติ (ซิงค์สด)" : "Active & Live"}</span>
             </div>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-            <Sparkles className="w-6 h-6" />
+            <p className="text-sm sm:text-base text-slate-600 mt-1.5 font-medium">
+              {isTh ? "อัปโหลดแล้วอัปเดตหน้าเว็บทันที" : "Instant updates to live website"}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      {/* Category Tabs (Clean Text Pills with Badge Counts, Zero Icon Spam) */}
+      <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
         {[
-          { id: "all", labelTh: "ทั้งหมด", labelEn: "All Media", count: totalAssets, icon: Layers },
-          { id: "site", labelTh: "หน้าแรก & โลโก้", labelEn: "Hero & Branding", count: mediaItems.filter((i) => i.category === "site").length, icon: Sparkles },
-          { id: "director", labelTh: "สาส์น ผอ. & ประวัติ", labelEn: "Director & Story", count: mediaItems.filter((i) => i.category === "director").length, icon: Eye },
-          { id: "programs", labelTh: "หลักสูตรการศึกษา", labelEn: "Academic Programs", count: mediaItems.filter((i) => i.category === "programs").length, icon: GraduationCap },
-          { id: "news", labelTh: "ข่าวสารประชาสัมพันธ์", labelEn: "News & Campus", count: mediaItems.filter((i) => i.category === "news").length, icon: Newspaper },
-          { id: "events", labelTh: "กิจกรรมโรงเรียน", labelEn: "School Events", count: mediaItems.filter((i) => i.category === "events").length, icon: Calendar },
-          { id: "gallery", labelTh: "แกลเลอรีภาพ", labelEn: "Photo Gallery", count: mediaItems.filter((i) => i.category === "gallery").length, icon: ImageIcon },
+          { id: "all", labelTh: "ทั้งหมด", labelEn: "All Media", count: totalAssets },
+          { id: "site", labelTh: "หน้าแรก & โลโก้", labelEn: "Hero & Branding", count: mediaItems.filter((i) => i.category === "site").length },
+          { id: "director", labelTh: "สาส์น ผอ. & ประวัติ", labelEn: "Director & Story", count: mediaItems.filter((i) => i.category === "director").length },
+          { id: "programs", labelTh: "หลักสูตรการศึกษา", labelEn: "Academic Programs", count: mediaItems.filter((i) => i.category === "programs").length },
+          { id: "news", labelTh: "ข่าวสารประชาสัมพันธ์", labelEn: "News & Campus", count: mediaItems.filter((i) => i.category === "news").length },
+          { id: "events", labelTh: "กิจกรรมโรงเรียน", labelEn: "School Events", count: mediaItems.filter((i) => i.category === "events").length },
+          { id: "gallery", labelTh: "แกลเลอรีภาพ", labelEn: "Photo Gallery", count: mediaItems.filter((i) => i.category === "gallery").length },
         ].map((tab) => {
-          const Icon = tab.icon
           const active = selectedCategory === tab.id
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => setSelectedCategory(tab.id)}
-              className={`px-4 py-2.5 text-base font-bold rounded-2xl transition-all whitespace-nowrap flex items-center gap-2.5 shadow-2xs ${
+              className={`px-4 sm:px-5 py-2.5 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap flex items-center gap-2.5 shadow-2xs ${
                 active
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                  : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+                  ? "bg-[#1e3a8a] text-white shadow-xs"
+                  : "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200"
               }`}
             >
-              <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-500"}`} />
               <span>{isTh ? tab.labelTh : tab.labelEn}</span>
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                  active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                className={`text-xs sm:text-sm px-2.5 py-0.5 rounded-full font-bold ${
+                  active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"
                 }`}
               >
                 {tab.count}
@@ -645,7 +639,7 @@ export function ImageManagerClient({
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1">
           <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
@@ -657,20 +651,20 @@ export function ImageManagerClient({
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-10 py-3 text-base bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
+            className="w-full pl-11 pr-10 py-3 text-base sm:text-lg bg-slate-50/80 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium text-slate-800 placeholder:text-slate-400"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 px-3">
+        <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-600 px-3">
           <span>
             {isTh
               ? `แสดง ${filteredItems.length} จาก ${mediaItems.length} รายการ`
@@ -681,14 +675,14 @@ export function ImageManagerClient({
 
       {/* Responsive Media Grid */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
             <ImageIcon className="w-8 h-8" />
           </div>
-          <h4 className="text-lg font-bold text-slate-900">
+          <h4 className="text-lg sm:text-xl font-bold text-slate-900">
             {isTh ? "ไม่พบรูปภาพที่ค้นหา" : "No matching visual assets found"}
           </h4>
-          <p className="text-base text-slate-500 mt-1 max-w-sm">
+          <p className="text-base text-slate-600 mt-1.5 max-w-sm">
             {isTh
               ? "ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นเพื่อดูรายการรูปภาพทั้งหมด"
               : "Try adjusting your search query or switch categories to view other assets."}
@@ -714,7 +708,7 @@ export function ImageManagerClient({
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+                className="bg-white rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all overflow-hidden flex flex-col justify-between group"
               >
                 {/* Image Container with hover overlay */}
                 <div className={`relative ${aspectStyle} bg-slate-100 overflow-hidden`}>
@@ -727,14 +721,14 @@ export function ImageManagerClient({
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center p-4 text-slate-400 bg-slate-50/80">
-                      <ImageIcon className="w-10 h-10 mb-1.5 opacity-50 text-slate-400" />
-                      <span className="text-xs font-semibold text-slate-500">{isTh ? "ยังไม่มีภาพ" : "No Image"}</span>
+                      <ImageIcon className="w-10 h-10 mb-2 opacity-40 text-slate-400" />
+                      <span className="text-sm font-bold text-slate-600">{isTh ? "ยังไม่มีภาพ" : "No Image"}</span>
                       <button
                         type="button"
                         onClick={() => setActiveModalItem(item)}
-                        className="mt-2.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                        className="mt-3 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-bold transition-all shadow-2xs flex items-center gap-1.5"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-4 h-4" />
                         <span>{isTh ? "+ กำหนดรูปภาพ" : "+ Set Image"}</span>
                       </button>
                     </div>
@@ -742,7 +736,7 @@ export function ImageManagerClient({
 
                   {/* Floating Category Badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-slate-900/80 text-white backdrop-blur-md shadow-xs">
+                    <span className="px-3 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-900/80 text-white backdrop-blur-xs shadow-2xs">
                       {badge}
                     </span>
                   </div>
@@ -752,9 +746,9 @@ export function ImageManagerClient({
                     <button
                       type="button"
                       onClick={() => setActiveModalItem(item)}
-                      className="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-base font-bold transition-all shadow-lg flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-white hover:bg-slate-50 text-slate-900 rounded-xl text-base font-bold transition-all shadow-md flex items-center justify-center gap-2"
                     >
-                      <UploadCloud className="w-5 h-5 text-blue-600" />
+                      <UploadCloud className="w-5 h-5 text-[#1e3a8a]" />
                       <span>{isTh ? "เปลี่ยนรูปภาพนี้" : "Replace Image"}</span>
                     </button>
                   </div>
@@ -763,26 +757,26 @@ export function ImageManagerClient({
                 {/* Card Body */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                   <div>
-                    <h4 className="text-lg font-bold text-slate-900 line-clamp-1" title={label}>
+                    <h4 className="text-lg sm:text-xl font-bold text-slate-900 line-clamp-1 leading-snug" title={label}>
                       {label}
                     </h4>
-                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed mt-1">
+                    <p className="text-sm sm:text-base text-slate-600 line-clamp-2 leading-relaxed mt-1.5">
                       {desc}
                     </p>
                   </div>
 
                   {/* Field identifier badge */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-                    <span className="font-mono truncate max-w-[150px]">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500 font-medium">
+                    <span className="font-mono text-xs sm:text-sm text-slate-500 font-semibold truncate max-w-[150px]">
                       {item.targetSlug}.{item.fieldName}
                     </span>
                     {hasImage ? (
-                      <span className="text-emerald-600 font-bold flex items-center gap-1">
+                      <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1">
                         <Check className="w-3.5 h-3.5" />
                         {isTh ? "พร้อมใช้งาน" : "Active"}
                       </span>
                     ) : (
-                      <span className="text-amber-600 font-bold">
+                      <span className="text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full text-xs sm:text-sm font-bold">
                         {isTh ? "ยังไม่กำหนด" : "Missing"}
                       </span>
                     )}
@@ -790,13 +784,13 @@ export function ImageManagerClient({
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
+                <div className="px-5 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     {hasImage ? (
                       <button
                         type="button"
                         onClick={() => setActiveModalItem(item)}
-                        className="px-3.5 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors flex items-center gap-1.5"
+                        className="px-4 py-2 text-sm sm:text-base font-bold text-[#1e3a8a] bg-slate-100 hover:bg-slate-200/80 rounded-xl transition-colors flex items-center gap-2 border border-slate-200 shadow-2xs"
                       >
                         <UploadCloud className="w-4 h-4" />
                         <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
@@ -805,7 +799,7 @@ export function ImageManagerClient({
                       <button
                         type="button"
                         onClick={() => setActiveModalItem(item)}
-                        className="px-3.5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+                        className="px-4 py-2 text-sm sm:text-base font-bold text-white bg-[#1e3a8a] hover:bg-[#1e40af] rounded-xl transition-colors flex items-center gap-2 shadow-2xs"
                       >
                         <Plus className="w-4 h-4" />
                         <span>{isTh ? "+ กำหนดภาพ" : "+ Set Image"}</span>
@@ -818,7 +812,7 @@ export function ImageManagerClient({
                       <button
                         type="button"
                         onClick={() => handleCopy(item.id, item.imageUrl)}
-                        className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-200/80 rounded-xl transition-colors"
+                        className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 rounded-xl transition-colors"
                         title={isTh ? "คัดลอกลิงก์รูปภาพ" : "Copy URL"}
                       >
                         {copiedId === item.id ? (
@@ -833,7 +827,7 @@ export function ImageManagerClient({
                       <button
                         type="button"
                         onClick={() => setDeletingItem(item)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                         title={isTh ? "ลบรูปภาพนี้" : "Delete Image"}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -854,19 +848,19 @@ export function ImageManagerClient({
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
         >
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             
             {/* Modal Header */}
             <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#1e3a8a]/10 text-[#1e3a8a] flex items-center justify-center shrink-0">
                   <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                     {isTh ? activeModalItem.labelTh : activeModalItem.labelEn}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500">
+                  <p className="text-sm sm:text-base text-slate-600 mt-0.5">
                     {isTh ? activeModalItem.descriptionTh : activeModalItem.descriptionEn}
                   </p>
                 </div>

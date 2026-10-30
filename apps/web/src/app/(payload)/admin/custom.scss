@@ -9,23 +9,30 @@
   --font-heading: 'Prompt', 'Sarabun', 'Inter', sans-serif;
 }
 
-/* Accessibility Font Scaler for Admin CMS */
-[data-admin-font-scale="normal"] {
+/* Accessibility Font Scaler for Admin CMS & Visual Assets Studio */
+html[data-admin-font-scale="normal"],
+:root[data-admin-font-scale="normal"] {
   --admin-font-scale: 100%;
+  font-size: 16px !important;
 }
 
-[data-admin-font-scale="large"] {
-  --admin-font-scale: 112%;
+html[data-admin-font-scale="large"],
+:root[data-admin-font-scale="large"] {
+  --admin-font-scale: 112.5%;
+  font-size: 18px !important;
 }
 
-[data-admin-font-scale="xlarge"] {
+html[data-admin-font-scale="xlarge"],
+:root[data-admin-font-scale="xlarge"] {
   --admin-font-scale: 125%;
+  font-size: 20px !important;
 }
 
-.admin-scalable-root {
+.admin-scalable-root,
+.pk-banner-wrapper {
   font-family: var(--font-admin);
   font-size: var(--admin-font-scale, 100%);
-  transition: font-size 0.2s ease-in-out;
+  transition: font-size 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer payload-default {
@@ -122,4 +129,593 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
   }
+}
+
+/* =========================================================================
+   PAKDEEPAN EXECUTIVE ADMIN BANNER (RESTRAINED, IMPECCABLE OPERATE PALETTE)
+   90% Neutral Slate + 10% Royal Navy Accent.
+   Zero rainbow clashing colors; strictly distilled icons & typography.
+   ========================================================================= */
+
+.pk-banner-wrapper {
+  width: 100%;
+  margin-bottom: 24px;
+  font-family: var(--font-admin, 'Prompt', 'Sarabun', 'Inter', sans-serif);
+  box-sizing: border-box;
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+}
+
+.pk-banner-top {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+  .pk-banner-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.pk-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pk-banner-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background-color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.pk-banner-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pk-banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pk-banner-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.pk-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.pk-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.pk-banner-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.pk-banner-sub-label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.pk-banner-sub-sep {
+  color: #cbd5e1;
+}
+
+.pk-banner-sub-date {
+  color: #64748b;
+}
+
+.pk-banner-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pk-scaler-group,
+.pk-lang-group {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  gap: 2px;
+}
+
+.pk-scaler-btn,
+.pk-lang-btn {
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.pk-scaler-btn:hover,
+.pk-lang-btn:hover {
+  color: #0f172a;
+}
+
+.pk-scaler-btn.active,
+.pk-lang-btn.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.pk-btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.15s ease;
+}
+
+.pk-btn-link:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.pk-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: 10px;
+  background-color: #1e3a8a;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(30, 58, 138, 0.15);
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.pk-btn-primary:hover {
+  background-color: #1e40af;
+  color: #ffffff !important;
+}
+
+.pk-btn-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pk-btn-logout:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+/* Quick KPI Cards Grid (Quiet, Unified Slate Neutral Cards) */
+.pk-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .pk-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pk-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pk-kpi-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.pk-kpi-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.pk-kpi-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pk-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.pk-kpi-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.pk-kpi-card:hover .pk-kpi-val {
+  color: #1e40af;
+}
+
+.pk-kpi-sub {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #2563eb;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pk-kpi-card:hover .pk-kpi-sub {
+  color: #1d4ed8;
+}
+
+/* Modal Styling */
+.pk-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pk-modal-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.2);
+  max-width: 420px;
+  width: 100%;
+  padding: 24px;
+  text-align: center;
+}
+
+.pk-modal-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+}
+
+.pk-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.pk-modal-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0 0 20px 0;
+}
+
+.pk-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pk-modal-btn-cancel {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #334155;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pk-modal-btn-cancel:hover {
+  background-color: #f8fafc;
+}
+
+.pk-modal-btn-confirm {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+  transition: all 0.15s ease;
+}
+
+.pk-modal-btn-confirm:hover {
+  background-color: #dc2626;
+}
+
+/* =========================================================================
+   MODERN, PROFESSIONAL PAYLOAD CMS DASHBOARD CARDS
+   Clean, enterprise-grade aesthetic without nested boxes or broken elements.
+   ========================================================================= */
+
+/* 1. Group Containers & Headers */
+.collections__group {
+  margin-top: 24px !important;
+  margin-bottom: 8px !important;
+}
+
+.collections__label {
+  font-family: var(--font-heading, 'Prompt', 'Inter', sans-serif) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 2. Grid List */
+.collections__card-list {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+@media (max-width: 1280px) {
+  .collections__card-list {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .collections__card-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .collections__card-list {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.collections__card-list > li {
+  list-style: none !important;
+  display: flex !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 3. Outer Card Container (ONLY the outer card, not inner elements) */
+.dashboard .card,
+.collections__card-list .card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+  padding: 16px 20px !important;
+  min-height: 70px !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+}
+
+/* Hover state for the outer card */
+.dashboard .card:hover,
+.collections__card-list .card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #93c5fd !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* 4. Completely Reset Inner Click Overlay (Eliminates the broken nested box!) */
+.dashboard .card__click,
+.collections__card-list .card__click {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 1 !important;
+  outline: none !important;
+}
+
+/* 5. Card Title Styling */
+.dashboard .card__title,
+.collections__card-list .card__title {
+  font-family: var(--font-heading, 'Prompt', 'Inter', sans-serif) !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  line-height: 1.3 !important;
+  transition: color 0.15s ease !important;
+  z-index: 0 !important;
+}
+
+.dashboard .card:hover .card__title,
+.collections__card-list .card:hover .card__title {
+  color: #2563eb !important;
+}
+
+/* 6. Card Actions Container */
+.dashboard .card__actions,
+.collections__card-list .card__actions {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 7. Action Plus Button (+) */
+.dashboard .card__actions .btn,
+.collections__card-list .card__actions .btn {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.dashboard .card__actions .btn__icon,
+.collections__card-list .card__actions .btn__icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.15s ease !important;
+}
+
+.dashboard .card__actions .btn:hover .btn__icon,
+.collections__card-list .card__actions .btn:hover .btn__icon,
+.dashboard .card__actions .btn__icon:hover,
+.collections__card-list .card__actions .btn__icon:hover {
+  background-color: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #2563eb !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2) !important;
 }

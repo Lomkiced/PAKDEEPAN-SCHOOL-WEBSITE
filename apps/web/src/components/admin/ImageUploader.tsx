@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
-  Sparkles,
   FileCheck,
   AlertTriangle,
 } from "lucide-react"
@@ -366,22 +365,22 @@ export function ImageUploader({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
         <div>
-          <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2 flex-wrap">
+          <h4 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2.5 flex-wrap">
             <span>{safeLabel}</span>
             {fieldName && (
-              <span className="font-mono text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+              <span className="font-mono text-xs sm:text-sm text-slate-600 font-semibold bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">
                 {fieldName}
               </span>
             )}
           </h4>
           {safeDescription && (
-            <p className="text-sm sm:text-base text-slate-600 mt-1 leading-relaxed">{safeDescription}</p>
+            <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed">{safeDescription}</p>
           )}
         </div>
 
         {previewUrl && (
           <span
-            className={`text-xs font-bold px-3 py-1 rounded-full border inline-flex items-center gap-1.5 shrink-0 ${
+            className={`text-xs sm:text-sm font-bold px-3 py-1 rounded-full border inline-flex items-center gap-1.5 shrink-0 ${
               selectedFile
                 ? "bg-amber-50 text-amber-800 border-amber-300"
                 : inputUrl
@@ -410,29 +409,29 @@ export function ImageUploader({
       </div>
 
       {/* Mode Tabs */}
-      <div className="flex gap-1.5 p-1.5 bg-slate-100 rounded-2xl mb-5 w-fit text-sm font-bold">
+      <div className="flex gap-1.5 p-1.5 bg-slate-100 rounded-xl mb-5 w-fit text-sm font-semibold border border-slate-200 shadow-2xs">
         <button
           type="button"
           onClick={() => setActiveTab("upload")}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
             activeTab === "upload"
-              ? "bg-white text-blue-900 shadow-xs border border-slate-200"
+              ? "bg-white text-slate-900 shadow-2xs border border-slate-200"
               : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <UploadCloud className="w-4 h-4 text-blue-600" />
+          <UploadCloud className="w-4 h-4 text-[#1e3a8a]" />
           <span>{isTh ? "อัปโหลดไฟล์จากเครื่อง" : "Upload Local File"}</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("url")}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
             activeTab === "url"
-              ? "bg-white text-blue-900 shadow-xs border border-slate-200"
+              ? "bg-white text-slate-900 shadow-2xs border border-slate-200"
               : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <Link2 className="w-4 h-4 text-blue-600" />
+          <Link2 className="w-4 h-4 text-[#1e3a8a]" />
           <span>{isTh ? "วางลิงก์รูปภาพ (URL)" : "Paste Image URL"}</span>
         </button>
       </div>
@@ -447,10 +446,10 @@ export function ImageUploader({
               onDragOver={handleDrag}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 bg-slate-50/60 hover:bg-slate-100/60 transition-all flex flex-col items-center justify-center text-center cursor-pointer group ${
+              className={`border-2 border-dashed rounded-xl p-8 sm:p-10 bg-slate-50/60 hover:bg-slate-100/60 transition-all flex flex-col items-center justify-center text-center cursor-pointer group ${
                 dragActive
-                  ? "border-blue-600 bg-blue-50/50 ring-4 ring-blue-100"
-                  : "border-slate-300 hover:border-blue-500"
+                  ? "border-[#1e3a8a] bg-[#1e3a8a]/5 ring-4 ring-[#1e3a8a]/10"
+                  : "border-slate-300 hover:border-slate-400"
               }`}
             >
               <input
@@ -466,24 +465,24 @@ export function ImageUploader({
               />
 
               <div
-                className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${
+                className={`w-16 h-16 rounded-xl flex items-center justify-center mb-3.5 transition-transform duration-200 group-hover:scale-105 shadow-2xs ${
                   dragActive
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-blue-600 border border-slate-200"
+                    ? "bg-[#1e3a8a] text-white"
+                    : "bg-white text-[#1e3a8a] border border-slate-200"
                 }`}
               >
-                <UploadCloud className="w-8 h-8 text-blue-600" />
+                <UploadCloud className="w-8 h-8 text-[#1e3a8a]" />
               </div>
 
-              <p className="text-base font-bold text-slate-800">
+              <p className="text-base sm:text-lg font-bold text-slate-800">
                 {selectedFile ? (
-                  <span className="text-blue-700 font-extrabold inline-flex items-center gap-1.5">
+                  <span className="text-[#1e3a8a] font-extrabold inline-flex items-center gap-2">
                     <FileCheck className="w-5 h-5 text-emerald-600" />
                     {selectedFile.name}
                   </span>
                 ) : (
                   <>
-                    <span className="text-blue-600 underline">
+                    <span className="text-[#1e3a8a] underline font-extrabold">
                       {isTh ? "คลิกเลือกไฟล์ภาพ" : "Browse Files"}
                     </span>{" "}
                     {isTh ? "หรือลากไฟล์มาวางที่นี่" : "or drag and drop here"}
@@ -491,14 +490,14 @@ export function ImageUploader({
                 )}
               </p>
 
-              <p className="text-sm text-slate-500 mt-1.5 font-medium">
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">
                 PNG, JPG, WebP, SVG, AVIF ({isTh ? "ขนาดสูงสุดไม่เกิน 10MB" : "Max size 10MB"})
               </p>
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
               <label className="text-base font-semibold text-slate-800 flex items-center gap-2">
-                <Link2 className="w-4 h-4 text-blue-600" />
+                <Link2 className="w-4 h-4 text-slate-500" />
                 <span>{isTh ? "ที่อยู่ลิงก์รูปภาพ (Public URL)" : "Image Source URL"}</span>
               </label>
 
@@ -508,13 +507,13 @@ export function ImageUploader({
                   placeholder="https://images.unsplash.com/... or /images/..."
                   value={inputUrl}
                   onChange={(e) => handleUrlChange(e.target.value)}
-                  className="w-full px-4 py-3 text-base bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 shadow-sm transition-all pr-16"
+                  className="w-full px-4 py-3 text-base bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] shadow-2xs transition-all pr-16"
                 />
                 {inputUrl && (
                   <button
                     type="button"
                     onClick={() => handleUrlChange("")}
-                    className="absolute right-3 px-2.5 py-1 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="absolute right-3 px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 rounded-md hover:bg-slate-100 transition-colors"
                   >
                     {isTh ? "ล้าง" : "Clear"}
                   </button>
@@ -535,10 +534,10 @@ export function ImageUploader({
               type="button"
               disabled={isLoading || isDeleting || (!selectedFile && !inputUrl)}
               onClick={handleSave}
-              className={`px-6 py-3.5 text-base font-semibold rounded-xl text-white transition-all flex items-center gap-2.5 shadow-md ${
+              className={`px-6 py-3 text-base font-bold rounded-xl text-white transition-all flex items-center gap-2 shadow-sm ${
                 isLoading || isDeleting || (!selectedFile && !inputUrl)
-                  ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
-                  : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] shadow-blue-600/30"
+                  ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                  : "bg-[#1e3a8a] hover:bg-[#1e40af] active:scale-[0.99]"
               }`}
             >
               {isLoading ? (
@@ -548,7 +547,7 @@ export function ImageUploader({
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5" />
+                  <Check className="w-5 h-5" />
                   <span>{isTh ? "บันทึกและเผยแพร่" : "Save Changes"}</span>
                 </>
               )}
@@ -559,7 +558,7 @@ export function ImageUploader({
               <button
                 type="button"
                 onClick={handleCopyUrl}
-                className="px-4 py-3.5 text-base font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-xl transition-all flex items-center gap-2 border border-slate-200"
+                className="px-4 py-3 text-base font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl transition-all flex items-center gap-2 border border-slate-200 shadow-2xs"
                 title={isTh ? "คัดลอกลิงก์รูปภาพ" : "Copy Image URL"}
               >
                 {copied ? (
@@ -581,7 +580,7 @@ export function ImageUploader({
               <button
                 type="button"
                 onClick={() => setDeleteModalOpen(true)}
-                className="px-4 py-3.5 text-base font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-2 border border-rose-200"
+                className="px-4 py-3 text-base font-semibold text-slate-600 hover:text-rose-600 bg-white hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-2 border border-slate-200 hover:border-rose-200 shadow-2xs"
               >
                 <Trash2 className="w-5 h-5" />
                 <span>{isTh ? "ลบรูปภาพ" : "Delete"}</span>
@@ -594,7 +593,7 @@ export function ImageUploader({
         <div className="lg:col-span-5 flex flex-col gap-2.5">
           <label className="text-base font-semibold text-slate-800 flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-blue-600" />
+              <ImageIcon className="w-4.5 h-4.5 text-slate-500" />
               <span>{isTh ? "ตัวอย่างการแสดงผลจริง" : "Live Visual Preview"}</span>
             </span>
             {previewUrl && (

@@ -1,22 +1,13 @@
 "use client"
 
 import React from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Image as ImageIcon,
-  CalendarDays,
   ExternalLink,
   LogOut,
-  Sparkles,
   AlertTriangle,
   Loader2,
   ArrowUpRight,
-  Languages,
-  Layers,
-  GraduationCap,
-  Newspaper,
-  CheckCircle2,
 } from "lucide-react"
 
 // Thai Day and Month names for Buddhist Era formatting
@@ -42,11 +33,9 @@ export function AdminNavBanner() {
   // ─── 1. LANGUAGE STATE (SSR-Safe Initialization) ───
   const [currentLocale, setCurrentLocale] = React.useState<"en" | "th">("th")
   const [fontSize, setFontSize] = React.useState<"normal" | "large" | "xlarge">("normal")
-  const [mounted, setMounted] = React.useState(false)
 
   // Sync client-side preferences after mount to prevent hydration mismatch
   React.useEffect(() => {
-    setMounted(true)
     try {
       const storedLocale = localStorage.getItem("pakdeepan_locale") as "en" | "th" | null
       if (storedLocale === "th" || storedLocale === "en") {
@@ -66,10 +55,21 @@ export function AdminNavBanner() {
       if (storedFont === "normal" || storedFont === "large" || storedFont === "xlarge") {
         setFontSize(storedFont)
         document.documentElement.setAttribute("data-admin-font-scale", storedFont)
+        document.documentElement.style.fontSize = storedFont === "large" ? "18px" : storedFont === "xlarge" ? "20px" : "16px"
       }
     } catch {
       // Ignore
     }
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "pakdeepan_admin_font_size" && (e.newValue === "normal" || e.newValue === "large" || e.newValue === "xlarge")) {
+        setFontSize(e.newValue)
+        document.documentElement.setAttribute("data-admin-font-scale", e.newValue)
+        document.documentElement.style.fontSize = e.newValue === "large" ? "18px" : e.newValue === "xlarge" ? "20px" : "16px"
+      }
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
   }, [])
 
   const isThai = currentLocale === "th"
@@ -91,12 +91,13 @@ export function AdminNavBanner() {
     try {
       localStorage.setItem("pakdeepan_admin_font_size", scale)
       document.documentElement.setAttribute("data-admin-font-scale", scale)
+      document.documentElement.style.fontSize = scale === "large" ? "18px" : scale === "xlarge" ? "20px" : "16px"
     } catch {
       // Ignore
     }
   }
 
-  // ─── 3. BILINGUAL DATE FORMATTING ───
+  // ─── 2. BILINGUAL DATE FORMATTING ───
   const dateStr = React.useMemo(() => {
     const now = new Date()
     if (isThai) {
@@ -114,7 +115,7 @@ export function AdminNavBanner() {
     })
   }, [isThai])
 
-  // ─── 4. LOGOUT MODAL STATE ───
+  // ─── 3. LOGOUT MODAL STATE ───
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false)
   const [isLoggingOut, setIsLoggingOut] = React.useState(false)
 
@@ -137,46 +138,45 @@ export function AdminNavBanner() {
   }
 
   return (
-    <div className="w-full mb-8 space-y-4" suppressHydrationWarning>
+    <div className="pk-banner-wrapper" suppressHydrationWarning>
       {/* ─── EXECUTIVE TOP BANNER ─── */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-5 sm:p-7 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+      <div className="pk-banner-top" suppressHydrationWarning>
         
         {/* Left: Branding & Subtitle */}
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 flex items-center justify-center text-white shadow-md shadow-blue-600/25 shrink-0 font-black text-2xl tracking-tight">
+        <div className="pk-banner-left">
+          <div className="pk-banner-logo" title="Pakdeepan School">
             ภ
           </div>
 
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight" suppressHydrationWarning>
+          <div className="pk-banner-titles">
+            <div className="pk-banner-title-row">
+              <h2 className="pk-banner-title" suppressHydrationWarning>
                 {isThai ? "ระบบจัดการเนื้อหา โรงเรียนภักดีพรรณ" : "Pakdeepan School Content Management"}
               </h2>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200" suppressHydrationWarning>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>{isThai ? "ระบบพร้อมใช้งาน" : "System Active"}</span>
+              <span className="pk-status-badge" suppressHydrationWarning>
+                <span className="pk-status-dot" />
+                <span>{isThai ? "ระบบออนไลน์" : "System Active"}</span>
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mt-1 text-sm font-medium text-slate-500 flex-wrap">
-              <span className="text-slate-600 font-semibold" suppressHydrationWarning>
-                {isThai ? "แผงควบคุมหลัก & ศูนย์สื่อเว็บไซต์" : "Executive Dashboard & Visual Assets"}
+            <div className="pk-banner-sub">
+              <span className="pk-banner-sub-label" suppressHydrationWarning>
+                {isThai ? "ศูนย์ควบคุมและสื่อเว็บไซต์" : "Executive Dashboard & Visual Studio"}
               </span>
-              <span className="text-slate-300 hidden sm:inline">•</span>
-              <span className="inline-flex items-center gap-1.5 text-slate-500" suppressHydrationWarning>
-                <CalendarDays className="w-4 h-4 text-blue-600 shrink-0" />
-                <span>{dateStr}</span>
+              <span className="pk-banner-sub-sep">•</span>
+              <span className="pk-banner-sub-date" suppressHydrationWarning>
+                {dateStr}
               </span>
             </div>
           </div>
         </div>
 
         {/* Right: Controls & Primary Visual Assets Studio CTA */}
-        <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+        <div className="pk-banner-controls">
           
-          {/* Accessible Font Scaler */}
+          {/* Accessible Font Scaler (Segmented Control) */}
           <div
-            className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs"
+            className="pk-scaler-group"
             role="group"
             aria-label="Font size scaler"
             suppressHydrationWarning
@@ -185,11 +185,7 @@ export function AdminNavBanner() {
               type="button"
               onClick={() => setScale("normal")}
               title={isThai ? "ขนาดปกติ (100%)" : "Normal Size (100%)"}
-              className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                fontSize === "normal"
-                  ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-              }`}
+              className={`pk-scaler-btn ${fontSize === "normal" ? "active" : ""}`}
             >
               <span suppressHydrationWarning>{isThai ? "ก ปกติ" : "A Normal"}</span>
             </button>
@@ -197,11 +193,7 @@ export function AdminNavBanner() {
               type="button"
               onClick={() => setScale("large")}
               title={isThai ? "ขนาดใหญ่ (112%)" : "Large Size (112%)"}
-              className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                fontSize === "large"
-                  ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-              }`}
+              className={`pk-scaler-btn ${fontSize === "large" ? "active" : ""}`}
             >
               <span suppressHydrationWarning>{isThai ? "ก+ ใหญ่" : "A+ Large"}</span>
             </button>
@@ -209,174 +201,152 @@ export function AdminNavBanner() {
               type="button"
               onClick={() => setScale("xlarge")}
               title={isThai ? "ขนาดใหญ่มาก (125%)" : "Extra Large Size (125%)"}
-              className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                fontSize === "xlarge"
-                  ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-              }`}
+              className={`pk-scaler-btn ${fontSize === "xlarge" ? "active" : ""}`}
             >
               <span suppressHydrationWarning>{isThai ? "ก++ ใหญ่มาก" : "A++ XL"}</span>
             </button>
           </div>
 
-          {/* Bilingual Language Switcher */}
+          {/* Bilingual Language Switcher (Segmented Control) */}
           <div
-            className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs gap-0.5"
+            className="pk-lang-group"
             role="group"
             aria-label="Language switch"
             suppressHydrationWarning
           >
-            <Languages className="w-4 h-4 text-slate-500 ml-1.5 mr-0.5 shrink-0" />
             <button
               type="button"
               onClick={() => switchLocale("th")}
-              className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                isThai
-                  ? "bg-white text-blue-800 shadow-xs border border-slate-200"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
+              className={`pk-lang-btn ${isThai ? "active" : ""}`}
             >
               ไทย
             </button>
             <button
               type="button"
               onClick={() => switchLocale("en")}
-              className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                !isThai
-                  ? "bg-white text-blue-800 shadow-xs border border-slate-200"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
+              className={`pk-lang-btn ${!isThai ? "active" : ""}`}
             >
               EN
             </button>
           </div>
 
           {/* View Live Site */}
-          <Link
+          <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition-colors flex items-center gap-1.5 shadow-2xs"
+            className="pk-btn-link"
             suppressHydrationWarning
           >
-            <ExternalLink className="w-4 h-4 text-blue-600" />
             <span suppressHydrationWarning>{isThai ? "ดูหน้าเว็บจริง" : "View Live Site"}</span>
-          </Link>
+            <ExternalLink className="w-3.5 h-3.5" style={{ width: 14, height: 14 }} />
+          </a>
 
           {/* PRIMARY CTA: Visual Assets Studio */}
-          <Link
+          <a
             href="/admin/image-manager"
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02]"
+            className="pk-btn-primary"
             suppressHydrationWarning
           >
-            <ImageIcon className="w-4 h-4" />
-            <span suppressHydrationWarning>{isThai ? "เปิดศูนย์จัดการรูปภาพ (Visual Assets Studio)" : "Open Visual Assets Studio"}</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
+            <span suppressHydrationWarning>{isThai ? "ศูนย์จัดการรูปภาพ (Studio)" : "Visual Assets Studio"}</span>
+            <ArrowUpRight className="w-4 h-4" style={{ width: 15, height: 15 }} />
+          </a>
 
           {/* Logout Button */}
           <button
             type="button"
             onClick={() => setLogoutModalOpen(true)}
-            className="p-2 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-xl transition-colors"
+            className="pk-btn-logout"
             title={isThai ? "ออกจากระบบ" : "Log Out"}
             suppressHydrationWarning
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4" style={{ width: 15, height: 15 }} />
           </button>
         </div>
       </div>
 
-      {/* ─── QUICK KPI SHORTCUT CARDS ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" suppressHydrationWarning>
+      {/* ─── QUICK KPI SHORTCUT STRIP (UNIFIED, RESTRAINED PALETTE) ─── */}
+      <div className="pk-kpi-grid" suppressHydrationWarning>
         
         {/* Card 1: Visual Assets */}
-        <Link
+        <a
           href="/admin/image-manager"
-          className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-2xs hover:shadow-md hover:border-blue-300 transition-all group flex items-center justify-between"
+          className="pk-kpi-card"
           suppressHydrationWarning
         >
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block" suppressHydrationWarning>
-              {isThai ? "สื่อและรูปภาพทั้งหมด" : "Visual Assets Studio"}
+          <div className="pk-kpi-info">
+            <span className="pk-kpi-label" suppressHydrationWarning>
+              {isThai ? "รูปภาพและสื่อทั้งหมด" : "Visual Assets"}
             </span>
-            <span className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors mt-0.5 block" suppressHydrationWarning>
+            <span className="pk-kpi-val" suppressHydrationWarning>
               {isThai ? "24+ ภาพ" : "24+ Images"}
             </span>
-            <span className="text-xs text-blue-600 font-semibold mt-1 inline-flex items-center gap-1" suppressHydrationWarning>
-              <span suppressHydrationWarning>{isThai ? "จัดการรูปภาพทุกจุด ↗" : "Manage all visual assets ↗"}</span>
+            <span className="pk-kpi-sub" suppressHydrationWarning>
+              <span>{isThai ? "เปิดศูนย์สื่อและภาพถ่าย" : "Open Visual Studio"}</span>
+              <ArrowUpRight className="w-3 h-3" style={{ width: 12, height: 12 }} />
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-            <ImageIcon className="w-6 h-6" />
-          </div>
-        </Link>
+        </a>
 
         {/* Card 2: Academic Programs */}
-        <Link
+        <a
           href="/admin/collections/programs"
-          className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all group flex items-center justify-between"
+          className="pk-kpi-card"
           suppressHydrationWarning
         >
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block" suppressHydrationWarning>
+          <div className="pk-kpi-info">
+            <span className="pk-kpi-label" suppressHydrationWarning>
               {isThai ? "หลักสูตรการศึกษา" : "Academic Programs"}
             </span>
-            <span className="text-2xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors mt-0.5 block" suppressHydrationWarning>
+            <span className="pk-kpi-val" suppressHydrationWarning>
               {isThai ? "4 ระดับชั้น" : "4 Levels"}
             </span>
-            <span className="text-xs text-emerald-600 font-semibold mt-1 inline-flex items-center gap-1" suppressHydrationWarning>
-              <span suppressHydrationWarning>{isThai ? "เตรียมอนุบาล – อ.3" : "Nursery to K3"}</span>
+            <span className="pk-kpi-sub" suppressHydrationWarning>
+              <span>{isThai ? "เตรียมอนุบาล – อนุบาล 3" : "Nursery to K3"}</span>
+              <ArrowUpRight className="w-3 h-3" style={{ width: 12, height: 12 }} />
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
-            <GraduationCap className="w-6 h-6" />
-          </div>
-        </Link>
+        </a>
 
         {/* Card 3: News & Stories */}
-        <Link
+        <a
           href="/admin/collections/news"
-          className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-2xs hover:shadow-md hover:border-amber-300 transition-all group flex items-center justify-between"
+          className="pk-kpi-card"
           suppressHydrationWarning
         >
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block" suppressHydrationWarning>
+          <div className="pk-kpi-info">
+            <span className="pk-kpi-label" suppressHydrationWarning>
               {isThai ? "ข่าวสารและกิจกรรม" : "News & Campus Life"}
             </span>
-            <span className="text-2xl font-black text-slate-900 group-hover:text-amber-600 transition-colors mt-0.5 block" suppressHydrationWarning>
+            <span className="pk-kpi-val" suppressHydrationWarning>
               {isThai ? "ข่าวประชาสัมพันธ์" : "Published Stories"}
             </span>
-            <span className="text-xs text-amber-600 font-semibold mt-1 inline-flex items-center gap-1" suppressHydrationWarning>
-              <span suppressHydrationWarning>{isThai ? "เพิ่ม / แก้ไขบทความ" : "Add / Edit articles"}</span>
+            <span className="pk-kpi-sub" suppressHydrationWarning>
+              <span>{isThai ? "จัดการเนื้อหาข่าวสาร" : "Manage Articles"}</span>
+              <ArrowUpRight className="w-3 h-3" style={{ width: 12, height: 12 }} />
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
-            <Newspaper className="w-6 h-6" />
-          </div>
-        </Link>
+        </a>
 
         {/* Card 4: Site Settings */}
-        <Link
+        <a
           href="/admin/globals/site-settings"
-          className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-2xs hover:shadow-md hover:border-purple-300 transition-all group flex items-center justify-between"
+          className="pk-kpi-card"
           suppressHydrationWarning
         >
-          <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block" suppressHydrationWarning>
+          <div className="pk-kpi-info">
+            <span className="pk-kpi-label" suppressHydrationWarning>
               {isThai ? "ตั้งค่าระบบและโรงเรียน" : "Site & School Settings"}
             </span>
-            <span className="text-2xl font-black text-slate-900 group-hover:text-purple-600 transition-colors mt-0.5 block" suppressHydrationWarning>
+            <span className="pk-kpi-val" suppressHydrationWarning>
               {isThai ? "ข้อมูลทั่วไป" : "General Config"}
             </span>
-            <span className="text-xs text-purple-600 font-semibold mt-1 inline-flex items-center gap-1" suppressHydrationWarning>
-              <span suppressHydrationWarning>{isThai ? "ข้อมูลติดต่อ & สาส์น ผอ." : "Contact & Director"}</span>
+            <span className="pk-kpi-sub" suppressHydrationWarning>
+              <span>{isThai ? "ข้อมูลติดต่อ & สาส์น ผอ." : "Contact & Director"}</span>
+              <ArrowUpRight className="w-3 h-3" style={{ width: 12, height: 12 }} />
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-            <Sparkles className="w-6 h-6" />
-          </div>
-        </Link>
+        </a>
 
       </div>
 
@@ -385,30 +355,30 @@ export function AdminNavBanner() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+          className="pk-modal-backdrop"
         >
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md p-6 sm:p-8 animate-in zoom-in-95 duration-200 text-center">
+          <div className="pk-modal-box">
             
-            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
-              <AlertTriangle className="w-8 h-8 text-rose-600" />
+            <div className="pk-modal-icon">
+              <AlertTriangle className="w-6 h-6" style={{ width: 28, height: 28 }} />
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
+            <h3 className="pk-modal-title">
               {isThai ? "ยืนยันการออกจากระบบ?" : "Confirm Log Out?"}
             </h3>
 
-            <p className="text-base text-slate-600 leading-relaxed mb-6">
+            <p className="pk-modal-desc">
               {isThai
                 ? "คุณต้องการออกจากระบบจัดการเว็บไซต์ โรงเรียนภักดีพรรณ หรือไม่? ข้อมูลที่ยังไม่ได้บันทึกอาจสูญหาย"
                 : "Are you sure you want to log out of the Pakdeepan School CMS? Any unsaved changes may be lost."}
             </p>
 
-            <div className="flex items-center justify-center gap-3">
+            <div className="pk-modal-actions">
               <button
                 type="button"
                 onClick={() => setLogoutModalOpen(false)}
                 disabled={isLoggingOut}
-                className="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-base transition-colors"
+                className="pk-modal-btn-cancel"
               >
                 {isThai ? "ยกเลิก" : "Cancel"}
               </button>
@@ -417,16 +387,16 @@ export function AdminNavBanner() {
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-base shadow-md shadow-rose-600/30 transition-all flex items-center gap-2"
+                className="pk-modal-btn-confirm"
               >
                 {isLoggingOut ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ width: 16, height: 16 }} />
                     <span>{isThai ? "กำลังออกจากระบบ..." : "Logging out..."}</span>
                   </>
                 ) : (
                   <>
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-4 h-4" style={{ width: 16, height: 16 }} />
                     <span>{isThai ? "ยืนยันออกจากระบบ" : "Yes, Log Out"}</span>
                   </>
                 )}
