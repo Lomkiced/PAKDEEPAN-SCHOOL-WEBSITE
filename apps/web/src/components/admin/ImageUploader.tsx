@@ -15,10 +15,10 @@ import {
   AlertCircle,
   ExternalLink,
   Sparkles,
-  RefreshCw,
   FileCheck,
-  Eye,
+  AlertTriangle,
 } from "lucide-react"
+import { extractPlainText } from "@/lib/richText"
 
 export interface ImageUploaderProps {
   initialImageUrl?: string
@@ -37,11 +37,11 @@ export interface ImageUploaderProps {
   compact?: boolean
 }
 
-const getClientLocale = (defaultLoc: "en" | "th" = "en"): "en" | "th" => {
+const getClientLocale = (defaultLoc: "en" | "th" = "th"): "en" | "th" => {
   if (typeof window === "undefined") return defaultLoc
   try {
     const stored = localStorage.getItem("pakdeepan_locale")
-    if (stored === "th" || stored === "en") return stored
+    if (stored === "th" || stored === "en") return stored as "en" | "th"
     const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)
     if (cookieMatch && (cookieMatch[1] === "th" || cookieMatch[1] === "en")) {
       return cookieMatch[1] as "en" | "th"
@@ -69,8 +69,12 @@ export function ImageUploader({
   compact = false,
 }: ImageUploaderProps) {
   const router = useRouter()
-  const [activeLocale] = React.useState<"en" | "th">(() => propLocale || getClientLocale("en"))
+  const [activeLocale] = React.useState<"en" | "th">(() => propLocale || getClientLocale("th"))
   const isTh = activeLocale === "th"
+
+  // Ensure safe string rendering against any Lexical richText objects or nested dictionaries
+  const safeLabel = extractPlainText(label, isTh ? "th" : "en") || (isTh ? "รูปภาพ" : "Image Asset")
+  const safeDescription = extractPlainText(description, isTh ? "th" : "en")
 
   // State
   const [currentUrl, setCurrentUrl] = React.useState<string>(initialImageUrl)
@@ -83,7 +87,9 @@ export function ImageUploader({
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false)
   const [dragActive, setDragActive] = React.useState<boolean>(false)
   const [copied, setCopied] = React.useState<boolean>(false)
-  const [confirmDelete, setConfirmDelete] = React.useState<boolean>(false)
+  
+  // Safe delete dialog state
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false)
   const [toast, setToast] = React.useState<{ message: string; type: "success" | "error" } | null>(null)
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -100,42 +106,36 @@ export function ImageUploader({
   const [prevInitial, setPrevInitial] = React.useState<string>(initialImageUrl)
   if (initialImageUrl !== prevInitial) {
     setPrevInitial(initialImageUrl)
-    if (!selectedFile && !inputUrl) {
-      setCurrentUrl(initialImageUrl)
-      setPreviewUrl(initialImageUrl)
-    }
+    setCurrentUrl(initialImageUrl)
+    setPreviewUrl(initialImageUrl)
+    setCurrentId(initialMediaId)
   }
 
-  // Handle local file selection with instant preview
+  // Handle local file selection
   const handleFileChange = (file: File) => {
+    if (!file) return
     if (!file.type.startsWith("image/")) {
       setToast({
-        message: isTh
-          ? "กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง (PNG, JPG, WebP, SVG, AVIF)"
-          : "Please select a valid image file (PNG, JPG, WebP, SVG, AVIF)",
+        message: isTh ? "กรุณาเลือกไฟล์ที่เป็นรูปภาพเท่านั้น (PNG, JPG, WebP, SVG)" : "Please select an image file",
         type: "error",
       })
       return
     }
-
     if (file.size > 10 * 1024 * 1024) {
       setToast({
-        message: isTh
-          ? "ขนาดไฟล์รูปภาพเกินกำหนด (ไม่เกิน 10MB)"
-          : "File size exceeds the 10MB limit.",
+        message: isTh ? "ขนาดไฟล์ต้องไม่เกิน 10MB" : "File size must be under 10MB",
         type: "error",
       })
       return
     }
 
     setSelectedFile(file)
-    const localUrl = URL.createObjectURL(file)
-    setPreviewUrl(localUrl)
     setInputUrl("")
-    setConfirmDelete(false)
+    const localBlob = URL.createObjectURL(file)
+    setPreviewUrl(localBlob)
   }
 
-  // Handle Drag events
+  // Drag and drop handlers
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -159,7 +159,6 @@ export function ImageUploader({
   const handleUrlChange = (url: string) => {
     setInputUrl(url)
     setSelectedFile(null)
-    setConfirmDelete(false)
     if (url.trim()) {
       setPreviewUrl(url.trim())
     } else {
@@ -188,7 +187,7 @@ export function ImageUploader({
         // Upload File via FormData
         const formData = new FormData()
         formData.append("file", selectedFile)
-        formData.append("alt", label)
+        formData.append("alt", safeLabel)
 
         const res = await fetch("/api/admin/upload-image", {
           method: "POST",
@@ -200,7 +199,7 @@ export function ImageUploader({
         const res = await fetch("/api/admin/upload-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: inputUrl.trim(), alt: label }),
+          body: JSON.stringify({ url: inputUrl.trim(), alt: safeLabel }),
         })
         uploadResult = await res.json()
       }
@@ -240,26 +239,21 @@ export function ImageUploader({
       setSelectedFile(null)
       setInputUrl("")
 
-      // Notify parent if callback provided
       if (onImageUploaded) {
         onImageUploaded({ url: uploadResult.url, id: uploadResult.id })
       }
 
-      // Trigger router refresh for instant Next.js real-time data sync
       router.refresh()
 
       setToast({
         message: isTh
-          ? "บันทึกและซิงค์รูปภาพขึ้นเว็บไซต์ทันทีสำเร็จ!"
-          : "Image published and synchronized with website in real-time!",
+          ? "บันทึกข้อมูลเรียบร้อยแล้ว! รูปภาพซิงค์สู่เว็บไซต์จริงทันที"
+          : "Saved successfully! Image synced to the live site instantaneously.",
         type: "success",
       })
     } catch (err: any) {
-      console.error("[ImageUploader] Error saving image:", err)
       setToast({
-        message:
-          err?.message ||
-          (isTh ? "อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่อีกครั้ง" : "Failed to upload image. Please try again."),
+        message: err.message || (isTh ? "เกิดข้อผิดพลาดในการบันทึก" : "Error saving image"),
         type: "error",
       })
     } finally {
@@ -267,27 +261,10 @@ export function ImageUploader({
     }
   }
 
-  // Handle Copy URL
-  const handleCopyUrl = async () => {
-    const urlToCopy = previewUrl || currentUrl
-    if (!urlToCopy) return
-    try {
-      await navigator.clipboard.writeText(urlToCopy)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Fallback
-    }
-  }
-
-  // Delete / Remove Action with Confirmation State
+  // Delete Action
   const handleDelete = async () => {
-    if (!confirmDelete) {
-      setConfirmDelete(true)
-      return
-    }
-
     setIsDeleting(true)
+
     try {
       if (targetType && targetSlug && fieldName) {
         const updateRes = await fetch("/api/admin/update-image", {
@@ -298,33 +275,36 @@ export function ImageUploader({
             targetSlug,
             id: docId,
             fieldName,
-            clear: true,
+            mediaId: null,
+            imageUrl: "",
           }),
         })
         const updateData = await updateRes.json()
         if (!updateData.success) {
-          throw new Error(updateData.error || (isTh ? "ไม่สามารถลบรูปภาพได้" : "Failed to remove image"))
+          throw new Error(updateData.error || (isTh ? "ลบรูปภาพไม่สำเร็จ" : "Failed to remove image"))
         }
       }
 
-      setSelectedFile(null)
-      setInputUrl("")
-      setPreviewUrl("")
       setCurrentUrl("")
       setCurrentId(undefined)
-      setConfirmDelete(false)
-      if (fileInputRef.current) fileInputRef.current.value = ""
+      setPreviewUrl("")
+      setSelectedFile(null)
+      setInputUrl("")
+      setDeleteModalOpen(false)
 
-      if (onRemove) onRemove()
+      if (onRemove) {
+        onRemove()
+      }
 
       router.refresh()
+
       setToast({
-        message: isTh ? "ลบรูปภาพและอัปเดตเว็บไซต์เรียบร้อยแล้ว" : "Image removed and updated on live site.",
+        message: isTh ? "ลบรูปภาพและอัปเดตหน้าเว็บจริงเรียบร้อยแล้ว" : "Image removed from site.",
         type: "success",
       })
     } catch (err: any) {
       setToast({
-        message: err?.message || (isTh ? "เกิดข้อผิดพลาดในการลบรูปภาพ" : "Failed to remove image."),
+        message: err.message || (isTh ? "เกิดข้อผิดพลาดในการลบ" : "Error removing image"),
         type: "error",
       })
     } finally {
@@ -332,75 +312,86 @@ export function ImageUploader({
     }
   }
 
-  // Aspect ratio classes for preview box
-  const aspectClass =
-    aspectRatio === "portrait"
-      ? "aspect-[3/4]"
-      : aspectRatio === "square"
-      ? "aspect-square"
-      : aspectRatio === "video"
-      ? "aspect-video"
-      : "aspect-[16/10]"
+  // Copy URL to clipboard
+  const handleCopyUrl = () => {
+    if (!previewUrl) return
+    navigator.clipboard.writeText(previewUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+    setToast({
+      message: isTh ? "คัดลอกลิงก์รูปภาพแล้ว" : "URL copied to clipboard",
+      type: "success",
+    })
+  }
+
+  // Aspect ratio styling for preview container
+  const aspectClasses = {
+    landscape: "aspect-16/10",
+    portrait: "aspect-3/4",
+    square: "aspect-square",
+    video: "aspect-video",
+  }[aspectRatio]
 
   return (
-    <div
-      className={`bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300 ${className}`}
-    >
-      {/* Toast Notification */}
+    <div className={`bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-sm transition-all ${className}`}>
+      
+      {/* Toast Feedback */}
       {toast && (
         <div
-          className={`mb-4 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 ${
+          role="status"
+          className={`mb-5 p-4 rounded-2xl text-base font-bold flex items-center justify-between border ${
             toast.type === "success"
-              ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-              : "bg-rose-50 text-rose-900 border border-rose-200"
+              ? "bg-emerald-50 text-emerald-900 border-emerald-300"
+              : "bg-rose-50 text-rose-900 border-rose-300"
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {toast.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
             )}
             <span>{toast.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setToast(null)}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/40 transition-colors"
+            className="p-1 rounded-lg hover:bg-black/5"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
         <div>
-          <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            {label}
+          <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2 flex-wrap">
+            <span>{safeLabel}</span>
             {fieldName && (
-              <span className="font-mono text-[10px] text-slate-400 font-normal bg-slate-100 px-1.5 py-0.5 rounded">
+              <span className="font-mono text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
                 {fieldName}
               </span>
             )}
           </h4>
-          {description && (
-            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{description}</p>
+          {safeDescription && (
+            <p className="text-sm sm:text-base text-slate-600 mt-1 leading-relaxed">{safeDescription}</p>
           )}
         </div>
+
         {previewUrl && (
           <span
-            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border inline-flex items-center gap-1.5 ${
+            className={`text-xs font-bold px-3 py-1 rounded-full border inline-flex items-center gap-1.5 shrink-0 ${
               selectedFile
-                ? "bg-amber-50 text-amber-700 border-amber-200"
+                ? "bg-amber-50 text-amber-800 border-amber-300"
                 : inputUrl
-                ? "bg-sky-50 text-sky-700 border-sky-200"
-                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                ? "bg-blue-50 text-blue-800 border-blue-300"
+                : "bg-emerald-50 text-emerald-800 border-emerald-300"
             }`}
           >
             <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                selectedFile ? "bg-amber-500" : inputUrl ? "bg-sky-500" : "bg-emerald-500"
+              className={`w-2 h-2 rounded-full ${
+                selectedFile ? "bg-amber-500" : inputUrl ? "bg-blue-500" : "bg-emerald-500"
               }`}
             />
             {selectedFile
@@ -419,42 +410,36 @@ export function ImageUploader({
       </div>
 
       {/* Mode Tabs */}
-      <div className="flex gap-1 p-1 bg-slate-100 rounded-xl mb-4 w-fit text-xs font-semibold">
+      <div className="flex gap-1.5 p-1.5 bg-slate-100 rounded-2xl mb-5 w-fit text-sm font-bold">
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("upload")
-            setConfirmDelete(false)
-          }}
-          className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+          onClick={() => setActiveTab("upload")}
+          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
             activeTab === "upload"
-              ? "bg-white text-slate-900 shadow-sm"
+              ? "bg-white text-blue-900 shadow-xs border border-slate-200"
               : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
+          <UploadCloud className="w-4 h-4 text-blue-600" />
           <span>{isTh ? "อัปโหลดไฟล์จากเครื่อง" : "Upload Local File"}</span>
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("url")
-            setConfirmDelete(false)
-          }}
-          className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+          onClick={() => setActiveTab("url")}
+          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
             activeTab === "url"
-              ? "bg-white text-slate-900 shadow-sm"
+              ? "bg-white text-blue-900 shadow-xs border border-slate-200"
               : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <Link2 className="w-3.5 h-3.5 text-slate-500" />
-          <span>{isTh ? "วางลิงก์รูปภาพภายนอก" : "Paste Image URL"}</span>
+          <Link2 className="w-4 h-4 text-blue-600" />
+          <span>{isTh ? "วางลิงก์รูปภาพ (URL)" : "Paste Image URL"}</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Input / Dropzone Area */}
-        <div className="md:col-span-7 flex flex-col gap-3">
+        <div className="lg:col-span-7 flex flex-col gap-4">
           {activeTab === "upload" ? (
             <div
               onDragEnter={handleDrag}
@@ -462,10 +447,10 @@ export function ImageUploader({
               onDragOver={handleDrag}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-8 bg-slate-50/50 hover:bg-slate-100/50 transition-all flex flex-col items-center justify-center text-center cursor-pointer group ${
+              className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 bg-slate-50/60 hover:bg-slate-100/60 transition-all flex flex-col items-center justify-center text-center cursor-pointer group ${
                 dragActive
-                  ? "border-[#1e3a8a] bg-blue-50/40 ring-4 ring-blue-50"
-                  : "border-slate-300 hover:border-[#1e3a8a]"
+                  ? "border-blue-600 bg-blue-50/50 ring-4 ring-blue-100"
+                  : "border-slate-300 hover:border-blue-500"
               }`}
             >
               <input
@@ -481,90 +466,90 @@ export function ImageUploader({
               />
 
               <div
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-sm ${
+                className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${
                   dragActive
-                    ? "bg-[#1e3a8a] text-white"
-                    : "bg-white text-slate-600 border border-slate-200"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-blue-600 border border-slate-200"
                 }`}
               >
-                <UploadCloud className="w-6 h-6 text-[#1e3a8a]" />
+                <UploadCloud className="w-8 h-8 text-blue-600" />
               </div>
 
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="text-base font-bold text-slate-800">
                 {selectedFile ? (
-                  <span className="text-[#1e3a8a] font-bold inline-flex items-center gap-1">
-                    <FileCheck className="w-3.5 h-3.5" />
+                  <span className="text-blue-700 font-extrabold inline-flex items-center gap-1.5">
+                    <FileCheck className="w-5 h-5 text-emerald-600" />
                     {selectedFile.name}
                   </span>
                 ) : (
                   <>
-                    <span className="text-[#1e3a8a] font-bold hover:underline">
-                      {isTh ? "เลือกไฟล์จากเครื่อง" : "Browse Files"}
+                    <span className="text-blue-600 underline">
+                      {isTh ? "คลิกเลือกไฟล์ภาพ" : "Browse Files"}
                     </span>{" "}
-                    {isTh ? "หรือลากไฟล์มาวางที่นี่" : "or drag and drop"}
+                    {isTh ? "หรือลากไฟล์มาวางที่นี่" : "or drag and drop here"}
                   </>
                 )}
               </p>
 
-              <p className="text-[11px] text-slate-400 mt-1.5">
-                PNG, JPG, WebP, SVG, AVIF ({isTh ? "ขนาดไม่เกิน 10MB" : "Max 10MB"})
+              <p className="text-sm text-slate-500 mt-1.5 font-medium">
+                PNG, JPG, WebP, SVG, AVIF ({isTh ? "ขนาดสูงสุดไม่เกิน 10MB" : "Max size 10MB"})
               </p>
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <Link2 className="w-3.5 h-3.5 text-slate-400" />
-                {isTh ? "ที่อยู่ลิงก์รูปภาพ (Public URL)" : "Image Source URL"}
+              <label className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-blue-600" />
+                <span>{isTh ? "ที่อยู่ลิงก์รูปภาพ (Public URL)" : "Image Source URL"}</span>
               </label>
 
               <div className="relative flex items-center">
                 <input
                   type="url"
-                  placeholder="https://images.unsplash.com/... or https://..."
+                  placeholder="https://images.unsplash.com/... or /images/..."
                   value={inputUrl}
                   onChange={(e) => handleUrlChange(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs bg-slate-50/60 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all pr-16"
+                  className="w-full px-4 py-3 text-base bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 shadow-sm transition-all pr-16"
                 />
                 {inputUrl && (
                   <button
                     type="button"
                     onClick={() => handleUrlChange("")}
-                    className="absolute right-2 px-2 py-1 text-[11px] font-bold text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-200/50 transition-colors"
+                    className="absolute right-3 px-2.5 py-1 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors"
                   >
                     {isTh ? "ล้าง" : "Clear"}
                   </button>
                 )}
               </div>
 
-              <p className="text-[11px] text-slate-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
                 {isTh
-                  ? "วางลิงก์รูปภาพความละเอียดสูงจาก CDN, Supabase Storage หรือเว็บสาธารณะ ดูตัวอย่างได้ทันที"
+                  ? "วางลิงก์รูปภาพความละเอียดสูงจาก Supabase Storage, CDN หรือ Unsplash ระบบจะแสดงตัวอย่างสดทันที"
                   : "Paste any high-resolution public URL. It will preview live immediately."}
               </p>
             </div>
           )}
 
           {/* Action Buttons Row */}
-          <div className="flex items-center gap-2 pt-2 flex-wrap">
+          <div className="flex items-center gap-3 pt-2 flex-wrap">
             <button
               type="button"
               disabled={isLoading || isDeleting || (!selectedFile && !inputUrl)}
               onClick={handleSave}
-              className={`px-4 py-2 text-xs font-bold rounded-xl text-white transition-all flex items-center gap-2 shadow-sm ${
+              className={`px-6 py-3.5 text-base font-semibold rounded-xl text-white transition-all flex items-center gap-2.5 shadow-md ${
                 isLoading || isDeleting || (!selectedFile && !inputUrl)
                   ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
-                  : "bg-[#1e3a8a] hover:bg-[#172e6b] active:scale-[0.98] hover:shadow"
+                  : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] shadow-blue-600/30"
               }`}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   <span>{isTh ? "กำลังบันทึกและซิงค์..." : "Saving & Syncing..."}</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isTh ? "บันทึกและเผยแพร่" : "Apply & Publish"}</span>
+                  <Sparkles className="w-5 h-5" />
+                  <span>{isTh ? "บันทึกและเผยแพร่" : "Save Changes"}</span>
                 </>
               )}
             </button>
@@ -574,138 +559,132 @@ export function ImageUploader({
               <button
                 type="button"
                 onClick={handleCopyUrl}
-                className="px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/70 rounded-xl transition-all flex items-center gap-1.5"
+                className="px-4 py-3.5 text-base font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-xl transition-all flex items-center gap-2 border border-slate-200"
                 title={isTh ? "คัดลอกลิงก์รูปภาพ" : "Copy Image URL"}
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <Check className="w-5 h-5 text-emerald-600" />
                     <span className="text-emerald-700">{isTh ? "คัดลอกแล้ว!" : "Copied!"}</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5" />
+                    <Copy className="w-5 h-5 text-slate-500" />
                     <span>{isTh ? "คัดลอกลิงก์" : "Copy URL"}</span>
                   </>
                 )}
               </button>
             )}
 
-            {/* Delete / Remove with Confirmation State */}
+            {/* Delete / Remove Button */}
             {previewUrl && (
-              <div className="inline-flex items-center">
-                {confirmDelete ? (
-                  <div className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 rounded-xl p-1 animate-in fade-in duration-150">
-                    <span className="text-[11px] font-bold text-rose-700 px-2">
-                      {isTh ? "ยืนยันการลบ?" : "Confirm Delete?"}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={isDeleting}
-                      onClick={handleDelete}
-                      className="px-2.5 py-1 text-[11px] font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      {isDeleting ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-3 h-3" />
-                      )}
-                      <span>{isTh ? "ใช่, ลบเลย" : "Yes, Delete"}</span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isDeleting}
-                      onClick={() => setConfirmDelete(false)}
-                      className="px-2 py-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 rounded-lg hover:bg-rose-100 transition-colors"
-                    >
-                      {isTh ? "ยกเลิก" : "Cancel"}
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmDelete(true)}
-                    className="px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-1.5"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>{isTh ? "ลบรูปภาพ" : "Delete"}</span>
-                  </button>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(true)}
+                className="px-4 py-3.5 text-base font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-2 border border-rose-200"
+              >
+                <Trash2 className="w-5 h-5" />
+                <span>{isTh ? "ลบรูปภาพ" : "Delete"}</span>
+              </button>
             )}
           </div>
         </div>
 
         {/* Right: Instant Live Preview Panel */}
-        <div className="md:col-span-5 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Eye className="w-3 h-3" />
-              {isTh ? "ตัวอย่างรูปภาพสด" : "Live Preview"}
+        <div className="lg:col-span-5 flex flex-col gap-2.5">
+          <label className="text-base font-semibold text-slate-800 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-blue-600" />
+              <span>{isTh ? "ตัวอย่างการแสดงผลจริง" : "Live Visual Preview"}</span>
             </span>
             {previewUrl && (
-              <a
-                href={previewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] text-slate-400 hover:text-[#1e3a8a] flex items-center gap-1 transition-colors"
-              >
-                <span>{isTh ? "เปิดภาพเต็ม" : "Open full"}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              <span className="text-xs font-mono text-slate-500 font-normal">
+                {aspectRatio}
+              </span>
             )}
-          </div>
+          </label>
 
           <div
-            className={`w-full ${aspectClass} rounded-xl overflow-hidden bg-slate-100/70 border border-slate-200 relative flex items-center justify-center shadow-inner group transition-all`}
+            className={`relative ${aspectClasses} rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center`}
           >
-            {/* Loading skeleton during upload */}
-            {isLoading && (
-              <div className="absolute inset-0 bg-slate-900/60 z-20 backdrop-blur-sm flex flex-col items-center justify-center text-white gap-2 animate-in fade-in">
-                <Loader2 className="w-7 h-7 animate-spin text-white" />
-                <span className="text-xs font-bold">
-                  {isTh ? "กำลังประมวลผลรูปภาพ..." : "Processing image..."}
-                </span>
-              </div>
-            )}
-
             {previewUrl ? (
-              <>
-                <img
-                  src={previewUrl}
-                  alt={label}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={() => {
-                    setToast({
-                      message: isTh
-                        ? "ไม่สามารถโหลดรูปภาพจากลิงก์นี้ได้ กรุณาตรวจสอบลิงก์"
-                        : "Failed to load image preview from this URL. Please check the link.",
-                      type: "error",
-                    })
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                  <span className="text-[11px] text-white font-medium truncate max-w-full drop-shadow">
-                    {selectedFile ? selectedFile.name : previewUrl}
-                  </span>
-                </div>
-              </>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={previewUrl}
+                alt={safeLabel}
+                className="w-full h-full object-cover transition-all"
+              />
             ) : (
-              <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
-                <div className="w-10 h-10 rounded-full bg-white/80 border border-slate-200 flex items-center justify-center mb-2 shadow-xs">
-                  <ImageIcon className="w-5 h-5 text-slate-300" />
-                </div>
-                <span className="text-xs font-bold text-slate-500">
-                  {isTh ? "ยังไม่ได้กำหนดรูปภาพ" : "No image assigned"}
-                </span>
-                <span className="text-[11px] text-slate-400 mt-0.5">
-                  {isTh ? "อัปโหลดหรือวางลิงก์ด้านซ้ายเพื่อดูตัวอย่าง" : "Upload or paste URL to preview"}
-                </span>
+              <div className="flex flex-col items-center justify-center p-6 text-slate-400 text-center">
+                <ImageIcon className="w-12 h-12 mb-2 text-slate-300" />
+                <p className="text-base font-bold text-slate-600">
+                  {isTh ? "ยังไม่มีรูปภาพที่กำหนด" : "No image configured"}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {isTh ? "อัปโหลดไฟล์หรือวางลิงก์ด้านซ้ายเพื่อดูตัวอย่าง" : "Upload a file or paste URL to preview"}
+                </p>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal for ImageUploader */}
+      {deleteModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+        >
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md p-6 sm:p-8 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
+              <AlertTriangle className="w-8 h-8 text-rose-600" />
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
+              {isTh ? "ยืนยันการลบรูปภาพนี้?" : "Confirm Delete Image?"}
+            </h3>
+
+            <p className="text-base text-slate-600 leading-relaxed mb-6">
+              {isTh
+                ? `คุณต้องการลบรูปภาพ "${safeLabel}" ออกจากระบบและเว็บไซต์จริงหรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`
+                : `Are you sure you want to delete the image for "${safeLabel}"? This action cannot be undone.`}
+            </p>
+
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-base transition-colors"
+              >
+                {isTh ? "ยกเลิก" : "Cancel"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-base shadow-md shadow-rose-600/30 transition-all flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{isTh ? "กำลังลบ..." : "Deleting..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5" />
+                    <span>{isTh ? "ยืนยันการลบ" : "Yes, Delete"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+export default ImageUploader

@@ -1,5 +1,32 @@
 /* Custom Admin Styling for Pakdeepan Kindergarten */
-/* Overriding Payload's default CSS variables with the brand theme */
+/* Overriding Payload's default CSS variables with the brand theme and Thai-first typography */
+
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-admin: 'Prompt', 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Prompt', 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Prompt', 'Sarabun', 'Inter', sans-serif;
+}
+
+/* Accessibility Font Scaler for Admin CMS */
+[data-admin-font-scale="normal"] {
+  --admin-font-scale: 100%;
+}
+
+[data-admin-font-scale="large"] {
+  --admin-font-scale: 112%;
+}
+
+[data-admin-font-scale="xlarge"] {
+  --admin-font-scale: 125%;
+}
+
+.admin-scalable-root {
+  font-family: var(--font-admin);
+  font-size: var(--admin-font-scale, 100%);
+  transition: font-size 0.2s ease-in-out;
+}
 
 @layer payload-default {
   :root {
@@ -13,11 +40,11 @@
     --theme-elevation-300: #64748b;
     --theme-elevation-400: #475569;
     --theme-elevation-500: #334155;
-    
+
     /* Text Colors */
     --theme-text: #1e293b;
     --theme-text-dim: #64748b;
-    
+
     /* Brand Primary (Light Blue: #38bdf8) */
     --theme-success-100: #e0f2fe;
     --theme-success-200: #bae6fd;
@@ -27,7 +54,7 @@
     --theme-success-500: #0284c7;
     --theme-success-550: #0369a1;
     --theme-success-600: #075985;
-    
+
     /* Brand Accent (Light Pink: #f472b6) */
     --theme-error-100: #fce7f3;
     --theme-error-200: #fbcfe8;
@@ -37,13 +64,13 @@
     --theme-error-500: #db2777;
     --theme-error-550: #be185d;
     --theme-error-600: #9f1239;
-    
+
     /* Focus & Highlights */
     --theme-focus-color: var(--theme-success-500);
 
     /* Fonts */
-    --font-body: 'Quicksand', sans-serif;
-    --font-heading: 'Nunito', sans-serif;
+    --font-body: 'Prompt', 'Sarabun', 'Inter', sans-serif;
+    --font-heading: 'Prompt', 'Sarabun', 'Inter', sans-serif;
   }
 
   /* Force light mode variables across the board for branding consistency if desired */
@@ -55,7 +82,7 @@
     --theme-elevation-150: #475569;
     --theme-elevation-200: #64748b;
     --theme-elevation-250: #94a3b8;
-    
+
     --theme-text: #f8fafc;
     --theme-text-dim: #94a3b8;
   }
@@ -72,21 +99,22 @@
     align-items: center;
     gap: 8px;
   }
-  
+
   .nav .logo::after {
     content: "Pakdeepan CMS";
   }
-  
+
   .app-header .logo svg,
   .nav .logo svg {
-    display: none; /* Hide default Payload logo */
+    display: none;
+    /* Hide default Payload logo */
   }
 
   /* Custom Login Page Styling */
   .template-default {
     background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
   }
-  
+
   .template-default__wrap {
     box-shadow: 0 25px 50px -12px rgba(56, 189, 248, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);

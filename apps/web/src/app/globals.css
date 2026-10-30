@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "@pakdeepan/ui/theme.css";
 @source "../";
 @source "../../src";
@@ -5,4 +6,22 @@
 
 .font-sherlina {
   font-family: var(--font-sherlina), cursive;
+}
+
+/* Accessibility Font Scaler for Thai Admin CMS */
+[data-admin-font-scale="normal"] {
+  --admin-font-scale: 100%;
+}
+
+[data-admin-font-scale="large"] {
+  --admin-font-scale: 112%;
+}
+
+[data-admin-font-scale="xlarge"] {
+  --admin-font-scale: 125%;
+}
+
+.admin-shell {
+  font-family: 'Prompt', 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--admin-font-scale, 100%);
 }

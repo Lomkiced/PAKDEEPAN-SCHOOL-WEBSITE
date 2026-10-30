@@ -1,6 +1,7 @@
 import "@/app/globals.css"
 import { getPayload } from "@/lib/payload"
 import { ImageManagerClient } from "@/components/admin/ImageManagerClient"
+import { AdminAppShell } from "@/components/admin/AdminAppShell"
 import { cookies } from "next/headers"
 
 export const dynamic = "force-dynamic"
@@ -8,8 +9,8 @@ export const revalidate = 0
 
 export default async function ImageManagerPage() {
   const cookieStore = await cookies()
-  const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "en"
-  const initialLocale = (localeStr === "th" ? "th" : "en") as "en" | "th"
+  const localeStr = cookieStore.get("NEXT_LOCALE")?.value || "th"
+  const initialLocale = (localeStr === "en" ? "en" : "th") as "en" | "th"
 
   const payload = await getPayload()
 
@@ -28,17 +29,31 @@ export default async function ImageManagerPage() {
     payload.find({ collection: "gallery-images", depth: 1, limit: 100 }).catch(() => ({ docs: [] })),
   ])
 
+  const counts = {
+    news: newsRes.docs?.length || 0,
+    programs: programsRes.docs?.length || 4,
+    events: eventsRes.docs?.length || 0,
+    gallery: galleryRes.docs?.length || 0,
+    media: 24,
+  }
+
   return (
-    <ImageManagerClient
-      initialLocale={initialLocale}
-      siteSettings={siteSettings}
-      homePage={homePage}
-      aboutPage={aboutPage}
-      programs={programsRes.docs}
-      news={newsRes.docs}
-      events={eventsRes.docs}
-      gallery={galleryRes.docs}
-    />
+    <AdminAppShell
+      title={initialLocale === "th" ? "ศูนย์จัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Media Manager"}
+      subtitle={initialLocale === "th" ? "อัปโหลดและเปลี่ยนภาพหน้าเว็บแบบซิงค์สด" : "Real-Time Visual Asset Replacement"}
+      activePath="/admin/image-manager"
+      counts={counts}
+    >
+      <ImageManagerClient
+        initialLocale={initialLocale}
+        siteSettings={siteSettings}
+        homePage={homePage}
+        aboutPage={aboutPage}
+        programs={programsRes.docs}
+        news={newsRes.docs}
+        events={eventsRes.docs}
+        gallery={galleryRes.docs}
+      />
+    </AdminAppShell>
   )
 }
-

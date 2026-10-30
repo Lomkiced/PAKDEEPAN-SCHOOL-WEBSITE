@@ -11,7 +11,6 @@ import {
   Check,
   Trash2,
   ExternalLink,
-  ArrowLeft,
   Image as ImageIcon,
   CheckCircle2,
   AlertCircle,
@@ -20,16 +19,15 @@ import {
   Newspaper,
   Calendar,
   Eye,
-  SlidersHorizontal,
   FolderOpen,
-  HelpCircle,
-  Maximize2,
   UploadCloud,
   FileText,
-  Plus,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { NewsArticleEditorModal } from "@/components/admin/NewsArticleEditorModal"
+import { extractPlainText } from "@/lib/richText"
 
 export interface ImageManagerClientProps {
   initialLocale?: "en" | "th"
@@ -61,7 +59,7 @@ interface MediaCardItem {
 }
 
 export function ImageManagerClient({
-  initialLocale = "en",
+  initialLocale = "th",
   siteSettings,
   homePage,
   aboutPage,
@@ -73,15 +71,11 @@ export function ImageManagerClient({
   const router = useRouter()
 
   // Locale state
-  const [locale, setLocale] = React.useState<"en" | "th">(() => {
+  const [locale] = React.useState<"en" | "th">(() => {
     if (typeof window === "undefined") return initialLocale
     try {
       const stored = localStorage.getItem("pakdeepan_locale") as "en" | "th" | null
       if (stored === "th" || stored === "en") return stored
-      const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)
-      if (cookieMatch && (cookieMatch[1] === "th" || cookieMatch[1] === "en")) {
-        return cookieMatch[1] as "en" | "th"
-      }
     } catch {
       // Ignore
     }
@@ -90,17 +84,6 @@ export function ImageManagerClient({
 
   const isTh = locale === "th"
 
-  const switchLocale = (newLocale: "en" | "th") => {
-    setLocale(newLocale)
-    try {
-      localStorage.setItem("pakdeepan_locale", newLocale)
-      document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    } catch {
-      // Ignore
-    }
-    window.location.reload()
-  }
-
   // Active Filter & Search State
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all")
   const [searchQuery, setSearchQuery] = React.useState<string>("")
@@ -108,13 +91,18 @@ export function ImageManagerClient({
   const [editingNewsArticle, setEditingNewsArticle] = React.useState<any | null>(null)
   const [isNewsEditorOpen, setIsNewsEditorOpen] = React.useState(false)
   const [copiedId, setCopiedId] = React.useState<string | null>(null)
-  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null)
+  
+  // Safe Delete Modal State
+  const [deletingItem, setDeletingItem] = React.useState<MediaCardItem | null>(null)
+  const [isDeleting, setIsDeleting] = React.useState(false)
+
+  // Toast State
   const [toast, setToast] = React.useState<{ message: string; type: "success" | "error" } | null>(null)
 
   // Auto-dismiss toast
   React.useEffect(() => {
     if (toast) {
-      const timer = setTimeout(() => setToast(null), 3500)
+      const timer = setTimeout(() => setToast(null), 4000)
       return () => clearTimeout(timer)
     }
   }, [toast])
@@ -198,98 +186,105 @@ export function ImageManagerClient({
       id: "home-cta-1",
       labelEn: "CTA Polaroid 1 (Left)",
       labelTh: "โพลารอยด์รับสมัคร 1 (ซ้าย)",
-      descriptionEn: "Tilted polaroid card in home admissions banner.",
-      descriptionTh: "ภาพโพลารอยด์เอียงซ้ายในแถบรับสมัครท้ายหน้าแรก",
+      descriptionEn: "Admissions banner floating photo left side.",
+      descriptionTh: "ภาพถ่ายลอยตัวด้านซ้ายในส่วนเปิดรับสมัคร",
       category: "site",
       targetType: "global",
       targetSlug: "home-page",
       fieldName: "ctaPolaroid1",
-      imageUrl: homePage?.ctaPolaroid1?.url,
+      imageUrl:
+        homePage?.ctaPolaroid1?.url ||
+        "https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop",
       mediaId: homePage?.ctaPolaroid1?.id,
       aspectRatio: "square",
       badgeEn: "Admissions CTA",
-      badgeTh: "การรับสมัคร",
+      badgeTh: "ส่วนรับสมัคร",
     })
 
     list.push({
       id: "home-cta-2",
       labelEn: "CTA Polaroid 2 (Center)",
       labelTh: "โพลารอยด์รับสมัคร 2 (กลาง)",
-      descriptionEn: "Center straight polaroid in admissions banner.",
-      descriptionTh: "ภาพโพลารอยด์ตรงกลางในแถบรับสมัครท้ายหน้าแรก",
+      descriptionEn: "Admissions banner floating photo center.",
+      descriptionTh: "ภาพถ่ายลอยตัวตรงกลางในส่วนเปิดรับสมัคร",
       category: "site",
       targetType: "global",
       targetSlug: "home-page",
       fieldName: "ctaPolaroid2",
-      imageUrl: homePage?.ctaPolaroid2?.url,
+      imageUrl:
+        homePage?.ctaPolaroid2?.url ||
+        "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop",
       mediaId: homePage?.ctaPolaroid2?.id,
       aspectRatio: "square",
       badgeEn: "Admissions CTA",
-      badgeTh: "การรับสมัคร",
+      badgeTh: "ส่วนรับสมัคร",
     })
 
     list.push({
       id: "home-cta-3",
       labelEn: "CTA Polaroid 3 (Right)",
       labelTh: "โพลารอยด์รับสมัคร 3 (ขวา)",
-      descriptionEn: "Tilted polaroid card in admissions banner.",
-      descriptionTh: "ภาพโพลารอยด์เอียงขวาในแถบรับสมัครท้ายหน้าแรก",
+      descriptionEn: "Admissions banner floating photo right side.",
+      descriptionTh: "ภาพถ่ายลอยตัวด้านขวาในส่วนเปิดรับสมัคร",
       category: "site",
       targetType: "global",
       targetSlug: "home-page",
       fieldName: "ctaPolaroid3",
-      imageUrl: homePage?.ctaPolaroid3?.url,
+      imageUrl:
+        homePage?.ctaPolaroid3?.url ||
+        "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600&auto=format&fit=crop",
       mediaId: homePage?.ctaPolaroid3?.id,
       aspectRatio: "square",
       badgeEn: "Admissions CTA",
-      badgeTh: "การรับสมัคร",
+      badgeTh: "ส่วนรับสมัคร",
     })
 
-    // 2. SCHOOL DIRECTOR & ABOUT
+    // 2. SCHOOL DIRECTOR & ABOUT US
     list.push({
       id: "director-portrait",
       labelEn: "School Director Portrait",
       labelTh: "ภาพถ่ายผู้อำนวยการโรงเรียน",
-      descriptionEn: "Official formal portrait for Director's Message.",
-      descriptionTh: "ภาพถ่ายทางการแสดงคู่กับสาส์นจากผู้อำนวยการโรงเรียน",
+      descriptionEn: "Official executive portrait accompanying the Director's message.",
+      descriptionTh: "ภาพถ่ายทางการเคียงคู่สาส์นจากผู้อำนวยการโรงเรียน",
       category: "director",
       targetType: "global",
-      targetSlug: "about-page",
-      fieldName: "principalPhoto",
+      targetSlug: "site-settings",
+      fieldName: "director.portrait",
       imageUrl:
-        aboutPage?.principalPhoto?.url ||
-        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop",
-      mediaId: aboutPage?.principalPhoto?.id,
+        siteSettings?.director?.portrait?.url ||
+        siteSettings?.director?.portraitUrl ||
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
+      mediaId: siteSettings?.director?.portrait?.id,
       aspectRatio: "portrait",
       badgeEn: "School Director",
-      badgeTh: "ผู้อำนวยการโรงเรียน",
+      badgeTh: "ผู้อำนวยการ",
     })
 
     list.push({
-      id: "about-hero-bg",
+      id: "about-hero",
       labelEn: "About Page Hero Backdrop",
       labelTh: "ภาพพื้นหลังหน้าเกี่ยวกับเรา",
-      descriptionEn: "Edge-to-edge photography behind 'Our Story' section.",
-      descriptionTh: "ภาพบรรยากาศโรงเรียนด้านหลังหัวข้อ 'เรื่องราวของเรา'",
+      descriptionEn: "Edge-to-edge header photograph on 'Our Story'.",
+      descriptionTh: "ภาพถ่ายบรรยากาศโรงเรียนด้านหลังหัวข้อ 'เรื่องราวของเรา'",
       category: "director",
       targetType: "global",
       targetSlug: "about-page",
       fieldName: "heroImage",
       imageUrl:
         aboutPage?.heroImage?.url ||
-        "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=2000&auto=format&fit=crop",
       mediaId: aboutPage?.heroImage?.id,
-      aspectRatio: "landscape",
-      badgeEn: "About Hero",
+      aspectRatio: "video",
+      badgeEn: "About Us",
       badgeTh: "เกี่ยวกับเรา",
     })
 
     list.push({
       id: "about-history",
-      labelEn: "Heritage & History Archive",
+      labelEn: "School History & Heritage Photo",
       labelTh: "ภาพถ่ายประวัติความเป็นมา",
-      descriptionEn: "Heritage photo displayed with the school founding timeline.",
-      descriptionTh: "ภาพถ่ายประวัติศาสตร์แสดงคู่กับเส้นทางความเป็นมาของโรงเรียน",
+      descriptionEn: "Archival imagery in the heritage timeline.",
+      descriptionTh: "ภาพถ่ายในอดีตแสดงคู่กับเรื่องราวการก่อตั้งโรงเรียน",
       category: "director",
       targetType: "global",
       targetSlug: "about-page",
@@ -299,644 +294,599 @@ export function ImageManagerClient({
         "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop",
       mediaId: aboutPage?.historyImage?.id,
       aspectRatio: "landscape",
-      badgeEn: "History",
+      badgeEn: "Heritage",
       badgeTh: "ประวัติศาสตร์",
     })
 
     // 3. ACADEMIC PROGRAMS
-    programs.forEach((prog) => {
-      list.push({
-        id: `program-${prog.id}`,
-        labelEn: prog.title || "Academic Program",
-        labelTh: prog.title_th || prog.title || "หลักสูตรการศึกษา",
-        descriptionEn: `Curriculum card cover for ${prog.level || "Early Years"}`,
-        descriptionTh: `ภาพหน้าปกหลักสูตรระดับชั้น ${prog.level || "ปฐมวัย"}`,
-        category: "programs",
-        targetType: "collection",
-        targetSlug: "programs",
-        docId: prog.id,
-        fieldName: "featuredImage",
-        imageUrl: prog.featuredImage?.url,
-        mediaId: prog.featuredImage?.id,
-        aspectRatio: "landscape",
-        badgeEn: "Program",
-        badgeTh: "หลักสูตร",
-      })
-    })
+    if (programs && programs.length > 0) {
+      programs.forEach((prog: any) => {
+        const titleEn = extractPlainText(prog.title_en || prog.title, "en") || "Academic Program"
+        const titleTh = extractPlainText(prog.title_th || prog.title, "th") || "หลักสูตรการศึกษา"
+        const descEn = extractPlainText(prog.description_en || prog.summary || prog.description, "en") || "Curriculum tier preview card."
+        const descTh = extractPlainText(prog.description_th || prog.summary || prog.description, "th") || "ภาพตัวอย่างประจำระดับชั้นการศึกษา"
 
-    // 4. NEWS ARTICLES
-    news.forEach((item) => {
-      list.push({
-        id: `news-${item.id}`,
-        labelEn: item.title || "News Article",
-        labelTh: item.title_th || item.title || "ข่าวประชาสัมพันธ์",
-        descriptionEn: item.category || "Campus Announcement",
-        descriptionTh: item.category || "ข่าวสารและประกาศ",
-        category: "news",
-        targetType: "collection",
-        targetSlug: "news",
-        docId: item.id,
-        fieldName: "featuredImage",
-        imageUrl: item.featuredImage?.url,
-        mediaId: item.featuredImage?.id,
-        aspectRatio: "landscape",
-        badgeEn: "News",
-        badgeTh: "ข่าวสาร",
+        list.push({
+          id: `prog-${prog.id}`,
+          labelEn: titleEn,
+          labelTh: titleTh,
+          descriptionEn: descEn,
+          descriptionTh: descTh,
+          category: "programs",
+          targetType: "collection",
+          targetSlug: "programs",
+          docId: prog.id,
+          fieldName: prog.featuredImage ? "featuredImage" : "image",
+          imageUrl: prog.image?.url || prog.imageUrl || prog.featuredImage?.url,
+          mediaId: prog.image?.id || prog.featuredImage?.id,
+          aspectRatio: "landscape",
+          badgeEn: "Curriculum",
+          badgeTh: "หลักสูตร",
+        })
       })
-    })
+    } else {
+      const defaultPrograms = [
+        { key: "toddlers", th: "เตรียมอนุบาล (Toddlers)", en: "Toddlers Program (1-3 yrs)" },
+        { key: "pre-k", th: "อนุบาล 1 (Pre-K)", en: "Kindergarten 1 / Pre-K" },
+        { key: "k1", th: "อนุบาล 2 (K1)", en: "Kindergarten 2 (K1)" },
+        { key: "k2", th: "อนุบาล 3 (K2)", en: "Kindergarten 3 (K2)" },
+      ]
+      defaultPrograms.forEach((dp, i) => {
+        list.push({
+          id: `default-prog-${dp.key}`,
+          labelEn: dp.en,
+          labelTh: dp.th,
+          descriptionEn: "Curriculum tier preview image.",
+          descriptionTh: "ภาพประจำระดับชั้นการเรียน",
+          category: "programs",
+          targetType: "collection",
+          targetSlug: "programs",
+          docId: i + 1,
+          fieldName: "featuredImage",
+          imageUrl: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80",
+          aspectRatio: "landscape",
+          badgeEn: "Curriculum",
+          badgeTh: "หลักสูตร",
+        })
+      })
+    }
 
-    // 5. EVENTS
-    events.forEach((evt) => {
-      list.push({
-        id: `event-${evt.id}`,
-        labelEn: evt.title || "Campus Event",
-        labelTh: evt.title_th || evt.title || "กิจกรรมโรงเรียน",
-        descriptionEn: evt.date || "Upcoming Calendar Highlight",
-        descriptionTh: evt.date || "ปฏิทินกิจกรรมโรงเรียน",
-        category: "events",
-        targetType: "collection",
-        targetSlug: "events",
-        docId: evt.id,
-        fieldName: "coverImage",
-        imageUrl: evt.coverImage?.url,
-        mediaId: evt.coverImage?.id,
-        aspectRatio: "landscape",
-        badgeEn: "Event",
-        badgeTh: "กิจกรรม",
-      })
-    })
+    // 4. NEWS & ANNOUNCEMENTS
+    if (news && news.length > 0) {
+      news.forEach((item: any) => {
+        const titleEn = extractPlainText(item.title_en || item.title, "en") || "News Article"
+        const titleTh = extractPlainText(item.title_th || item.title, "th") || "ข่าวสารประชาสัมพันธ์"
+        const descEn = extractPlainText(item.excerpt_en || item.excerpt || item.content || item.body, "en") || "Campus news cover photography."
+        const descTh = extractPlainText(item.excerpt_th || item.excerpt || item.content || item.body, "th") || "ภาพหน้าปกข่าวสารและกิจกรรมในโรงเรียน"
 
-    // 6. GALLERY
-    gallery.forEach((pic) => {
-      list.push({
-        id: `gallery-${pic.id}`,
-        labelEn: pic.title || "Gallery Photo",
-        labelTh: pic.title_th || pic.title || "ภาพถ่ายแกลเลอรี",
-        descriptionEn: pic.category || "Campus Facilities",
-        descriptionTh: pic.category || "สิ่งอำนวยความสะดวก",
-        category: "gallery",
-        targetType: "collection",
-        targetSlug: "gallery-images",
-        docId: pic.id,
-        fieldName: "image",
-        imageUrl: pic.image?.url,
-        mediaId: pic.image?.id,
-        aspectRatio: "square",
-        badgeEn: "Gallery",
-        badgeTh: "แกลเลอรี",
+        list.push({
+          id: `news-${item.id}`,
+          labelEn: titleEn,
+          labelTh: titleTh,
+          descriptionEn: descEn,
+          descriptionTh: descTh,
+          category: "news",
+          targetType: "collection",
+          targetSlug: "news",
+          docId: item.id,
+          fieldName: "featuredImage",
+          imageUrl: item.imageUrl || item.featuredImage?.url,
+          mediaId: item.featuredImage?.id,
+          aspectRatio: "landscape",
+          badgeEn: "News & Campus",
+          badgeTh: "ข่าวสาร",
+        })
       })
-    })
+    }
+
+    // 5. EVENTS (Ensuring richText Lexical description is safely converted to plain text)
+    if (events && events.length > 0) {
+      events.forEach((ev: any) => {
+        const titleEn = extractPlainText(ev.title_en || ev.title, "en") || "School Event"
+        const titleTh = extractPlainText(ev.title_th || ev.title, "th") || "กิจกรรมโรงเรียน"
+        const descEn = extractPlainText(ev.description_en || ev.description, "en") || "Upcoming calendar event poster."
+        const descTh = extractPlainText(ev.description_th || ev.description, "th") || "ภาพโปสเตอร์กิจกรรมตามปฏิทินโรงเรียน"
+
+        list.push({
+          id: `event-${ev.id}`,
+          labelEn: titleEn,
+          labelTh: titleTh,
+          descriptionEn: descEn,
+          descriptionTh: descTh,
+          category: "events",
+          targetType: "collection",
+          targetSlug: "events",
+          docId: ev.id,
+          fieldName: ev.coverImage ? "coverImage" : "image",
+          imageUrl: ev.imageUrl || ev.coverImage?.url || ev.image?.url,
+          mediaId: ev.coverImage?.id || ev.image?.id,
+          aspectRatio: "landscape",
+          badgeEn: "Event",
+          badgeTh: "กิจกรรม",
+        })
+      })
+    }
+
+    // 6. GALLERY & FACILITIES
+    if (gallery && gallery.length > 0) {
+      gallery.forEach((g: any, i: number) => {
+        const labelEn = extractPlainText(g.title_en || g.title || g.caption_en || g.caption, "en") || `Campus Facility ${i + 1}`
+        const labelTh = extractPlainText(g.title_th || g.title || g.caption_th || g.caption, "th") || `บรรยากาศและสิ่งอำนวยความสะดวก ${i + 1}`
+        const descEn = extractPlainText(g.description_en || g.description, "en") || "Campus life photo displayed in the interactive grid."
+        const descTh = extractPlainText(g.description_th || g.description, "th") || "ภาพถ่ายชีวิตในรั้วโรงเรียนที่แสดงในแกลเลอรี"
+
+        list.push({
+          id: `gallery-${g.id || i}`,
+          labelEn: labelEn,
+          labelTh: labelTh,
+          descriptionEn: descEn,
+          descriptionTh: descTh,
+          category: "gallery",
+          targetType: "collection",
+          targetSlug: "gallery-images",
+          docId: g.id,
+          fieldName: "image",
+          imageUrl: g.image?.url || g.imageUrl,
+          mediaId: g.image?.id,
+          aspectRatio: "landscape",
+          badgeEn: "Gallery",
+          badgeTh: "แกลเลอรี",
+        })
+      })
+    }
 
     return list
   }, [siteSettings, homePage, aboutPage, programs, news, events, gallery])
 
-  // Filter items
+  // Filter items based on category and search query
   const filteredItems = React.useMemo(() => {
     return mediaItems.filter((item) => {
-      const matchesCategory =
-        selectedCategory === "all" ||
-        item.category === selectedCategory ||
-        (selectedCategory === "news-events" && (item.category === "news" || item.category === "events"))
-
+      const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
       const query = searchQuery.toLowerCase().trim()
-      const matchesQuery =
-        !query ||
+      if (!query) return matchesCategory
+
+      const matchesSearch =
         item.labelEn.toLowerCase().includes(query) ||
         item.labelTh.toLowerCase().includes(query) ||
-        item.fieldName.toLowerCase().includes(query) ||
-        item.targetSlug.toLowerCase().includes(query)
+        item.descriptionEn.toLowerCase().includes(query) ||
+        item.descriptionTh.toLowerCase().includes(query) ||
+        item.targetSlug.toLowerCase().includes(query) ||
+        item.fieldName.toLowerCase().includes(query)
 
-      return matchesCategory && matchesQuery
+      return matchesCategory && matchesSearch
     })
   }, [mediaItems, selectedCategory, searchQuery])
 
-  // Stats calculation
-  const totalAssets = mediaItems.length
-  const configuredAssets = mediaItems.filter((m) => !!m.imageUrl).length
-
-  // Quick Copy URL
-  const handleCopy = async (id: string, url?: string) => {
+  // Quick URL Copy handler
+  const handleCopy = (id: string, url?: string) => {
     if (!url) return
-    try {
-      await navigator.clipboard.writeText(url)
-      setCopiedId(id)
-      setTimeout(() => setCopiedId(null), 2000)
-    } catch {
-      // Fallback
-    }
+    navigator.clipboard.writeText(url)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2500)
+    setToast({
+      message: isTh ? "คัดลอกลิงก์รูปภาพเรียบร้อยแล้ว!" : "Image URL copied to clipboard!",
+      type: "success",
+    })
   }
 
-  // Quick Delete from Card
-  const handleDeleteCard = async (item: MediaCardItem) => {
-    if (confirmDeleteId !== item.id) {
-      setConfirmDeleteId(item.id)
-      return
-    }
+  // Safe Permanent Delete Handler
+  const executeDelete = async () => {
+    if (!deletingItem) return
+    setIsDeleting(true)
 
     try {
       const res = await fetch("/api/admin/update-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          targetType: item.targetType,
-          targetSlug: item.targetSlug,
-          id: item.docId,
-          fieldName: item.fieldName,
-          clear: true,
+          targetType: deletingItem.targetType,
+          targetSlug: deletingItem.targetSlug,
+          docId: deletingItem.docId,
+          fieldName: deletingItem.fieldName,
+          imageUrl: "",
+          mediaId: null,
         }),
       })
 
-      const data = await res.json()
-      if (!data.success) {
-        throw new Error(data.error || "Failed to remove image")
-      }
+      if (!res.ok) throw new Error("Delete failed")
 
-      setConfirmDeleteId(null)
-      router.refresh()
       setToast({
-        message: isTh ? "ลบรูปภาพและอัปเดตเว็บไซต์เรียบร้อยแล้ว" : "Image removed from live site.",
+        message: isTh ? "ลบรูปภาพและซิงค์เว็บไซต์เรียบร้อยแล้ว!" : "Image deleted and site synchronized!",
         type: "success",
       })
-    } catch (err: any) {
+
+      setDeletingItem(null)
+      router.refresh()
+    } catch {
       setToast({
-        message: err?.message || (isTh ? "ไม่สามารถลบรูปภาพได้" : "Failed to delete image."),
+        message: isTh ? "เกิดข้อผิดพลาดในการลบรูปภาพ" : "Failed to delete image.",
         type: "error",
       })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
-  // Badge Color Helper
-  const getBadgeClass = (category: string) => {
-    switch (category) {
-      case "site":
-        return "bg-blue-50 text-[#1e3a8a] border-blue-200"
-      case "director":
-        return "bg-sky-50 text-sky-700 border-sky-200"
-      case "programs":
-        return "bg-amber-50 text-amber-800 border-amber-200"
-      case "news":
-      case "events":
-        return "bg-purple-50 text-purple-700 border-purple-200"
-      case "gallery":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200"
-      default:
-        return "bg-slate-100 text-slate-700 border-slate-200"
-    }
-  }
+  // Statistics
+  const totalAssets = mediaItems.length
+  const configuredAssets = mediaItems.filter((m) => !!m.imageUrl).length
 
   return (
-    <div className="min-h-screen bg-slate-50/60 text-slate-900 pb-24 font-sans">
-      {/* Toast Notification */}
+    <div className="space-y-6 max-w-7xl mx-auto">
+      
+      {/* Toast Notification Bar */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div
-            className={`px-4 py-3 rounded-2xl text-xs font-bold shadow-lg flex items-center gap-3 border ${
-              toast.type === "success"
-                ? "bg-slate-900 text-white border-slate-800"
-                : "bg-rose-600 text-white border-rose-700"
-            }`}
-          >
+        <div
+          role="status"
+          className={`p-4 rounded-2xl shadow-lg border flex items-center justify-between text-base font-bold transition-all ${
+            toast.type === "success"
+              ? "bg-emerald-50 text-emerald-900 border-emerald-300"
+              : "bg-rose-50 text-rose-900 border-rose-300"
+          }`}
+        >
+          <div className="flex items-center gap-3">
             {toast.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-white" />
+              <AlertCircle className="w-6 h-6 text-rose-600 shrink-0" />
             )}
             <span>{toast.message}</span>
-            <button
-              type="button"
-              onClick={() => setToast(null)}
-              className="p-1 hover:bg-white/20 rounded-lg transition-colors ml-2"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="p-1 rounded-lg hover:bg-black/5"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
       )}
 
-      {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="text-xs font-bold text-slate-600 hover:text-slate-900 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-2xs"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{isTh ? "แดชบอร์ดแอดมิน" : "Admin Dashboard"}</span>
-            </Link>
-
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                  <span className="text-[#1e3a8a]">{isTh ? "ศูนย์จัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Image Manager"}</span>
-                </h1>
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  {isTh ? "ระบบซิงค์สดเปิดใช้งาน" : "Real-Time Sync Active"}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {isTh
-                  ? "จัดการรูปภาพทุกส่วนของเว็บไซต์โรงเรียนภักดีพรรณ อัปโหลดใหม่หรือวางลิงก์ พร้อมอัปเดตหน้าเว็บจริงทันที"
-                  : "Manage all visual assets across Pakdeepan School. Replace images via upload or public URL."}
-              </p>
-            </div>
+      {/* Header Info Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs sm:text-sm font-bold text-blue-700 mb-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span>{isTh ? "ระบบแทนที่รูปภาพแบบเรียลไทม์" : "Real-Time Visual Asset Manager"}</span>
           </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            {isTh ? "ศูนย์จัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Media Manager"}
+          </h2>
+          <p className="text-base text-slate-600 mt-1 max-w-2xl leading-relaxed">
+            {isTh
+              ? "เปลี่ยนรูปภาพทุกจุดบนเว็บไซต์ เช่น แบนเนอร์หน้าแรก, โลโก้, สาส์น ผอ., การ์ดหลักสูตร และแกลเลอรี โดยไม่ต้องเขียนโค้ด"
+              : "Easily replace any visual asset across Hero, Logo, Director Portrait, Programs, and Gallery with live preview."}
+          </p>
+        </div>
 
-          <div className="flex items-center gap-3">
-            {/* Language Switcher */}
-            <div
-              className="inline-flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold shadow-2xs"
-              role="group"
-            >
-              <button
-                type="button"
-                onClick={() => switchLocale("en")}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1.5 ${
-                  !isTh
-                    ? "bg-[#1e3a8a] text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <span>🇬🇧</span>
-                <span>EN</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => switchLocale("th")}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1.5 ${
-                  isTh
-                    ? "bg-[#1e3a8a] text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <span>🇹🇭</span>
-                <span>ไทย</span>
-              </button>
-            </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-base transition-colors flex items-center gap-2"
+          >
+            <ExternalLink className="w-5 h-5 text-blue-600" />
+            <span>{isTh ? "ดูหน้าเว็บจริง" : "View Live Site"}</span>
+          </Link>
+        </div>
+      </div>
 
-            {/* View Live Site Button */}
-            <Link
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-bold px-4 py-2 bg-[#1e3a8a] hover:bg-[#172e6b] text-white rounded-xl transition-all shadow-xs flex items-center gap-1.5"
-            >
-              <span>{isTh ? "เปิดหน้าเว็บจริง" : "View Live Site"}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </Link>
+      {/* KPI & Status Overview Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              {isTh ? "รูปภาพทั้งหมดในระบบ" : "Total Visual Assets"}
+            </p>
+            <h3 className="text-3xl font-black text-slate-900 mt-1">{totalAssets}</h3>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
+            <Layers className="w-6 h-6" />
           </div>
         </div>
 
-        {/* Category Navigation Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-2 border-t border-slate-100 overflow-x-auto py-2.5">
-          {[
-            { id: "all", labelEn: "All Media", labelTh: "สื่อทั้งหมด", count: totalAssets, icon: Layers },
-            { id: "site", labelEn: "Site & Hero", labelTh: "แบนเนอร์หน้าแรก", count: mediaItems.filter(m => m.category === 'site').length, icon: Sparkles },
-            { id: "director", labelEn: "School Director & About", labelTh: "ผู้อำนวยการและประวัติ", count: mediaItems.filter(m => m.category === 'director').length, icon: CompassIcon },
-            { id: "programs", labelEn: "Academic Programs", labelTh: "หลักสูตรการศึกษา", count: programs.length, icon: GraduationCap },
-            { id: "news-events", labelEn: "News & Events", labelTh: "ข่าวสารและกิจกรรม", count: news.length + events.length, icon: Newspaper },
-            { id: "gallery", labelEn: "School Gallery", labelTh: "แกลเลอรีภาพ", count: gallery.length, icon: ImageIcon },
-          ].map((tab) => {
-            const Icon = tab.icon
-            const active = selectedCategory === tab.id
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setSelectedCategory(tab.id)}
-                className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap flex items-center gap-2 ${
-                  active
-                    ? "bg-[#1e3a8a] text-white shadow-xs"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              {isTh ? "กำหนดภาพเรียบร้อย" : "Configured Assets"}
+            </p>
+            <h3 className="text-3xl font-black text-emerald-600 mt-1">
+              {configuredAssets} <span className="text-base font-semibold text-slate-400">/ {totalAssets}</span>
+            </h3>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              {isTh ? "หมวดหมู่เว็บไซต์" : "Website Sections"}
+            </p>
+            <h3 className="text-3xl font-black text-slate-900 mt-1">6</h3>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+            <FolderOpen className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              {isTh ? "ระบบซิงค์สด" : "Real-Time Pipeline"}
+            </p>
+            <div className="text-base font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 mt-1.5 inline-flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>{isTh ? "ทำงานปกติ (ซิงค์สด)" : "Active & Live"}</span>
+            </div>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+            <Sparkles className="w-6 h-6" />
+          </div>
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {[
+          { id: "all", labelTh: "ทั้งหมด", labelEn: "All Media", count: totalAssets, icon: Layers },
+          { id: "site", labelTh: "หน้าแรก & โลโก้", labelEn: "Hero & Branding", count: mediaItems.filter((i) => i.category === "site").length, icon: Sparkles },
+          { id: "director", labelTh: "สาส์น ผอ. & ประวัติ", labelEn: "Director & Story", count: mediaItems.filter((i) => i.category === "director").length, icon: Eye },
+          { id: "programs", labelTh: "หลักสูตรการศึกษา", labelEn: "Academic Programs", count: mediaItems.filter((i) => i.category === "programs").length, icon: GraduationCap },
+          { id: "news", labelTh: "ข่าวสารประชาสัมพันธ์", labelEn: "News & Campus", count: mediaItems.filter((i) => i.category === "news").length, icon: Newspaper },
+          { id: "events", labelTh: "กิจกรรมโรงเรียน", labelEn: "School Events", count: mediaItems.filter((i) => i.category === "events").length, icon: Calendar },
+          { id: "gallery", labelTh: "แกลเลอรีภาพ", labelEn: "Photo Gallery", count: mediaItems.filter((i) => i.category === "gallery").length, icon: ImageIcon },
+        ].map((tab) => {
+          const Icon = tab.icon
+          const active = selectedCategory === tab.id
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSelectedCategory(tab.id)}
+              className={`px-4 py-2.5 text-base font-bold rounded-2xl transition-all whitespace-nowrap flex items-center gap-2.5 shadow-2xs ${
+                active
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                  : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-500"}`} />
+              <span>{isTh ? tab.labelTh : tab.labelEn}</span>
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                  active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${active ? "text-white" : "text-slate-400"}`} />
-                <span>{isTh ? tab.labelTh : tab.labelEn}</span>
-                <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                    active ? "bg-white/20 text-white" : "bg-slate-200/60 text-slate-600"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              </button>
+                {tab.count}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Search Bar */}
+      <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder={
+              isTh
+                ? "ค้นหารูปภาพตามชื่อ, ตำแหน่ง หรือหมวดหมู่..."
+                : "Search visual assets by title, field name, or slug..."
+            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-10 py-3 text-base bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 px-3">
+          <span>
+            {isTh
+              ? `แสดง ${filteredItems.length} จาก ${mediaItems.length} รายการ`
+              : `Showing ${filteredItems.length} of ${mediaItems.length} items`}
+          </span>
+        </div>
+      </div>
+
+      {/* Responsive Media Grid */}
+      {filteredItems.length === 0 ? (
+        <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
+            <ImageIcon className="w-8 h-8" />
+          </div>
+          <h4 className="text-lg font-bold text-slate-900">
+            {isTh ? "ไม่พบรูปภาพที่ค้นหา" : "No matching visual assets found"}
+          </h4>
+          <p className="text-base text-slate-500 mt-1 max-w-sm">
+            {isTh
+              ? "ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นเพื่อดูรายการรูปภาพทั้งหมด"
+              : "Try adjusting your search query or switch categories to view other assets."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredItems.map((item) => {
+            const label = isTh ? item.labelTh : item.labelEn
+            const desc = isTh ? item.descriptionTh : item.descriptionEn
+            const badge = isTh ? item.badgeTh : item.badgeEn
+            const hasImage = !!item.imageUrl
+
+            const aspectStyle =
+              item.aspectRatio === "portrait"
+                ? "aspect-3/4"
+                : item.aspectRatio === "square"
+                ? "aspect-square"
+                : item.aspectRatio === "video"
+                ? "aspect-video"
+                : "aspect-16/10"
+
+            return (
+              <div
+                key={item.id}
+                className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+              >
+                {/* Image Container with hover overlay */}
+                <div className={`relative ${aspectStyle} bg-slate-100 overflow-hidden`}>
+                  {hasImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.imageUrl}
+                      alt={label}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-slate-400">
+                      <ImageIcon className="w-10 h-10 mb-2 opacity-60" />
+                      <span className="text-sm font-semibold">{isTh ? "ยังไม่มีภาพ" : "No Image"}</span>
+                    </div>
+                  )}
+
+                  {/* Floating Category Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-slate-900/80 text-white backdrop-blur-md shadow-xs">
+                      {badge}
+                    </span>
+                  </div>
+
+                  {/* Quick Replace Overlay Button */}
+                  <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                    <button
+                      type="button"
+                      onClick={() => setActiveModalItem(item)}
+                      className="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-base font-bold transition-all shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <UploadCloud className="w-5 h-5 text-blue-600" />
+                      <span>{isTh ? "เปลี่ยนรูปภาพนี้" : "Replace Image"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-900 line-clamp-1" title={label}>
+                      {label}
+                    </h4>
+                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed mt-1">
+                      {desc}
+                    </p>
+                  </div>
+
+                  {/* Field identifier badge */}
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                    <span className="font-mono truncate max-w-[150px]">
+                      {item.targetSlug}.{item.fieldName}
+                    </span>
+                    {hasImage ? (
+                      <span className="text-emerald-600 font-bold flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" />
+                        {isTh ? "พร้อมใช้งาน" : "Active"}
+                      </span>
+                    ) : (
+                      <span className="text-amber-600 font-bold">
+                        {isTh ? "ยังไม่กำหนด" : "Missing"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Footer Actions */}
+                <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setActiveModalItem(item)}
+                      className="px-3.5 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors flex items-center gap-1.5"
+                    >
+                      <UploadCloud className="w-4 h-4" />
+                      <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
+                    </button>
+
+                    {item.category === "news" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const orig = news.find((n) => String(n.id) === String(item.docId)) || item
+                          setEditingNewsArticle(orig)
+                          setIsNewsEditorOpen(true)
+                        }}
+                        className="px-3 py-2 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200/80 rounded-xl transition-colors flex items-center gap-1.5"
+                        title={isTh ? "แก้ไขเนื้อหาข่าวฉบับเต็ม" : "Edit Full Story Content"}
+                      >
+                        <FileText className="w-4 h-4 text-blue-600" />
+                        <span>{isTh ? "เนื้อหา" : "Story"}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {hasImage && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(item.id, item.imageUrl)}
+                        className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-200/80 rounded-xl transition-colors"
+                        title={isTh ? "คัดลอกลิงก์รูปภาพ" : "Copy URL"}
+                      >
+                        {copiedId === item.id ? (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    )}
+
+                    {hasImage && (
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(item)}
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                        title={isTh ? "ลบรูปภาพนี้" : "Delete Image"}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             )
           })}
         </div>
-      </header>
+      )}
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-        
-        {/* KPI & Status Overview Card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                {isTh ? "สื่อทั้งหมดในระบบ" : "Total Visual Assets"}
-              </p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{totalAssets}</h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#1e3a8a]">
-              <Layers className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                {isTh ? "กำหนดรูปภาพแล้ว" : "Images Configured"}
-              </p>
-              <h3 className="text-2xl font-black text-emerald-600 mt-1">
-                {configuredAssets}{" "}
-                <span className="text-xs font-semibold text-slate-400">/ {totalAssets}</span>
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                {isTh ? "หมวดหมู่เว็บไซต์" : "Website Sections"}
-              </p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">6</h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-              <FolderOpen className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                {isTh ? "การซิงค์ข้อมูล" : "Sync Pipeline"}
-              </p>
-              <h3 className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 mt-2 inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                {isTh ? "อัปเดตแบบเรียลไทม์" : "Instant ISR Revalidate"}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
-              <Sparkles className="w-5 h-5" />
-            </div>
-          </div>
-        </div>
-
-        {/* Search & Action Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={
-                isTh
-                  ? "ค้นหารูปภาพตามชื่อ, ตำแหน่ง หรือหมวดหมู่..."
-                  : "Search visual assets by title, field name, or slug..."
-              }
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-slate-500 px-2">
-            <span>
-              {isTh
-                ? `แสดง ${filteredItems.length} จาก ${mediaItems.length} รายการ`
-                : `Showing ${filteredItems.length} of ${mediaItems.length} items`}
-            </span>
-          </div>
-        </div>
-
-        {/* Responsive Media Grid */}
-        {filteredItems.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center flex flex-col items-center justify-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-              <ImageIcon className="w-7 h-7" />
-            </div>
-            <h4 className="text-sm font-bold text-slate-800">
-              {isTh ? "ไม่พบรูปภาพที่ค้นหา" : "No matching visual assets found"}
-            </h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
-              {isTh
-                ? "ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นเพื่อดูรายการรูปภาพทั้งหมด"
-                : "Try adjusting your search query or switch categories to view other assets."}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredItems.map((item) => {
-              const label = isTh ? item.labelTh : item.labelEn
-              const desc = isTh ? item.descriptionTh : item.descriptionEn
-              const badge = isTh ? item.badgeTh : item.badgeEn
-              const hasImage = !!item.imageUrl
-
-              const aspectStyle =
-                item.aspectRatio === "portrait"
-                  ? "aspect-[3/4]"
-                  : item.aspectRatio === "square"
-                  ? "aspect-square"
-                  : "aspect-video"
-
-              return (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-2xl shadow-xs hover:shadow-md border border-slate-200/90 overflow-hidden group transition-all duration-300 flex flex-col"
-                >
-                  {/* Image Container with Zoom & Hover Overlay */}
-                  <div className={`w-full ${aspectStyle} relative overflow-hidden bg-slate-100 flex items-center justify-center group/img`}>
-                    {hasImage ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={label}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-center text-slate-400">
-                        <ImageIcon className="w-8 h-8 text-slate-300 mb-1" />
-                        <span className="text-[11px] font-semibold text-slate-400">
-                          {isTh ? "ยังไม่มีรูปภาพ" : "No Image"}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Top Badges */}
-                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none z-10">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border shadow-2xs backdrop-blur-md ${getBadgeClass(
-                          item.category
-                        )}`}
-                      >
-                        {badge}
-                      </span>
-                      <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-black/50 text-white backdrop-blur-md">
-                        {item.aspectRatio === "portrait"
-                          ? "3:4"
-                          : item.aspectRatio === "square"
-                          ? "1:1"
-                          : "16:9"}
-                      </span>
-                    </div>
-
-                    {/* Hover Overlay with Action Pill */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 z-10">
-                      <button
-                        type="button"
-                        onClick={() => setActiveModalItem(item)}
-                        className="w-full py-2 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5"
-                      >
-                        <UploadCloud className="w-3.5 h-3.5 text-[#1e3a8a]" />
-                        <span>{isTh ? "เปลี่ยนรูปภาพนี้" : "Replace Image"}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <h4 className="text-xs font-extrabold text-slate-900 truncate" title={label}>
-                          {label}
-                        </h4>
-                      </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-3">
-                        {desc}
-                      </p>
-                    </div>
-
-                    {/* Field identifier badge */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                      <span className="font-mono truncate max-w-[150px]">
-                        {item.targetSlug}.{item.fieldName}
-                      </span>
-                      {hasImage ? (
-                        <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          {isTh ? "พร้อมใช้งาน" : "Active"}
-                        </span>
-                      ) : (
-                        <span className="text-amber-600 font-semibold">
-                          {isTh ? "ยังไม่กำหนด" : "Missing"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Card Footer Actions */}
-                  <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setActiveModalItem(item)}
-                        className="px-2.5 py-1.5 text-[11px] font-bold text-[#1e3a8a] hover:bg-blue-100/60 rounded-lg transition-colors flex items-center gap-1"
-                      >
-                        <UploadCloud className="w-3 h-3" />
-                        <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
-                      </button>
-
-                      {item.category === "news" && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const orig = news.find((n) => String(n.id) === String(item.docId)) || item
-                            setEditingNewsArticle(orig)
-                            setIsNewsEditorOpen(true)
-                          }}
-                          className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200/60 rounded-lg transition-colors flex items-center gap-1"
-                          title={isTh ? "แก้ไขเนื้อหาข่าวฉบับเต็ม" : "Edit Full Story Content"}
-                        >
-                          <FileText className="w-3 h-3 text-[#1e3a8a]" />
-                          <span>{isTh ? "เนื้อหา" : "Story"}</span>
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      {hasImage && (
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(item.id, item.imageUrl)}
-                          className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 rounded-lg transition-colors"
-                          title={isTh ? "คัดลอกลิงก์รูปภาพ" : "Copy URL"}
-                        >
-                          {copiedId === item.id ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      )}
-
-                      {hasImage && (
-                        <>
-                          {confirmDeleteId === item.id ? (
-                            <div className="inline-flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteCard(item)}
-                                className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-[10px] font-bold transition-colors"
-                              >
-                                {isTh ? "ยืนยัน" : "Confirm"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setConfirmDeleteId(null)}
-                                className="px-1.5 py-1 text-slate-500 hover:bg-slate-200 rounded text-[10px] transition-colors"
-                              >
-                                {isTh ? "ยกเลิก" : "Cancel"}
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => setConfirmDeleteId(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                              title={isTh ? "ลบรูปภาพ" : "Delete Image"}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </main>
-
-      {/* Modern Modal for Replacing Image */}
+      {/* ─── MODERN MODAL FOR REPLACING IMAGE ─── */}
       {activeModalItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+        >
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-100/70 text-[#1e3a8a] flex items-center justify-center">
-                  <UploadCloud className="w-4 h-4" />
+            <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                  <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-base font-extrabold text-slate-900">
                     {isTh ? activeModalItem.labelTh : activeModalItem.labelEn}
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs sm:text-sm text-slate-500">
                     {isTh ? activeModalItem.descriptionTh : activeModalItem.descriptionEn}
                   </p>
                 </div>
@@ -945,9 +895,9 @@ export function ImageManagerClient({
               <button
                 type="button"
                 onClick={() => setActiveModalItem(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -966,63 +916,99 @@ export function ImageManagerClient({
                 locale={locale}
                 onImageUploaded={(res) => {
                   setToast({
-                    message: isTh
-                      ? "อัปเดตรูปภาพและบันทึกสู่เว็บไซต์จริงเรียบร้อยแล้ว!"
-                      : "Image synchronized with live website successfully!",
+                    message: isTh ? "อัปโหลดและซิงค์รูปภาพเรียบร้อยแล้ว!" : "Image uploaded and synced successfully!",
                     type: "success",
                   })
-                  router.refresh()
                   setActiveModalItem(null)
+                  router.refresh()
                 }}
                 onRemove={() => {
                   setToast({
-                    message: isTh ? "ลบรูปภาพเรียบร้อยแล้ว" : "Image removed.",
+                    message: isTh ? "ลบรูปภาพเรียบร้อยแล้ว!" : "Image removed successfully!",
                     type: "success",
                   })
-                  router.refresh()
                   setActiveModalItem(null)
+                  router.refresh()
                 }}
               />
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Modal Footer */}
-            <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-              <span className="font-mono text-[10px]">
-                {activeModalItem.targetSlug}.{activeModalItem.fieldName}
-              </span>
+      {/* ─── SAFE DELETE CONFIRMATION MODAL ─── */}
+      {deletingItem && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+        >
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md p-6 sm:p-8 animate-in zoom-in-95 duration-200 text-center">
+            
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-5 shadow-inner">
+              <AlertTriangle className="w-8 h-8 text-rose-600" />
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
+              {isTh ? "ยืนยันการลบรูปภาพ?" : "Confirm Delete Image?"}
+            </h3>
+
+            <p className="text-base text-slate-700 font-bold mb-1">
+              {isTh ? deletingItem.labelTh : deletingItem.labelEn}
+            </p>
+
+            <p className="text-sm text-slate-500 leading-relaxed mb-6">
+              {isTh
+                ? "การกระทำนี้จะลบรูปภาพนี้ออกจากระบบและหน้าเว็บไซต์จริงทันทีโดยไม่สามารถกู้คืนได้ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?"
+                : "This action will immediately remove this image from the database and public site. Are you sure you want to proceed?"}
+            </p>
+
+            <div className="flex items-center justify-center gap-3 flex-wrap">
               <button
                 type="button"
-                onClick={() => setActiveModalItem(null)}
-                className="px-4 py-2 bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 font-bold rounded-xl transition-colors"
+                onClick={() => setDeletingItem(null)}
+                disabled={isDeleting}
+                className="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-base transition-colors"
               >
-                {isTh ? "ปิดหน้าต่าง" : "Close"}
+                {isTh ? "ยกเลิก" : "Cancel"}
+              </button>
+
+              <button
+                type="button"
+                onClick={executeDelete}
+                disabled={isDeleting}
+                className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-base shadow-md shadow-rose-600/30 transition-all flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{isTh ? "กำลังลบ..." : "Deleting..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5" />
+                    <span>{isTh ? "ยืนยันการลบรูปภาพ" : "Delete Permanently"}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Admin News Story & Content Editor Modal */}
+      {/* Embedded News Editor Modal */}
       <NewsArticleEditorModal
         article={editingNewsArticle}
         isOpen={isNewsEditorOpen}
-        onClose={() => {
-          setIsNewsEditorOpen(false)
-          setEditingNewsArticle(null)
-        }}
+        onClose={() => setIsNewsEditorOpen(false)}
+        locale={locale}
         onSaved={() => {
-          setToast({
-            message: isTh ? "บันทึกและเผยแพร่เนื้อหาข่าวเรียบร้อยแล้ว!" : "News article saved and published!",
-            type: "success",
-          })
+          setIsNewsEditorOpen(false)
           router.refresh()
         }}
-        locale={locale}
       />
     </div>
   )
 }
 
-function CompassIcon(props: any) {
-  return <Sparkles {...props} />
-}
+export default ImageManagerClient

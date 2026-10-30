@@ -267,6 +267,56 @@
       "draft": "Draft",
       "published": "Published",
       "archived": "Archived"
+    },
+    "shell": {
+      "cmsTitle": "Pakdeepan School Content Management System",
+      "roleAdmin": "Administrator",
+      "executiveDashboard": "Executive Dashboard",
+      "visualAssets": "Visual Assets & Media",
+      "academicPrograms": "Academic Programs",
+      "schoolEvents": "School Calendar Events",
+      "photoGallery": "Photo Gallery",
+      "siteSettings": "Site Settings & Director",
+      "adminUsers": "Admin Users",
+      "viewLiveWebsite": "View Live Website",
+      "logOut": "Log Out",
+      "logOutConfirmTitle": "Confirm Log Out?",
+      "logOutConfirmDesc": "Are you sure you want to log out of the Pakdeepan School CMS? Any unsaved changes may be lost.",
+      "logOutConfirmBtn": "Yes, Log Out",
+      "fontSize": "Font Size",
+      "fontNormal": "A Normal",
+      "fontLarge": "A+ Large",
+      "fontExtraLarge": "A++ Extra Large"
+    },
+    "dashboard": {
+      "executiveTitle": "Executive Content Dashboard",
+      "executiveSubtitle": "Monitor site overview, manage bilingual records, and control live media in real-time.",
+      "cardNews": "News & Events",
+      "cardPrograms": "Academic Programs",
+      "cardMedia": "System Media & Images",
+      "cardSiteStatus": "Live Website Status",
+      "statusOnlineText": "100% Operational & Live Synchronized",
+      "quickActionsTitle": "Quick Actions",
+      "actionAddNews": "Write New News Story",
+      "actionAddNewsDesc": "Publish a new announcement or school activity story to the live website.",
+      "actionManageImages": "Manage Website Images",
+      "actionManageImagesDesc": "Replace Hero banners, logos, School Director portrait, and gallery photos.",
+      "actionManagePrograms": "Update Academic Programs",
+      "actionManageProgramsDesc": "Edit curriculum descriptions, student-teacher ratios, and level cards.",
+      "actionSiteSettings": "Site Settings & Director Message",
+      "actionSiteSettingsDesc": "Update school contact info, name, and official School Director's message.",
+      "recentNewsTitle": "Recent News & Campus Life Stories",
+      "directorMessageTitle": "Current School Director's Message",
+      "directorMessageDesc": "Displayed prominently on the homepage in both Thai and English."
+    },
+    "dialog": {
+      "deleteTitle": "Confirm Permanent Deletion?",
+      "deleteWarning": "This action will immediately remove the record from both the database and the live website. This cannot be undone.",
+      "confirmDelete": "Confirm Delete",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "savedSuccess": "Saved successfully!"
     }
   }
 }
