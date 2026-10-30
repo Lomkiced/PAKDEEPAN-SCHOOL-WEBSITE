@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   Loader2,
   CalendarDays,
+  Languages,
 } from "lucide-react"
 
 export interface AdminAppShellProps {
@@ -488,7 +489,7 @@ export function AdminAppShell({
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                     }`}
                   >
-                    ก <span className="hidden sm:inline">{isTh ? "ปกติ" : "100%"}</span>
+                    <span>{isTh ? "ก ปกติ" : "A Normal"}</span>
                   </button>
 
                   <button
@@ -501,7 +502,7 @@ export function AdminAppShell({
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                     }`}
                   >
-                    ก+ <span className="hidden sm:inline">{isTh ? "ใหญ่" : "112%"}</span>
+                    <span>{isTh ? "ก+ ใหญ่" : "A+ Large"}</span>
                   </button>
 
                   <button
@@ -514,39 +515,38 @@ export function AdminAppShell({
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                     }`}
                   >
-                    ก++ <span className="hidden sm:inline">{isTh ? "ใหญ่มาก" : "125%"}</span>
+                    <span>{isTh ? "ก++ ใหญ่มาก" : "A++ XL"}</span>
                   </button>
                 </div>
 
-                {/* 2. Bilingual Language Switcher (🇹🇭 ไทย | 🇬🇧 EN) */}
+                {/* 2. Bilingual Language Switcher (Clean ไทย | EN with Languages Icon) */}
                 <div
-                  className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs"
+                  className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs gap-1"
                   role="group"
                   aria-label="Admin Language Toggle"
                 >
+                  <Languages className="w-4 h-4 text-slate-500 ml-1.5 mr-0.5 shrink-0" />
                   <button
                     type="button"
                     onClick={() => switchLocale("th")}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                       isTh
                         ? "bg-white text-blue-800 shadow-xs border border-slate-200"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <span>🇹🇭</span>
-                    <span>ไทย</span>
+                    ไทย
                   </button>
                   <button
                     type="button"
                     onClick={() => switchLocale("en")}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                       !isTh
                         ? "bg-white text-blue-800 shadow-xs border border-slate-200"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <span>🇬🇧</span>
-                    <span>EN</span>
+                    EN
                   </button>
                 </div>
 

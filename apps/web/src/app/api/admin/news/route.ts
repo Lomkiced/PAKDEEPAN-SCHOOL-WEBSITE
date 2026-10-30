@@ -100,3 +100,60 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function GET() {
+  try {
+    const payload = await getPayload()
+    const res = await payload.find({
+      collection: "news",
+      limit: 100,
+      sort: "-publishDate",
+      depth: 1,
+    })
+    return NextResponse.json({
+      success: true,
+      docs: res.docs || [],
+      totalDocs: res.totalDocs || 0,
+    })
+  } catch (err: any) {
+    console.error("[API Admin News GET] Error:", err)
+    return NextResponse.json(
+      { success: false, error: err?.message || "Failed to fetch news", docs: [] },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id")
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Article ID is required for deletion" },
+        { status: 400 }
+      )
+    }
+
+    const payload = await getPayload()
+    await payload.delete({
+      collection: "news",
+      id,
+    })
+
+    revalidateAllRoutes("/campus-life", ["campus-life-cache", "home-cache", "news-cache"])
+    revalidateAllRoutes(`/news/${id}`)
+
+    return NextResponse.json({
+      success: true,
+      message: "Article deleted successfully",
+    })
+  } catch (err: any) {
+    console.error("[API Admin News DELETE] Error:", err)
+    return NextResponse.json(
+      { success: false, error: err?.message || "Failed to delete news article" },
+      { status: 500 }
+    )
+  }
+}
+

@@ -70,8 +70,8 @@ export function ImageManagerClient({
 }: ImageManagerClientProps) {
   const router = useRouter()
 
-  // Locale state
-  const [locale] = React.useState<"en" | "th">(() => {
+  // Locale state synchronized with localStorage and server cookies
+  const [locale, setLocale] = React.useState<"en" | "th">(() => {
     if (typeof window === "undefined") return initialLocale
     try {
       const stored = localStorage.getItem("pakdeepan_locale") as "en" | "th" | null
@@ -81,6 +81,16 @@ export function ImageManagerClient({
     }
     return initialLocale
   })
+
+  React.useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "pakdeepan_locale" && (e.newValue === "th" || e.newValue === "en")) {
+        setLocale(e.newValue as "en" | "th")
+      }
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
+  }, [])
 
   const isTh = locale === "th"
 

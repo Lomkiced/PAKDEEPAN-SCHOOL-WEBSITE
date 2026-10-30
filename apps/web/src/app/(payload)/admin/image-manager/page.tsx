@@ -45,6 +45,7 @@ export default async function ImageManagerPage() {
       counts={counts}
     >
       <ImageManagerClient
+        key={initialLocale}
         initialLocale={initialLocale}
         siteSettings={siteSettings}
         homePage={homePage}
