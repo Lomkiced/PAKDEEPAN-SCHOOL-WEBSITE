@@ -21,12 +21,11 @@ import {
   Eye,
   FolderOpen,
   UploadCloud,
-  FileText,
+  Plus,
   AlertTriangle,
   Loader2,
 } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
-import { NewsArticleEditorModal } from "@/components/admin/NewsArticleEditorModal"
 import { extractPlainText } from "@/lib/richText"
 
 export interface ImageManagerClientProps {
@@ -70,19 +69,19 @@ export function ImageManagerClient({
 }: ImageManagerClientProps) {
   const router = useRouter()
 
-  // Locale state synchronized with localStorage and server cookies
-  const [locale, setLocale] = React.useState<"en" | "th">(() => {
-    if (typeof window === "undefined") return initialLocale
+  // Locale state initialized with server initialLocale to guarantee hydration match
+  const [locale, setLocale] = React.useState<"en" | "th">(initialLocale)
+
+  React.useEffect(() => {
     try {
       const stored = localStorage.getItem("pakdeepan_locale") as "en" | "th" | null
-      if (stored === "th" || stored === "en") return stored
+      if ((stored === "th" || stored === "en") && stored !== initialLocale) {
+        setLocale(stored)
+      }
     } catch {
       // Ignore
     }
-    return initialLocale
-  })
 
-  React.useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === "pakdeepan_locale" && (e.newValue === "th" || e.newValue === "en")) {
         setLocale(e.newValue as "en" | "th")
@@ -90,7 +89,7 @@ export function ImageManagerClient({
     }
     window.addEventListener("storage", handleStorage)
     return () => window.removeEventListener("storage", handleStorage)
-  }, [])
+  }, [initialLocale])
 
   const isTh = locale === "th"
 
@@ -98,8 +97,6 @@ export function ImageManagerClient({
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all")
   const [searchQuery, setSearchQuery] = React.useState<string>("")
   const [activeModalItem, setActiveModalItem] = React.useState<MediaCardItem | null>(null)
-  const [editingNewsArticle, setEditingNewsArticle] = React.useState<any | null>(null)
-  const [isNewsEditorOpen, setIsNewsEditorOpen] = React.useState(false)
   const [copiedId, setCopiedId] = React.useState<string | null>(null)
   
   // Safe Delete Modal State
@@ -522,7 +519,7 @@ export function ImageManagerClient({
   const configuredAssets = mediaItems.filter((m) => !!m.imageUrl).length
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" suppressHydrationWarning>
       
       {/* Toast Notification Bar */}
       {toast && (
@@ -551,36 +548,6 @@ export function ImageManagerClient({
           </button>
         </div>
       )}
-
-      {/* Header Info Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs sm:text-sm font-bold text-blue-700 mb-2">
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>{isTh ? "ระบบแทนที่รูปภาพแบบเรียลไทม์" : "Real-Time Visual Asset Manager"}</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {isTh ? "ศูนย์จัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Media Manager"}
-          </h2>
-          <p className="text-base text-slate-600 mt-1 max-w-2xl leading-relaxed">
-            {isTh
-              ? "เปลี่ยนรูปภาพทุกจุดบนเว็บไซต์ เช่น แบนเนอร์หน้าแรก, โลโก้, สาส์น ผอ., การ์ดหลักสูตร และแกลเลอรี โดยไม่ต้องเขียนโค้ด"
-              : "Easily replace any visual asset across Hero, Logo, Director Portrait, Programs, and Gallery with live preview."}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <Link
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-base transition-colors flex items-center gap-2"
-          >
-            <ExternalLink className="w-5 h-5 text-blue-600" />
-            <span>{isTh ? "ดูหน้าเว็บจริง" : "View Live Site"}</span>
-          </Link>
-        </div>
-      </div>
 
       {/* KPI & Status Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -759,9 +726,17 @@ export function ImageManagerClient({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-slate-400">
-                      <ImageIcon className="w-10 h-10 mb-2 opacity-60" />
-                      <span className="text-sm font-semibold">{isTh ? "ยังไม่มีภาพ" : "No Image"}</span>
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-slate-400 bg-slate-50/80">
+                      <ImageIcon className="w-10 h-10 mb-1.5 opacity-50 text-slate-400" />
+                      <span className="text-xs font-semibold text-slate-500">{isTh ? "ยังไม่มีภาพ" : "No Image"}</span>
+                      <button
+                        type="button"
+                        onClick={() => setActiveModalItem(item)}
+                        className="mt-2.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{isTh ? "+ กำหนดรูปภาพ" : "+ Set Image"}</span>
+                      </button>
                     </div>
                   )}
 
@@ -817,28 +792,23 @@ export function ImageManagerClient({
                 {/* Card Footer Actions */}
                 <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setActiveModalItem(item)}
-                      className="px-3.5 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors flex items-center gap-1.5"
-                    >
-                      <UploadCloud className="w-4 h-4" />
-                      <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
-                    </button>
-
-                    {item.category === "news" && (
+                    {hasImage ? (
                       <button
                         type="button"
-                        onClick={() => {
-                          const orig = news.find((n) => String(n.id) === String(item.docId)) || item
-                          setEditingNewsArticle(orig)
-                          setIsNewsEditorOpen(true)
-                        }}
-                        className="px-3 py-2 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200/80 rounded-xl transition-colors flex items-center gap-1.5"
-                        title={isTh ? "แก้ไขเนื้อหาข่าวฉบับเต็ม" : "Edit Full Story Content"}
+                        onClick={() => setActiveModalItem(item)}
+                        className="px-3.5 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors flex items-center gap-1.5"
                       >
-                        <FileText className="w-4 h-4 text-blue-600" />
-                        <span>{isTh ? "เนื้อหา" : "Story"}</span>
+                        <UploadCloud className="w-4 h-4" />
+                        <span>{isTh ? "เปลี่ยนภาพ" : "Replace"}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setActiveModalItem(item)}
+                        className="px-3.5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>{isTh ? "+ กำหนดภาพ" : "+ Set Image"}</span>
                       </button>
                     )}
                   </div>
@@ -1006,17 +976,6 @@ export function ImageManagerClient({
         </div>
       )}
 
-      {/* Embedded News Editor Modal */}
-      <NewsArticleEditorModal
-        article={editingNewsArticle}
-        isOpen={isNewsEditorOpen}
-        onClose={() => setIsNewsEditorOpen(false)}
-        locale={locale}
-        onSaved={() => {
-          setIsNewsEditorOpen(false)
-          router.refresh()
-        }}
-      />
     </div>
   )
 }

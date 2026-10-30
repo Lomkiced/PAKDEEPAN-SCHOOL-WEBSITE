@@ -43,6 +43,7 @@ export default async function ImageManagerPage() {
       subtitle={initialLocale === "th" ? "อัปโหลดและเปลี่ยนภาพหน้าเว็บแบบซิงค์สด" : "Real-Time Visual Asset Replacement"}
       activePath="/admin/image-manager"
       counts={counts}
+      initialLocale={initialLocale}
     >
       <ImageManagerClient
         key={initialLocale}

@@ -2,25 +2,17 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import {
-  LayoutDashboard,
-  Image as ImageIcon,
-  Newspaper,
-  GraduationCap,
-  Calendar,
-  Camera,
-  Settings,
-  Users,
   ExternalLink,
   LogOut,
-  Menu,
-  X,
   ShieldCheck,
   AlertTriangle,
   Loader2,
   CalendarDays,
   Languages,
+  LayoutDashboard,
+  Sparkles,
 } from "lucide-react"
 
 export interface AdminAppShellProps {
@@ -36,6 +28,7 @@ export interface AdminAppShellProps {
     media?: number
     users?: number
   }
+  initialLocale?: "en" | "th"
 }
 
 // Thai Day and Month names for Buddhist Era formatting
@@ -76,28 +69,34 @@ export function AdminAppShell({
   children,
   title,
   subtitle,
-  activePath,
-  counts = {},
+  initialLocale = "th",
 }: AdminAppShellProps) {
   const router = useRouter()
-  const pathname = usePathname()
-  const currentPath = activePath || pathname || "/admin"
 
-  // 1. Language state (defaults to Thai for primary school admin)
-  const [locale, setLocale] = React.useState<"en" | "th">(() => {
-    if (typeof window === "undefined") return "th"
+  // 1. Language state (SSR-Safe Initialization from Server Prop)
+  const [locale, setLocale] = React.useState<"en" | "th">(initialLocale)
+  const [fontSize, setFontSize] = React.useState<"normal" | "large" | "xlarge">("normal")
+
+  React.useEffect(() => {
     try {
       const stored = localStorage.getItem("pakdeepan_locale") as "en" | "th" | null
-      if (stored === "th" || stored === "en") return stored
-      const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)
-      if (cookieMatch && (cookieMatch[1] === "th" || cookieMatch[1] === "en")) {
-        return cookieMatch[1] as "en" | "th"
+      if ((stored === "th" || stored === "en") && stored !== locale) {
+        setLocale(stored)
       }
     } catch {
       // Ignore
     }
-    return "th" // Thai first default
-  })
+
+    try {
+      const stored = localStorage.getItem("pakdeepan_admin_font_size") as "normal" | "large" | "xlarge" | null
+      if (stored === "normal" || stored === "large" || stored === "xlarge") {
+        setFontSize(stored)
+        document.documentElement.setAttribute("data-admin-font-scale", stored)
+      }
+    } catch {
+      // Ignore
+    }
+  }, [locale])
 
   const isTh = locale === "th"
 
@@ -112,33 +111,21 @@ export function AdminAppShell({
     window.location.reload()
   }
 
-  // 2. Accessibility Font Size Scaler: 'normal' (100%), 'large' (112%), 'xlarge' (125%)
-  const [fontSize, setFontSize] = React.useState<"normal" | "large" | "xlarge">(() => {
-    if (typeof window === "undefined") return "normal"
+  // Set font scale
+  const handleSetFontSize = (scale: "normal" | "large" | "xlarge") => {
+    setFontSize(scale)
     try {
-      const stored = localStorage.getItem("pakdeepan_admin_font_size") as "normal" | "large" | "xlarge" | null
-      if (stored === "normal" || stored === "large" || stored === "xlarge") return stored
+      localStorage.setItem("pakdeepan_admin_font_size", scale)
+      document.documentElement.setAttribute("data-admin-font-scale", scale)
     } catch {
       // Ignore
     }
-    return "normal"
-  })
-
-  // Apply font scale to document element and container
-  React.useEffect(() => {
-    try {
-      localStorage.setItem("pakdeepan_admin_font_size", fontSize)
-      document.documentElement.setAttribute("data-admin-font-scale", fontSize)
-    } catch {
-      // Ignore
-    }
-  }, [fontSize])
+  }
 
   // 3. Current formatted date
   const currentDateFormatted = React.useMemo(() => formatBilingualDate(locale), [locale])
 
-  // 4. UI States (Mobile drawer & Logout confirmation modal)
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  // 4. Logout modal state
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false)
   const [isLoggingOut, setIsLoggingOut] = React.useState(false)
 
@@ -151,7 +138,6 @@ export function AdminAppShell({
       // Ignore
     }
     try {
-      // Clear token cookies manually as well
       document.cookie = "payload-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       localStorage.removeItem("payload-token")
       sessionStorage.clear()
@@ -161,80 +147,6 @@ export function AdminAppShell({
     router.push("/admin/login")
     window.location.href = "/admin/login"
   }
-
-  // Navigation Items
-  const navItems = [
-    {
-      id: "dashboard",
-      href: "/admin",
-      labelTh: "แผงควบคุมหลัก",
-      labelEn: "Executive Dashboard",
-      icon: LayoutDashboard,
-      active: currentPath === "/admin" || currentPath === "/admin/",
-    },
-    {
-      id: "images",
-      href: "/admin/image-manager",
-      labelTh: "ศูนย์จัดการรูปภาพและสื่อ",
-      labelEn: "Visual Assets & Images",
-      icon: ImageIcon,
-      active: currentPath.startsWith("/admin/image-manager"),
-      badge: counts.media,
-    },
-    {
-      id: "news",
-      href: "/admin/collections/news",
-      labelTh: "ข่าวสารและกิจกรรม",
-      labelEn: "News & Campus Life",
-      icon: Newspaper,
-      active: currentPath.includes("/collections/news"),
-      badge: counts.news,
-    },
-    {
-      id: "programs",
-      href: "/admin/collections/programs",
-      labelTh: "หลักสูตรการศึกษา",
-      labelEn: "Academic Programs",
-      icon: GraduationCap,
-      active: currentPath.includes("/collections/programs"),
-      badge: counts.programs,
-    },
-    {
-      id: "events",
-      href: "/admin/collections/events",
-      labelTh: "ปฏิทินกิจกรรมโรงเรียน",
-      labelEn: "School Calendar Events",
-      icon: Calendar,
-      active: currentPath.includes("/collections/events"),
-      badge: counts.events,
-    },
-    {
-      id: "gallery",
-      href: "/admin/collections/gallery-images",
-      labelTh: "แกลเลอรีภาพกิจกรรม",
-      labelEn: "Photo Gallery",
-      icon: Camera,
-      active: currentPath.includes("/collections/gallery-images"),
-      badge: counts.gallery,
-    },
-    {
-      id: "site-settings",
-      href: "/admin/globals/site-settings",
-      labelTh: "ตั้งค่าเว็บไซต์และสาส์น ผอ.",
-      labelEn: "Site Settings & Director",
-      icon: Settings,
-      active: currentPath.includes("/globals/site-settings"),
-    },
-    {
-      id: "users",
-      href: "/admin/collections/users",
-      labelTh: "จัดการผู้ดูแลระบบ",
-      labelEn: "Admin Users",
-      icon: Users,
-      active: currentPath.includes("/collections/users"),
-      badge: counts.users,
-    },
-  ]
 
   const fontScaleStyles: Record<"normal" | "large" | "xlarge", React.CSSProperties> = {
     normal: { fontSize: "16px" },
@@ -246,336 +158,163 @@ export function AdminAppShell({
     <div
       data-admin-font-scale={fontSize}
       style={fontScaleStyles[fontSize]}
-      className="admin-shell min-h-screen bg-slate-100 flex flex-col font-sans text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900"
+      className="admin-shell min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900"
+      suppressHydrationWarning
     >
-      {/* ─── SIDEBAR & MAIN CONTAINER ─── */}
-      <div className="flex-1 flex overflow-hidden">
-        
-        {/* DESKTOP SIDEBAR */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 bg-slate-900 text-slate-100 border-r border-slate-800 shadow-xl shrink-0 z-30">
+      {/* ─── CONSOLIDATED SINGLE STICKY TOPBAR (FULL-WIDTH, NO SIDEBAR) ─── */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5" suppressHydrationWarning>
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
           
-          {/* School Crest / Branding Header */}
-          <div className="p-6 border-b border-slate-800/80 bg-slate-950/40">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0 font-extrabold text-xl">
-                ภ
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-white tracking-tight leading-snug">
-                  {isTh ? "โรงเรียนภักดีพรรณ" : "Pakdeepan School"}
+          {/* Left Side: School Badge + Title + Subtitle with Date & Sync Status */}
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 flex items-center justify-center text-white shadow-md shadow-blue-600/25 shrink-0 font-black text-xl tracking-tight">
+              ภ
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug truncate" suppressHydrationWarning>
+                  {title || (isTh ? "ระบบจัดการรูปภาพและสื่อเว็บไซต์" : "Visual Assets & Media Manager")}
                 </h1>
-                <p className="text-xs font-medium text-blue-400 flex items-center gap-1.5 mt-0.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>{isTh ? "ระบบจัดการเว็บไซต์ CMS" : "School Content System"}</span>
-                </p>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200" suppressHydrationWarning>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>{isTh ? "ซิงค์สด" : "Live Sync"}</span>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 mt-0.5 text-xs sm:text-sm font-medium text-slate-500 flex-wrap">
+                <span className="text-slate-600 font-semibold truncate" suppressHydrationWarning>
+                  {subtitle || (isTh ? "อัปโหลดและเปลี่ยนภาพหน้าเว็บแบบซิงค์สดทันที" : "Real-Time Visual Asset Replacement")}
+                </span>
+                <span className="text-slate-300 hidden md:inline">•</span>
+                <span className="hidden md:inline-flex items-center gap-1.5 text-slate-500" suppressHydrationWarning>
+                  <CalendarDays className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>{currentDateFormatted}</span>
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1.5">
-            <div className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-wider text-slate-400">
-              {isTh ? "เมนูการจัดการหลัก" : "Main Navigation"}
+          {/* Right Side Controls (In One Clean Row) */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            
+            {/* 1. Accessible Font Size Scaler */}
+            <div
+              className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs"
+              role="group"
+              aria-label="Font size scaler"
+              suppressHydrationWarning
+            >
+              <button
+                type="button"
+                onClick={() => setFontSize("normal")}
+                title={isTh ? "ขนาดปกติ (100%)" : "Normal Size (100%)"}
+                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                  fontSize === "normal"
+                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                }`}
+              >
+                <span suppressHydrationWarning>{isTh ? "ก ปกติ" : "A Normal"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFontSize("large")}
+                title={isTh ? "ขนาดใหญ่ (112%)" : "Large Size (112%)"}
+                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                  fontSize === "large"
+                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                }`}
+              >
+                <span suppressHydrationWarning>{isTh ? "ก+ ใหญ่" : "A+ Large"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFontSize("xlarge")}
+                title={isTh ? "ขนาดใหญ่มาก (125%)" : "Extra Large Size (125%)"}
+                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                  fontSize === "xlarge"
+                    ? "bg-white text-blue-700 shadow-xs border border-slate-200"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                }`}
+              >
+                <span suppressHydrationWarning>{isTh ? "ก++ ใหญ่มาก" : "A++ XL"}</span>
+              </button>
             </div>
 
-            {navItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={`flex items-center justify-between px-4 py-3.5 text-base font-semibold rounded-xl transition-all ${
-                    item.active
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30 font-bold"
-                      : "text-slate-300 hover:text-white hover:bg-slate-800/80"
-                  }`}
-                >
-                  <div className="flex items-center gap-3.5">
-                    <Icon
-                      className={`w-5 h-5 shrink-0 ${
-                        item.active ? "text-white" : "text-slate-400 group-hover:text-white"
-                      }`}
-                    />
-                    <span className="truncate">{isTh ? item.labelTh : item.labelEn}</span>
-                  </div>
+            {/* 2. Clean Bilingual Language Switcher (Languages Icon + ไทย | EN) */}
+            <div
+              className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs gap-0.5"
+              role="group"
+              aria-label="Admin Language Toggle"
+              suppressHydrationWarning
+            >
+              <Languages className="w-4 h-4 text-slate-500 ml-1.5 mr-0.5 shrink-0" />
+              <button
+                type="button"
+                onClick={() => switchLocale("th")}
+                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                  isTh
+                    ? "bg-white text-blue-800 shadow-xs border border-slate-200"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                ไทย
+              </button>
+              <button
+                type="button"
+                onClick={() => switchLocale("en")}
+                className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                  !isTh
+                    ? "bg-white text-blue-800 shadow-xs border border-slate-200"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                EN
+              </button>
+            </div>
 
-                  {typeof item.badge === "number" && item.badge > 0 && (
-                    <span
-                      className={`px-2 py-0.5 text-xs font-bold rounded-full ${
-                        item.active
-                          ? "bg-white/20 text-white"
-                          : "bg-slate-800 text-slate-300 border border-slate-700"
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              )
-            })}
-          </nav>
-
-          {/* Sidebar Bottom Actions */}
-          <div className="p-4 border-t border-slate-800/80 bg-slate-950/30 space-y-2">
-            {/* View Live Website Button */}
+            {/* 3. View Live Site Button */}
             <Link
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between w-full px-4 py-3 text-base font-semibold text-slate-300 hover:text-white hover:bg-slate-800/90 rounded-xl transition-colors border border-slate-800"
+              className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition-colors flex items-center gap-1.5 shadow-2xs"
             >
-              <div className="flex items-center gap-3">
-                <ExternalLink className="w-5 h-5 text-blue-400" />
-                <span>{isTh ? "ดูหน้าเว็บไซต์จริง" : "View Live Website"}</span>
-              </div>
-              <span className="text-xs text-slate-400 font-mono">↗</span>
+              <ExternalLink className="w-4 h-4 text-blue-600" />
+              <span>{isTh ? "ดูหน้าเว็บจริง" : "View Live Site"}</span>
             </Link>
 
-            {/* Log Out Button */}
+            {/* 4. Link to Payload CMS Dashboard */}
+            <Link
+              href="/admin"
+              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors border border-slate-200"
+              title={isTh ? "กลับสู่แผงควบคุมระบบหลัก" : "Return to Payload CMS"}
+            >
+              <LayoutDashboard className="w-4 h-4 text-slate-600" />
+              <span>{isTh ? "แผงควบคุม CMS" : "Payload CMS"}</span>
+            </Link>
+
+            {/* 5. Log Out Button */}
             <button
               type="button"
               onClick={() => setLogoutModalOpen(true)}
-              className="flex items-center gap-3 w-full px-4 py-3 text-base font-semibold text-rose-400 hover:text-white hover:bg-rose-600/90 rounded-xl transition-colors"
+              className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shadow-2xs"
             >
-              <LogOut className="w-5 h-5 text-rose-400" />
+              <LogOut className="w-4 h-4 text-rose-600" />
               <span>{isTh ? "ออกจากระบบ" : "Log Out"}</span>
             </button>
           </div>
-        </aside>
-
-        {/* MOBILE SIDEBAR DRAWER */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden flex">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs transition-opacity"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            {/* Drawer */}
-            <aside className="relative flex flex-col w-5/6 max-w-sm bg-slate-900 text-slate-100 shadow-2xl z-10">
-              <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                    ภ
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white leading-tight">
-                      {isTh ? "โรงเรียนภักดีพรรณ" : "Pakdeepan School"}
-                    </h2>
-                    <span className="text-xs text-blue-400">{isTh ? "ผู้ดูแลระบบ" : "Admin CMS"}</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <nav className="flex-1 overflow-y-auto p-4 space-y-1.5">
-                {navItems.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-between px-4 py-3.5 text-base font-semibold rounded-xl ${
-                        item.active
-                          ? "bg-blue-600 text-white font-bold"
-                          : "text-slate-300 hover:bg-slate-800"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <Icon className="w-5 h-5" />
-                        <span>{isTh ? item.labelTh : item.labelEn}</span>
-                      </div>
-                      {typeof item.badge === "number" && item.badge > 0 && (
-                        <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-slate-800">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  )
-                })}
-              </nav>
-
-              <div className="p-4 border-t border-slate-800 space-y-2">
-                <Link
-                  href="/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 w-full px-4 py-3 text-base font-semibold text-slate-300 hover:bg-slate-800 rounded-xl"
-                >
-                  <ExternalLink className="w-5 h-5 text-blue-400" />
-                  <span>{isTh ? "ดูหน้าเว็บไซต์จริง" : "View Live Website"}</span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setLogoutModalOpen(true)
-                  }}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-base font-semibold text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>{isTh ? "ออกจากระบบ" : "Log Out"}</span>
-                </button>
-              </div>
-            </aside>
-          </div>
-        )}
-
-        {/* ─── MAIN CONTENT AREA WITH STICKY TOPBAR ─── */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          
-          {/* STICKY TOPBAR */}
-          <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              
-              {/* Left Side: Mobile Menu Button + Title + Date */}
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  aria-label="Open mobile menu"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight truncate">
-                    {title || (isTh ? "ระบบจัดการเว็บไซต์ โรงเรียนภักดีพรรณ" : "Pakdeepan School CMS")}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs sm:text-sm font-medium text-slate-500">
-                    <CalendarDays className="w-4 h-4 text-blue-600 shrink-0" />
-                    <span className="font-medium text-slate-700">
-                      {currentDateFormatted || (isTh ? "กำลังโหลดวันที่..." : "Loading date...")}
-                    </span>
-                    {subtitle && (
-                      <>
-                        <span className="text-slate-300">•</span>
-                        <span className="text-slate-500 hidden md:inline truncate">{subtitle}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Side Controls: Font Scaler + Language Toggle + Role Badge + Log Out */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                
-                {/* 1. Accessible Font Size Scaler (ก ปกติ | ก+ ใหญ่ | ก++ ใหญ่มาก) */}
-                <div
-                  className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs"
-                  role="group"
-                  aria-label="Font size scaler"
-                >
-                  <span className="text-xs font-bold text-slate-500 px-2 hidden xl:inline">
-                    {isTh ? "ขนาดอักษร:" : "Font Size:"}
-                  </span>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setFontSize("normal")}
-                    title={isTh ? "ขนาดปกติ (100%)" : "Normal Size (100%)"}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                      fontSize === "normal"
-                        ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-                    }`}
-                  >
-                    <span>{isTh ? "ก ปกติ" : "A Normal"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFontSize("large")}
-                    title={isTh ? "ขนาดใหญ่ (112%)" : "Large Size (112%)"}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                      fontSize === "large"
-                        ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-                    }`}
-                  >
-                    <span>{isTh ? "ก+ ใหญ่" : "A+ Large"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFontSize("xlarge")}
-                    title={isTh ? "ขนาดใหญ่มาก (125%)" : "Extra Large Size (125%)"}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                      fontSize === "xlarge"
-                        ? "bg-white text-blue-700 shadow-xs border border-slate-200"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-                    }`}
-                  >
-                    <span>{isTh ? "ก++ ใหญ่มาก" : "A++ XL"}</span>
-                  </button>
-                </div>
-
-                {/* 2. Bilingual Language Switcher (Clean ไทย | EN with Languages Icon) */}
-                <div
-                  className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs gap-1"
-                  role="group"
-                  aria-label="Admin Language Toggle"
-                >
-                  <Languages className="w-4 h-4 text-slate-500 ml-1.5 mr-0.5 shrink-0" />
-                  <button
-                    type="button"
-                    onClick={() => switchLocale("th")}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                      isTh
-                        ? "bg-white text-blue-800 shadow-xs border border-slate-200"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    ไทย
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchLocale("en")}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-                      !isTh
-                        ? "bg-white text-blue-800 shadow-xs border border-slate-200"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    EN
-                  </button>
-                </div>
-
-                {/* 3. Role Badge */}
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs sm:text-sm font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>{isTh ? "ผู้ดูแลระบบ" : "Administrator"}</span>
-                </div>
-
-                {/* 4. Prominent Log Out Button */}
-                <button
-                  type="button"
-                  onClick={() => setLogoutModalOpen(true)}
-                  className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shadow-2xs"
-                >
-                  <LogOut className="w-4 h-4 text-rose-600" />
-                  <span className="hidden sm:inline">{isTh ? "ออกจากระบบ" : "Log Out"}</span>
-                </button>
-              </div>
-            </div>
-          </header>
-
-          {/* MAIN WORKSPACE BODY */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50">
-            {children}
-          </main>
         </div>
-      </div>
+      </header>
+
+      {/* ─── FULL-WIDTH MAIN CONTENT AREA (NO SIDEBAR) ─── */}
+      <main className="w-full flex-1 bg-slate-50">
+        {children}
+      </main>
 
       {/* ─── LOGOUT CONFIRMATION MODAL ─── */}
       {logoutModalOpen && (
@@ -586,7 +325,7 @@ export function AdminAppShell({
         >
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md p-6 sm:p-8 animate-in zoom-in-95 duration-200 text-center">
             
-            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-5 shadow-inner">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
               <AlertTriangle className="w-8 h-8 text-rose-600" />
             </div>
 
@@ -600,14 +339,14 @@ export function AdminAppShell({
                 : "Are you sure you want to log out of the Pakdeepan School CMS? Any unsaved changes may be lost."}
             </p>
 
-            <div className="flex items-center justify-center gap-3 flex-wrap">
+            <div className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setLogoutModalOpen(false)}
                 disabled={isLoggingOut}
                 className="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-base transition-colors"
               >
-                {isTh ? "ยกเลิก / อยู่ต่อ" : "Cancel"}
+                {isTh ? "ยกเลิก" : "Cancel"}
               </button>
 
               <button
