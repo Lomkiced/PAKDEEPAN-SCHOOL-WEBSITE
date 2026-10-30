@@ -99,3 +99,4 @@ next-env.d.ts
 *.cert
 *.crt
 .vercel/
+.neon

@@ -35,8 +35,24 @@ yarn-error.log*
 !.env.example
 !.env*.example
 
-# vercel
+# vercel & cloud deployments
 .vercel
+.vercel/
+
+# local media & database files
+/media
+/uploads
+*.sqlite
+*.sqlite-journal
+*.db
+
+# agents & ai assistant local files
+.agents/
+.agents
+.codex/
+.claude/
+.cursor/
+.devin/
 
 # typescript
 *.tsbuildinfo

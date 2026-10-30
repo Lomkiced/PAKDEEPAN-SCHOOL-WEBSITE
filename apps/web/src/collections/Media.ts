@@ -23,7 +23,7 @@ export const Media: CollectionConfig = {
     ],
   },
   upload: {
-    staticDir: "media",
+    staticDir: process.env.VERCEL ? "/tmp/media" : "media",
     imageSizes: [
       {
         name: "thumbnail",

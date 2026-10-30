@@ -40,9 +40,75 @@ const mali = Mali({
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SERVER_URL || "https://pakdeepan.ac.th"
+
 export const metadata: Metadata = {
-  title: "Pakdeepan Kindergarten School | A Foundation for a Beautiful Future",
-  description: "Premium early childhood education nurturing creativity, curiosity, and character.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "โรงเรียนภักดีพรรณ (Pakdeepan School) | ชลบุรี",
+    template: "%s | โรงเรียนภักดีพรรณ (Pakdeepan School)",
+  },
+  description: "โรงเรียนภักดีพรรณ สถานศึกษาปฐมวัยคุณภาพสูง มุ่งพัฒนาศักยภาพเด็กอย่างรอบด้าน ปลูกฝังคุณธรรม จริยธรรม และความคิดสร้างสรรค์ ในบรรยากาศที่อบอุ่นและปลอดภัย ชลบุรี | Pakdeepan Kindergarten School, Chonburi",
+  applicationName: "โรงเรียนภักดีพรรณ",
+  keywords: [
+    "โรงเรียนภักดีพรรณ",
+    "ภักดีพรรณ",
+    "Pakdeepan School",
+    "Pakdeepan Kindergarten",
+    "โรงเรียนอนุบาลชลบุรี",
+    "อนุบาลชลบุรี",
+    "เตรียมอนุบาล",
+    "อนุบาล 1",
+    "อนุบาล 2",
+    "อนุบาล 3",
+    "โรงเรียนปฐมวัย",
+    "ชลบุรี",
+  ],
+  authors: [{ name: "โรงเรียนภักดีพรรณ (Pakdeepan School)" }],
+  creator: "โรงเรียนภักดีพรรณ",
+  publisher: "โรงเรียนภักดีพรรณ",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "th_TH",
+    alternateLocale: ["en_US"],
+    url: "/",
+    siteName: "โรงเรียนภักดีพรรณ (Pakdeepan School)",
+    title: "โรงเรียนภักดีพรรณ (Pakdeepan School) | ชลบุรี",
+    description: "โรงเรียนภักดีพรรณ สถานศึกษาปฐมวัยคุณภาพสูง มุ่งพัฒนาศักยภาพเด็กอย่างรอบด้าน ปลูกฝังคุณธรรมและความคิดสร้างสรรค์ ชลบุรี",
+    images: [
+      {
+        url: "/images/pakdeepan-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "ตราสัญลักษณ์โรงเรียนภักดีพรรณ Pakdeepan Kindergarten School",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "โรงเรียนภักดีพรรณ (Pakdeepan School) | ชลบุรี",
+    description: "โรงเรียนภักดีพรรณ สถานศึกษาปฐมวัยคุณภาพสูง มุ่งพัฒนาศักยภาพเด็กอย่างรอบด้าน ชลบุรี",
+    images: ["/images/pakdeepan-logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 }
 
 export default async function FrontendLayout({

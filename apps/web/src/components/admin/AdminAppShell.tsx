@@ -293,6 +293,10 @@ export function AdminAppShell({
             {/* 4. Link to Payload CMS Dashboard */}
             <a
               href="/admin"
+              onClick={(e) => {
+                e.preventDefault()
+                window.location.assign("/admin")
+              }}
               className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors border border-slate-200 shadow-2xs"
               title={isTh ? "กลับสู่แผงควบคุมระบบหลัก" : "Return to Payload CMS"}
             >

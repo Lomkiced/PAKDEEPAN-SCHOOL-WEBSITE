@@ -139,6 +139,47 @@ export function AdminNavBanner() {
 
   return (
     <div className="pk-banner-wrapper" suppressHydrationWarning>
+      {/* ─── INLINE STYLES FOR ZERO-FOUC ASSURANCE ─── */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .pk-banner-wrapper { width: 100%; margin-bottom: 24px; font-family: var(--font-admin, 'Prompt', 'Sarabun', 'Inter', sans-serif); box-sizing: border-box; }
+        .pk-banner-wrapper *, .pk-banner-wrapper *::before, .pk-banner-wrapper *::after { box-sizing: border-box; }
+        .pk-banner-top { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px 24px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        @media (max-width: 1100px) { .pk-banner-top { flex-direction: column; align-items: flex-start; } }
+        .pk-banner-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .pk-banner-logo { width: 42px; height: 42px; border-radius: 10px; background-color: #1e3a8a; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; flex-shrink: 0; }
+        .pk-banner-titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .pk-banner-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pk-banner-title { font-size: 19px; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; margin: 0; line-height: 1.25; }
+        .pk-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 9999px; font-size: 12px; font-weight: 600; background-color: #f8fafc; border: 1px solid #e2e8f0; color: #475569; white-space: nowrap; }
+        .pk-status-dot { width: 6px; height: 6px; border-radius: 50%; background-color: #10b981; }
+        .pk-banner-sub { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #64748b; flex-wrap: wrap; }
+        .pk-banner-sub-label { color: #475569; font-weight: 500; }
+        .pk-banner-sub-sep { color: #cbd5e1; }
+        .pk-banner-sub-date { color: #64748b; }
+        .pk-banner-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .pk-scaler-group, .pk-lang-group { display: inline-flex; align-items: center; background-color: #f1f5f9; padding: 3px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 2px; }
+        .pk-scaler-btn, .pk-lang-btn { padding: 5px 9px; border-radius: 7px; font-size: 12.5px; font-weight: 600; border: 1px solid transparent; background: transparent; color: #64748b; cursor: pointer; transition: all 0.15s ease; line-height: 1.2; }
+        .pk-scaler-btn:hover, .pk-lang-btn:hover { color: #0f172a; }
+        .pk-scaler-btn.active, .pk-lang-btn.active { background-color: #ffffff; color: #0f172a; border-color: #e2e8f0; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); }
+        .pk-btn-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 10px; border: 1px solid #e2e8f0; background-color: #ffffff; color: #475569; font-weight: 600; font-size: 13px; text-decoration: none; cursor: pointer; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03); transition: all 0.15s ease; }
+        .pk-btn-link:hover { background-color: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+        .pk-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 7px 15px; border-radius: 10px; background-color: #1e3a8a; color: #ffffff !important; font-weight: 600; font-size: 13px; text-decoration: none; cursor: pointer; box-shadow: 0 1px 3px rgba(30, 58, 138, 0.15); transition: all 0.15s ease; border: 1px solid transparent; }
+        .pk-btn-primary:hover { background-color: #1e40af; color: #ffffff !important; }
+        .pk-btn-logout { display: inline-flex; align-items: center; justify-content: center; padding: 7px 10px; border-radius: 10px; border: 1px solid #e2e8f0; background-color: #ffffff; color: #64748b; cursor: pointer; transition: all 0.15s ease; }
+        .pk-btn-logout:hover { background-color: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+        .pk-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 14px; box-sizing: border-box; }
+        @media (max-width: 1024px) { .pk-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .pk-kpi-grid { grid-template-columns: 1fr; } }
+        .pk-kpi-card { display: flex; flex-direction: column; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 20px; text-decoration: none; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03); transition: all 0.15s ease; box-sizing: border-box; }
+        .pk-kpi-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); }
+        .pk-kpi-info { display: flex; flex-direction: column; }
+        .pk-kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 2px; }
+        .pk-kpi-val { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; line-height: 1.25; }
+        .pk-kpi-card:hover .pk-kpi-val { color: #1e40af; }
+        .pk-kpi-sub { font-size: 12.5px; font-weight: 500; color: #2563eb; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
+        .pk-kpi-card:hover .pk-kpi-sub { color: #1d4ed8; }
+      `}} />
+
       {/* ─── EXECUTIVE TOP BANNER ─── */}
       <div className="pk-banner-top" suppressHydrationWarning>
         
@@ -245,6 +286,10 @@ export function AdminNavBanner() {
           {/* PRIMARY CTA: Visual Assets Studio */}
           <a
             href="/admin/image-manager"
+            onClick={(e) => {
+              e.preventDefault()
+              window.location.assign("/admin/image-manager")
+            }}
             className="pk-btn-primary"
             suppressHydrationWarning
           >
@@ -271,6 +316,10 @@ export function AdminNavBanner() {
         {/* Card 1: Visual Assets */}
         <a
           href="/admin/image-manager"
+          onClick={(e) => {
+            e.preventDefault()
+            window.location.assign("/admin/image-manager")
+          }}
           className="pk-kpi-card"
           suppressHydrationWarning
         >
