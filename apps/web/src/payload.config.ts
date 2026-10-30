@@ -97,14 +97,15 @@ export default buildConfig({
               const base = process.env.R2_PUBLIC_URL.replace(/\/$/, "")
               return `${base}/${prefix ? `${prefix}/` : ""}${filename}`
             }
-            if (process.env.R2_ACCOUNT_ID && process.env.R2_BUCKET_NAME) {
-              return `https://${process.env.R2_BUCKET_NAME}.${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${prefix ? `${prefix}/` : ""}${filename}`
+            const bucket = process.env.R2_BUCKET || process.env.R2_BUCKET_NAME
+            if (process.env.R2_ACCOUNT_ID && bucket) {
+              return `https://${bucket}.${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${prefix ? `${prefix}/` : ""}${filename}`
             }
             return `/media/${filename}`
           },
         },
       },
-      bucket: process.env.R2_BUCKET_NAME || "pakdeepan-media",
+      bucket: process.env.R2_BUCKET || process.env.R2_BUCKET_NAME || "pakdeepan-media",
       config: {
         endpoint: process.env.R2_ENDPOINT || (process.env.R2_ACCOUNT_ID ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : ""),
         credentials: {
@@ -112,12 +113,13 @@ export default buildConfig({
           secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
         },
         region: "auto",
+        forcePathStyle: true,
       },
       enabled: Boolean(
         (process.env.R2_ACCOUNT_ID || process.env.R2_ENDPOINT) &&
         process.env.R2_ACCESS_KEY_ID &&
         process.env.R2_SECRET_ACCESS_KEY &&
-        process.env.R2_BUCKET_NAME
+        (process.env.R2_BUCKET || process.env.R2_BUCKET_NAME)
       ),
     }),
   ],

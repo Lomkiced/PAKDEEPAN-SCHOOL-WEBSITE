@@ -7,7 +7,7 @@ import { getPayload } from "@/lib/payload"
 const r2AccountId = process.env.R2_ACCOUNT_ID || ""
 const r2AccessKeyId = process.env.R2_ACCESS_KEY_ID || ""
 const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY || ""
-const r2BucketName = process.env.R2_BUCKET_NAME || ""
+const r2BucketName = process.env.R2_BUCKET || process.env.R2_BUCKET_NAME || ""
 const r2PublicUrl = process.env.R2_PUBLIC_URL || ""
 const r2Endpoint = process.env.R2_ENDPOINT || (r2AccountId ? `https://${r2AccountId}.r2.cloudflarestorage.com` : "")
 
@@ -15,6 +15,7 @@ const r2Client = (r2Endpoint && r2AccessKeyId && r2SecretAccessKey)
   ? new S3Client({
       region: "auto",
       endpoint: r2Endpoint,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: r2AccessKeyId,
         secretAccessKey: r2SecretAccessKey,
