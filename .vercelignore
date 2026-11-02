@@ -1,0 +1,13 @@
+.git
+.agents
+.agents/
+.neon
+.neon/
+media/
+uploads/
+*.sqlite
+*.sqlite-journal
+*.db
+.env*
+!.env.example
+!.env*.example
