@@ -7,6 +7,7 @@ import { getPayload } from "payload"
 import configPromise from "@/payload.config"
 import { getDictionary } from "@/lib/i18n"
 import { normalizeNewsItem, DEFAULT_NEWS_ITEMS } from "@/lib/newsData"
+import { resolveMediaUrl, FALLBACK_IMAGES } from "@/lib/media"
 import {
   ArrowLeft,
   Calendar,
@@ -192,7 +193,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         {/* Cinematic Full-Width Featured Cover Image */}
         <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 mb-10 group bg-slate-100">
           <img
-            src={article.imageUrl}
+            src={resolveMediaUrl(article.imageUrl, FALLBACK_IMAGES.news)}
             alt={article.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-102"
           />
@@ -287,7 +288,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                 >
                   <div className="aspect-[16/10] overflow-hidden bg-slate-100 relative">
                     <img
-                      src={item.imageUrl}
+                      src={resolveMediaUrl(item.imageUrl, FALLBACK_IMAGES.news)}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

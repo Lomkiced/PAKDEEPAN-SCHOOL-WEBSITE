@@ -93,8 +93,9 @@ export default buildConfig({
       collections: {
         media: {
           generateFileURL: ({ filename, prefix }) => {
-            if (process.env.R2_PUBLIC_URL) {
-              const base = process.env.R2_PUBLIC_URL.replace(/\/$/, "")
+            const r2Public = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL
+            if (r2Public) {
+              const base = r2Public.replace(/\/$/, "")
               return `${base}/${prefix ? `${prefix}/` : ""}${filename}`
             }
             const bucket = process.env.R2_BUCKET || process.env.R2_BUCKET_NAME

@@ -4,6 +4,7 @@ import * as React from "react"
 import { FadeIn, StaggerContainer, StaggerItem } from "@pakdeepan/ui"
 import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 interface AboutClientProps {
   aboutData: any;
@@ -29,7 +30,10 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
     localizeData(aboutData, 'heroDescription', activeLocale) || 
     dict.about?.heroDescription || 
     (isTh ? "ณ โรงเรียนภักดีพรรณ เราเชื่อมั่นในการสร้างรากฐานแห่งความอยากรู้อยากเห็น ความเห็นอกเห็นใจ และความเป็นเลิศทางวิชาการในบรรยากาศอบอุ่นมาตรฐานสากล" : "At Pakdeepan Kindergarten School, we believe in cultivating a foundation of curiosity, empathy, and academic rigor in a warm, international setting.");
-  const heroImage = aboutData?.heroImage?.url || "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop";
+  const heroImage = resolveMediaUrl(
+    aboutData?.heroImage,
+    FALLBACK_IMAGES.campus
+  );
 
   // --- VISION & MISSION ---
   const vision = 
@@ -53,7 +57,10 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
     localizeData(aboutData, 'principalMessage', activeLocale) || 
     dict.about?.principalMessage || 
     (isTh ? "ยินดีต้อนรับสู่ประชาคมที่เด็กทุกคนได้รับการเอาใจใส่ รับฟัง และมองเห็นคุณค่า ทีมครูและบุคลากรของเรามุ่งมั่นมอบจุดเริ่มต้นที่ดีที่สุดสำหรับการเรียนรู้ตลอดชีวิตของบุตรหลานท่าน เราเชื่อมั่นว่าความเป็นเลิศที่แท้จริงเกิดขึ้นเมื่อวิชาการที่เข้มข้นผสานกับความอบอุ่นและเอาใจใส่" : "Welcome to a community where every child is seen, heard, and valued. Our dedicated team of international educators is committed to providing an exceptional start to your child's lifelong learning journey. We believe that true excellence is achieved when rigor meets warmth.");
-  const principalPhoto = aboutData?.principalPhoto?.url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop";
+  const principalPhoto = resolveMediaUrl(
+    aboutData?.principalPhoto,
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop"
+  );
 
   // --- HISTORY & HERITAGE ---
   const historyBadge = 
@@ -65,7 +72,10 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
   const historyDescription = 
     localizeData(aboutData, 'historyDescription', activeLocale) || 
     (isTh ? "ก่อตั้งขึ้นในจังหวัดจันทบุรีด้วยวิสัยทัศน์ที่มุ่งเน้นการศึกษาปฐมวัยสองภาษาที่ทันสมัยและเปี่ยมสุข โรงเรียนภักดีพรรณได้บ่มเพาะเยาวชนรุ่นแล้วรุ่นเล่าให้เติบโตอย่างมั่นใจและสร้างสรรค์" : "Founded in Chanthaburi with a vision for modern, joyful, and bilingual early years learning, Pakdeepan Kindergarten School has nurtured generations of young learners into confident, creative global citizens.");
-  const historyImage = aboutData?.historyImage?.url || "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop";
+  const historyImage = resolveMediaUrl(
+    aboutData?.historyImage,
+    FALLBACK_IMAGES.classroom
+  );
 
   const defaultMilestones = [
     {
@@ -178,6 +188,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
               className="w-full h-full object-cover object-[center_30%]" 
               alt="School environment" 
               src={heroImage}
+              onError={(e) => handleImageError(e, FALLBACK_IMAGES.campus)}
             />
             {/* Elegant Gradient Fade to White (bottom) and slight darkening (top) */}
             <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/60 to-white z-10" />
@@ -257,6 +268,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
                       alt={principalName} 
                       src={principalPhoto}
+                      onError={(e) => handleImageError(e, "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop")}
                     />
                     <div className="absolute inset-0 border border-white/20 rounded-2xl pointer-events-none z-10" />
                   </div>
@@ -324,6 +336,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
                       <img 
                         src={historyImage} 
                         alt={historyTitle} 
+                        onError={(e) => handleImageError(e, FALLBACK_IMAGES.classroom)}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                       />
                     </div>
@@ -375,7 +388,8 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
               {/* Faculty Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {facultyMembers.map((member: any, idx: number) => {
-                  const photoSrc = member.photo?.url || member.photoUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop";
+                  const fallbackMemberPhoto = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop";
+                  const photoSrc = resolveMediaUrl(member.photo || member.photoUrl, fallbackMemberPhoto);
                   return (
                     <div 
                       key={idx}
@@ -385,6 +399,7 @@ export default function AboutClient({ aboutData, dict, locale }: AboutClientProp
                         <img 
                           src={photoSrc} 
                           alt={member.name}
+                          onError={(e) => handleImageError(e, fallbackMemberPhoto)}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                         />
                       </div>

@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import type { NormalizedNewsItem } from "@/lib/newsData"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 export interface NewsArticleModalProps {
   article: NormalizedNewsItem | null
@@ -89,8 +90,9 @@ export function NewsArticleModal({
         {/* Top Hero Banner with Floating Category & Close Button */}
         <div className="relative w-full h-52 sm:h-72 overflow-hidden bg-slate-100 flex-shrink-0 group">
           <img
-            src={article.imageUrl}
+            src={resolveMediaUrl(article.imageUrl, FALLBACK_IMAGES.news)}
             alt={article.title}
+            onError={(e) => handleImageError(e, FALLBACK_IMAGES.news)}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           {/* Subtle bottom gradient to blend image into content */}

@@ -10,6 +10,7 @@ import { cn } from "@pakdeepan/ui/src/utils/cn"
 import { submitInquiry } from "@/actions/contact"
 import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 const contactSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -76,7 +77,10 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
   const email = contact.email || "admissions@pakdeepan.ac.th"
   const address = localizeData(contact, 'address', activeLocale) || (isTh ? "จังหวัดจันทบุรี, ประเทศไทย" : "Chanthaburi, Thailand")
   const mapsUrl = contact.mapsUrl || "https://maps.google.com"
-  const mapsImage = contact.mapsImage?.url || "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop"
+  const mapsImage = resolveMediaUrl(
+    contact.mapsImage,
+    "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop"
+  )
   
   const officeDays = localizeData(siteSettings?.officeHours, 'days', activeLocale) || (isTh ? "วันจันทร์ – วันศุกร์" : "Monday – Friday")
   const officeHoursTime = localizeData(siteSettings?.officeHours, 'hours', activeLocale) || (isTh ? "08:00 น. – 16:00 น." : "8:00 AM – 4:00 PM (Local Time)")
@@ -174,6 +178,7 @@ export default function ContactClient({ siteSettings, dict, locale }: ContactCli
                     <img 
                       src={mapsImage} 
                       alt="Map Location" 
+                      onError={(e) => handleImageError(e, "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop")}
                       className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-in-out"
                     />
                   ) : (

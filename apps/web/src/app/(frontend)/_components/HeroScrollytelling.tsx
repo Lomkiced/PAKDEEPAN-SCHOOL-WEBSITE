@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "@phosphor-icons/react"
 import { useLanguage } from "@/context/LanguageContext"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 export interface HeroScrollytellingProps {
   tagline?: string
@@ -62,8 +63,9 @@ export function HeroScrollytelling({
       {backgroundImage && (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <img 
-            src={backgroundImage} 
+            src={resolveMediaUrl(backgroundImage, FALLBACK_IMAGES.hero)} 
             alt="School Hero Background" 
+            onError={(e) => handleImageError(e, FALLBACK_IMAGES.hero)}
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/30" />

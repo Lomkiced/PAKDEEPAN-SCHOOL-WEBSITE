@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { extractPlainText } from "@/lib/richText"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 export interface ImageManagerClientProps {
   initialLocale?: "en" | "th"
@@ -715,8 +716,9 @@ export function ImageManagerClient({
                   {hasImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={item.imageUrl}
+                      src={resolveMediaUrl(item.imageUrl, FALLBACK_IMAGES.general)}
                       alt={label}
+                      onError={(e) => handleImageError(e, FALLBACK_IMAGES.general)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (

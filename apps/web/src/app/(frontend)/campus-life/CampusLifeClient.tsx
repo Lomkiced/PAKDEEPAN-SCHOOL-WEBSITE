@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
 import { normalizeNewsItem, DEFAULT_NEWS_ITEMS, type NormalizedNewsItem } from "@/lib/newsData"
 import { NewsArticleModal } from "@/components/news/NewsArticleModal"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 export default function CampusLifeClient({ initialNews, initialEvents, initialGallery, campusLifePageData, locale: propLocale = "en" }: any) {
   const { locale: contextLocale } = useLanguage()
@@ -27,7 +28,7 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
     title: localizeData(g, 'title', activeLocale) || g.title,
     desc: localizeData(g, 'description', activeLocale) || g.description || "",
     category: localizeData(g, 'category', activeLocale) || g.category || "General",
-    image: g.image?.url,
+    image: resolveMediaUrl(g.image, FALLBACK_IMAGES.campus),
     hasVideo: false,
   }));
 
@@ -41,7 +42,10 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
     time: new Date(e.eventDate).toLocaleTimeString(isTh ? 'th-TH' : 'en-US', { hour: 'numeric', minute: '2-digit' }),
     location: localizeData(e, 'location', activeLocale) || e.location,
     category: localizeData(e, 'category', activeLocale) || e.category,
-    image: e.coverImage?.url || campusLifePageData?.modalFallbackImage?.url || "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=800&auto=format&fit=crop",
+    image: resolveMediaUrl(
+      e.coverImage || campusLifePageData?.modalFallbackImage,
+      "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=800&auto=format&fit=crop"
+    ),
     description: localizeData(e, 'description', activeLocale) || (typeof e.description === 'string' ? e.description : ""),
     isToday: new Date(e.eventDate).toDateString() === new Date().toDateString()
   }));
@@ -237,8 +241,9 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
                   >
                     <div className="h-48 overflow-hidden relative bg-slate-100">
                       <img
-                        src={news.imageUrl}
+                        src={resolveMediaUrl(news.imageUrl, FALLBACK_IMAGES.news)}
                         alt={news.title}
+                        onError={(e) => handleImageError(e, FALLBACK_IMAGES.news)}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute top-4 left-4 backdrop-blur-md bg-white/90 text-[#1e3a8a] font-label-caps text-label-caps px-3 py-1 rounded-full shadow-xs">
@@ -456,8 +461,9 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
                     onClick={() => openLightbox(idx)}
                   >
                     <img
-                      src={item.image}
+                      src={resolveMediaUrl(item.image, FALLBACK_IMAGES.campus)}
                       alt={item.title}
+                      onError={(e) => handleImageError(e, FALLBACK_IMAGES.campus)}
                       className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                     />
@@ -568,8 +574,9 @@ export default function CampusLifeClient({ initialNews, initialEvents, initialGa
         </button>
 
         <img
-          src={filteredGallery[currentGalleryIndex].image}
-          alt={filteredGallery[currentGalleryIndex].title}
+          src={resolveMediaUrl(filteredGallery[currentGalleryIndex]?.image, FALLBACK_IMAGES.campus)}
+          alt={filteredGallery[currentGalleryIndex]?.title || "Gallery Image"}
+          onError={(e) => handleImageError(e, FALLBACK_IMAGES.campus)}
           className="max-w-full max-h-full object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-300"
           onClick={(e) => e.stopPropagation()}
         />

@@ -10,6 +10,7 @@ import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
 import { normalizeNewsItem, DEFAULT_NEWS_ITEMS, type NormalizedNewsItem } from "@/lib/newsData"
 import { NewsArticleModal } from "@/components/news/NewsArticleModal"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 interface HomeClientProps {
   news: any[];
@@ -103,9 +104,10 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
       : isTh ? DEFAULT_EDITORIAL_PATHWAYS_TH : DEFAULT_EDITORIAL_PATHWAYS_EN
 
   // Philosophy section values
-  const philosophyImg = 
-    homeData?.philosophyImage?.url || 
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop"
+  const philosophyImg = resolveMediaUrl(
+    homeData?.philosophyImage,
+    FALLBACK_IMAGES.philosophy
+  )
   const philosophyTagline = 
     localizeData(homeData, 'philosophyScriptTagline', activeLocale) || 
     (isTh ? "ก้าวเล็กๆ ในวันนี้ สู่อนาคตที่ยิ่งใหญ่ในวันพรุ่งนี้" : "Small steps today, big dreams tomorrow")
@@ -169,9 +171,9 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
   const ctaScriptText = 
     localizeData(homeData, 'ctaScriptText', activeLocale) || 
     (isTh ? "เติบโตไปด้วยกัน" : "Together We Grow")
-  const polaroid1 = homeData?.ctaPolaroid1?.url || "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600&auto=format&fit=crop"
-  const polaroid2 = homeData?.ctaPolaroid2?.url || "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop"
-  const polaroid3 = homeData?.ctaPolaroid3?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop"
+  const polaroid1 = resolveMediaUrl(homeData?.ctaPolaroid1, FALLBACK_IMAGES.polaroid1)
+  const polaroid2 = resolveMediaUrl(homeData?.ctaPolaroid2, FALLBACK_IMAGES.polaroid2)
+  const polaroid3 = resolveMediaUrl(homeData?.ctaPolaroid3, FALLBACK_IMAGES.polaroid3)
 
   const mockNews = isTh
     ? [
@@ -200,8 +202,8 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
           primaryCtaLink={homeData?.heroPrimaryCTALink}
           secondaryCtaLabel={homeData?.heroSecondaryCTALabel}
           secondaryCtaLink={homeData?.heroSecondaryCTALink}
-          backgroundImage={homeData?.heroBackgroundImage?.url}
-          videoPoster={homeData?.heroVideoPoster?.url}
+          backgroundImage={resolveMediaUrl(homeData?.heroBackgroundImage, "")}
+          videoPoster={resolveMediaUrl(homeData?.heroVideoPoster, "/pakdeepan-logo-poster.jpg")}
         />
 
         {/* --- INFINITE SCROLLING MARQUEE --- */}
@@ -237,6 +239,7 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
                 <img 
                   src={philosophyImg} 
                   alt={philosophyHeading} 
+                  onError={(e) => handleImageError(e, FALLBACK_IMAGES.philosophy)}
                   className="w-full h-full object-cover object-[center_35%] transform hover:scale-105 transition-transform duration-[1.5s] ease-out"
                 />
               </div>
@@ -413,19 +416,34 @@ export default function HomeClient({ news, events, gallery, programs = [], homeD
                   {/* Polaroid 1 */}
                   <div className="absolute top-0 left-0 bg-white p-3 pb-10 rounded-sm shadow-xl transform -rotate-6 z-10 w-44 hover:rotate-0 transition-transform cursor-pointer">
                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-white/50 backdrop-blur-md rotate-3 z-10 shadow-sm border border-black/5"></div>
-                    <img src={polaroid1} alt="Students" className="w-full h-32 object-cover rounded-sm" />
+                    <img 
+                      src={polaroid1} 
+                      alt="Students" 
+                      onError={(e) => handleImageError(e, FALLBACK_IMAGES.polaroid1)}
+                      className="w-full h-32 object-cover rounded-sm" 
+                    />
                   </div>
                   
                   {/* Polaroid 2 */}
                   <div className="absolute top-8 left-28 bg-white p-3 pb-10 rounded-sm shadow-2xl transform rotate-6 z-20 w-48 hover:-rotate-3 transition-transform cursor-pointer">
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-14 h-5 bg-[#fefce8]/80 backdrop-blur-md -rotate-6 z-10 shadow-sm border border-black/5"></div>
-                    <img src={polaroid2} alt="School Campus" className="w-full h-32 object-cover rounded-sm" />
+                    <img 
+                      src={polaroid2} 
+                      alt="School Campus" 
+                      onError={(e) => handleImageError(e, FALLBACK_IMAGES.polaroid2)}
+                      className="w-full h-32 object-cover rounded-sm" 
+                    />
                   </div>
                   
                   {/* Polaroid 3 */}
                   <div className="absolute top-32 left-10 bg-white p-3 pb-10 rounded-sm shadow-xl transform -rotate-12 z-15 w-40 hover:rotate-0 transition-transform cursor-pointer">
                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-white/50 backdrop-blur-md rotate-2 z-10 shadow-sm border border-black/5"></div>
-                    <img src={polaroid3} alt="Event Moments" className="w-full h-24 object-cover rounded-sm" />
+                    <img 
+                      src={polaroid3} 
+                      alt="Event Moments" 
+                      onError={(e) => handleImageError(e, FALLBACK_IMAGES.polaroid3)}
+                      className="w-full h-24 object-cover rounded-sm" 
+                    />
                   </div>
 
                   {/* Decorative Hearts */}

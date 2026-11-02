@@ -35,8 +35,10 @@ dist/
 # =======================================================
 # Payload CMS Local Uploads & SQLite
 # =======================================================
-media/
-uploads/
+/media/
+/apps/web/media/
+/uploads/
+/apps/web/uploads/
 *.sqlite
 *.sqlite-journal
 *.db

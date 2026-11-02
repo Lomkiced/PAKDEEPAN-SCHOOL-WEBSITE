@@ -146,7 +146,7 @@ export function Footer({
           <p>
             &copy; {new Date().getFullYear()} {resolvedCopyrightName}. {isTh ? "สงวนลิขสิทธิ์ทั้งหมด" : "All rights reserved."}
           </p>
-          <div className="flex gap-6 mt-4 md:mt-0">
+          <div className="flex items-center gap-6 mt-4 md:mt-0">
             {facebookUrl && (
               <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 Facebook
@@ -157,6 +157,14 @@ export function Footer({
                 Instagram
               </a>
             )}
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 text-white/30 hover:text-white/80 transition-colors text-[11px] font-medium border border-white/10 hover:border-white/30 px-2.5 py-1 rounded-full"
+              title={isTh ? "เข้าสู่ระบบจัดการเนื้อหา (Admin CMS)" : "Staff / Admin Content Management Portal"}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {isTh ? "ระบบผู้ดูแล (Admin)" : "Staff / Admin Portal"}
+            </Link>
           </div>
         </div>
       </div>

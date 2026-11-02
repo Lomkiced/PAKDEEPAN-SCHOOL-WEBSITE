@@ -18,6 +18,7 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { extractPlainText } from "@/lib/richText"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 export interface ImageUploaderProps {
   initialImageUrl?: string
@@ -609,8 +610,9 @@ export function ImageUploader({
             {previewUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={previewUrl}
+                src={resolveMediaUrl(previewUrl, FALLBACK_IMAGES.general)}
                 alt={safeLabel}
+                onError={(e) => handleImageError(e, FALLBACK_IMAGES.general)}
                 className="w-full h-full object-cover transition-all"
               />
             ) : (

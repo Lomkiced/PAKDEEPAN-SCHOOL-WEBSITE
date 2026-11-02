@@ -1,4 +1,5 @@
 import { localizeData } from "./localize"
+import { resolveMediaUrl, FALLBACK_IMAGES } from "./media"
 
 export interface NormalizedNewsItem {
   id: string
@@ -332,11 +333,10 @@ export function normalizeNewsItem(
   const category = isTh ? categoryTh : categoryEn
 
   // Image URL
-  const imageUrl =
-    doc.featuredImage?.url ||
-    doc.imageUrl ||
-    doc.image ||
-    "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1600&auto=format&fit=crop"
+  const imageUrl = resolveMediaUrl(
+    doc.featuredImage || doc.imageUrl || doc.image,
+    FALLBACK_IMAGES.news
+  )
 
   // Date
   const rawDate = doc.publishDate || doc.date || doc.createdAt || new Date().toISOString()

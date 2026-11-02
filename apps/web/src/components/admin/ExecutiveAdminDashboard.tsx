@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { NewsArticleEditorModal } from "@/components/admin/NewsArticleEditorModal"
 import { extractPlainText } from "@/lib/richText"
+import { resolveMediaUrl, FALLBACK_IMAGES } from "@/lib/media"
 
 export interface ExecutiveDashboardData {
   news: any[]
@@ -81,10 +82,10 @@ export function ExecutiveAdminDashboard({
       ? "ยินดีต้อนรับสู่โรงเรียนภักดีพรรณ เรามุ่งมั่นส่งเสริมการเรียนรู้ของเด็กทุกคนด้วยความรักและความเอาใจใส่"
       : "Welcome to Pakdeepan School. We are dedicated to nurturing every child with warmth and care.")
 
-  const directorPortraitUrl =
-    data.siteSettings?.director?.portrait?.url ||
-    data.siteSettings?.director?.portraitUrl ||
+  const directorPortraitUrl = resolveMediaUrl(
+    data.siteSettings?.director?.portrait || data.siteSettings?.director?.portraitUrl,
     "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80"
+  )
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -377,7 +378,10 @@ export function ExecutiveAdminDashboard({
                 const rawExcerpt = (isTh ? item.excerpt_th : item.excerpt_en) || item.excerpt || item.content || item.body
                 const excerpt = extractPlainText(rawExcerpt, isTh ? "th" : "en") || ""
                 const category = typeof item.category === "string" ? item.category : "campus-life"
-                const img = item.imageUrl || item.featuredImage?.url || "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=600&q=80"
+                const img = resolveMediaUrl(
+                  item.imageUrl || item.featuredImage,
+                  "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=600&q=80"
+                )
 
                 return (
                   <div

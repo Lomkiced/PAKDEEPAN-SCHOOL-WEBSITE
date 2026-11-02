@@ -6,6 +6,7 @@ import { Baby, Shapes, Student, Brain, Translate, Atom, Book, Sparkle, Globe } f
 import { formatTHB } from "@/utils/currency"
 import { useLanguage } from "@/context/LanguageContext"
 import { localizeData } from "@/lib/localize"
+import { resolveMediaUrl, handleImageError, FALLBACK_IMAGES } from "@/lib/media"
 
 interface ProgramsClientProps {
   programs: any[];
@@ -235,7 +236,8 @@ export default function ProgramsClient({ programs, programsPageData, dict, local
                           <img 
                             className="object-cover w-full h-full absolute inset-0 group-hover:scale-105 transition-transform duration-500" 
                             alt={programTitle} 
-                            src={program.featuredImage?.url || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop"}
+                            src={resolveMediaUrl(program.featuredImage, FALLBACK_IMAGES.classroom)}
+                            onError={(e) => handleImageError(e, FALLBACK_IMAGES.classroom)}
                           />
                         </div>
                         <div className="flex-grow flex flex-col space-y-4 justify-center py-2">
