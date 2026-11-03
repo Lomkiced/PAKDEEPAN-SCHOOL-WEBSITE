@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { uploadImageFile, handleExternalImageUrl } from "@/lib/storage"
 import { revalidateAllRoutes } from "@/lib/revalidate"
+import { verifyAdminAuth } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await verifyAdminAuth(req)
+    if (!auth.authorized) {
+      return NextResponse.json(
+        { success: false, error: auth.error || "Unauthorized: Administrator access required" },
+        { status: 401 }
+      )
+    }
+
     const contentType = req.headers.get("content-type") || ""
 
     // 1. Handle JSON payload (e.g., external URL paste)

@@ -7,7 +7,7 @@ import { getDictionary } from "@/lib/i18n"
 import { getCachedGlobal } from "@/lib/payload"
 
 export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Pakdeepan Kindergarten School | A Foundation for a Beautiful Future",

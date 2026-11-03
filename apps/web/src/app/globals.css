@@ -32,3 +32,12 @@ html[data-admin-font-scale="xlarge"],
   font-size: var(--admin-font-scale, 100%);
   transition: font-size 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

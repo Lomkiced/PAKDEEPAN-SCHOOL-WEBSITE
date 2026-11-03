@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPayload } from "@/lib/payload"
 import { revalidateAllRoutes } from "@/lib/revalidate"
+import { verifyAdminAuth } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await verifyAdminAuth(req)
+    if (!auth.authorized) {
+      return NextResponse.json(
+        { success: false, error: auth.error || "Unauthorized: Administrator access required" },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const { targetType, targetSlug, id, fieldName, mediaId, imageUrl, clear, remove } = body
     const isClearing = clear === true || remove === true

@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 import { getDictionary } from "@/lib/i18n"
 
 export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "About Us | Pakdeepan Kindergarten School",

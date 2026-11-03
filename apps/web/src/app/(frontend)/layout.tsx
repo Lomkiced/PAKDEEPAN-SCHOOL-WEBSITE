@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import { Outfit, Plus_Jakarta_Sans, Satisfy, Mali } from "next/font/google"
 import localFont from "next/font/local"
 import { cookies } from "next/headers"
 import { NavBar, Footer } from "@pakdeepan/ui"
 import { CookieConsentProvider } from "@/components/CookieConsentProvider"
 import { LanguageProvider } from "@/context/LanguageContext"
+import { NavigationLoader } from "@/components/NavigationLoader"
 import { getDictionary } from "@/lib/i18n"
 import { getCachedGlobal } from "@/lib/payload"
 import "../globals.css"
@@ -134,6 +136,9 @@ export default async function FrontendLayout({
   return (
     <html lang={locale}>
       <body className={`${outfit.variable} ${plusJakartaSans.variable} ${sherlina.variable} ${satisfy.variable} ${mali.variable} bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col`}>
+        <Suspense fallback={null}>
+          <NavigationLoader />
+        </Suspense>
         <LanguageProvider initialLocale={locale} initialDict={dict}>
           <NavBar 
             ctaLabel={siteSettings?.navigation?.ctaLabel}
